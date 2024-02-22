@@ -25,13 +25,17 @@ __all__ = (
 )
 
 
-def count(data: Iterable) -> List[Dict[Literal["value", "count"], Any]]:
+def count(
+    data: Iterable,
+    ascend: bool = False
+) -> List[Dict[Literal["value", "count"], Any]]:
     """
     Group count data element value.
 
     Parameters
     ----------
     data : Data.
+    ascend : Whether ascending by count, otherwise descending order.
 
     Returns
     -------
@@ -51,7 +55,9 @@ def count(data: Iterable) -> List[Dict[Literal["value", "count"], Any]]:
     for element in data:
         value_list_exist = False
         for index, value in enumerate(value_list):
-            if element is value:
+            element_str = str(element)
+            value_str = str(value)
+            if element_str == value_str:
                 value_list_exist = True
                 count_list[index] += 1
                 break
@@ -67,6 +73,12 @@ def count(data: Iterable) -> List[Dict[Literal["value", "count"], Any]]:
         }
         for value, count in zip(value_list, count_list)
     ]
+
+    # Sort.
+    result.sort(
+        key=lambda info: info["count"],
+        reverse=not ascend
+    )
 
     return result
 

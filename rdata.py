@@ -25,53 +25,50 @@ __all__ = (
 )
 
 
-def count(
-    data: Any,
-    _count_value: Dict = {"size": 0, "total": 0, "types": {}},
-    _surface: bool = True
-) -> Dict[Literal["size", "total", "types"], Any]:
+def count(data: Iterable) -> List[Dict[Literal["value", "count"], Any]]:
     """
-    Count data element.
+    Group count data element value.
 
     Parameters
     ----------
     data : Data.
-    _count_value : Cumulative Count.
-    _surface : Whether is surface recursion.
 
     Returns
     -------
-    Count data.
+    Count result.
 
     Examples
     --------
-    >>> count([1, 'b', [3, 4]])
-    {'size': 4, 'total': 6, 'types': {<class 'int'>: 3, <class 'list'>: 2, <class 'str'>: 1}}
+    >>> count([1, True, 1, '1', (2, 3)])
+    [{'value': 1, 'count': 2}, {'value': True, 'count': 1}, {'value': '1', 'count': 1}, {'value': (2, 3), 'count': 1}]
     """
 
-    # Count Element.
-    _count_value["total"] += 1
-    _count_value["types"][data.__class__] = _count_value["types"].get(data.__class__, 0) + 1
+    # Set parameter.
+    value_list = []
+    count_list = []
 
-    # Recursion.
-    if data.__class__ == dict:
-        for element in data.values():
-            count(element, _count_value, False)
-    elif is_iterable(data):
-        for element in data:
-            count(element, _count_value, False)
-    else:
-        _count_value["size"] = _count_value["size"] + 1
+    # Count.
+    for element in data:
+        value_list_exist = False
+        for index, value in enumerate(value_list):
+            if element is value:
+                value_list_exist = True
+                count_list[index] += 1
+                break
+        if not value_list_exist:
+            value_list.append(element)
+            count_list.append(1)
 
-    # End Recursion and return.
-    if _surface:
+    # Convert.
+    result = [
+        {
+            "value": value,
+            "count": count
+        }
+        for value, count in zip(value_list, count_list)
+    ]
 
-        ## Sort by count.
-        sorted_func = lambda key: _count_value["types"][key]
-        sorted_key = sorted(_count_value["types"], key=sorted_func, reverse=True)
-        _count_value["types"] = {key: _count_value["types"][key] for key in sorted_key}
-
-        return _count_value
+    return result
 
 
 def flatten(data: Any, flattern_data: List = []) -> List:

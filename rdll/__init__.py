@@ -14,9 +14,18 @@ rdll_inject : DLL file inject method.
 """
 
 
-from .rdll_inject import *
+import ctypes
 
 
-__all__ = (
-    "inject_dll",
-)
+# Windows.
+if hasattr(ctypes, "windll"):
+
+    from .rdll_inject import *
+
+    __all__ = (
+        "inject_dll",
+    )
+
+# Non Windwos.
+else:
+    __all__ = ()

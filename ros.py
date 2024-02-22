@@ -297,7 +297,7 @@ class RFile(object):
             mode = "r"
 
         # Read.
-        with open(self.path, mode) as file:
+        with open(self.path, mode, encoding="utf-8") as file:
             content = file.read()
 
         return content

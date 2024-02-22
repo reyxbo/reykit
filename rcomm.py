@@ -268,12 +268,16 @@ def request(
             if item_data.__class__ == str:
                 rfile = RFile(item_data)
                 data = rfile.bytes
-                if "filename" not in item_headers:
-                    item_headers["filename"] = rfile.name_suffix
+                item_headers.setdefault("filename", rfile.name_suffix)
             if item_data.__class__ == bytes:
                 if "Content-Type" not in item_headers:
                     item_headers["Content-Type"] = get_content_type(item_data)
-            files[key] = item_headers.get("filename", key), item_data, item_headers.get("Content-Type"), item_headers
+            files[key] = (
+                item_headers.get("filename", key),
+                item_data,
+                item_headers.get("Content-Type"),
+                item_headers
+            )
 
     # Request.
     response = requests_request(

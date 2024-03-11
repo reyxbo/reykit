@@ -293,11 +293,13 @@ class RFile(object):
         # Handle parameter.
         if type_ == "bytes":
             mode = "rb"
+            encoding = None
         elif type_ == "str":
             mode = "r"
+            encoding="utf-8"
 
         # Read.
-        with open(self.path, mode, encoding="utf-8") as file:
+        with open(self.path, mode, encoding=encoding) as file:
             content = file.read()
 
         return content

@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, Tuple, Callable, Optional, Union, Literal, overload
+from typing import Any, List, Tuple, Dict, Callable, Optional, Union, Literal, overload
 from inspect import getdoc
 from functools import wraps as functools_wraps
 from threading import Thread
@@ -26,7 +26,9 @@ __all__ = (
     "wrap_thread",
     "wrap_exc",
     "wrap_retry",
-    "wrap_dos_command"
+    "wrap_dos_command",
+    "wrap_cache",
+    "wrap_cache_data"
 )
 
 
@@ -468,5 +470,57 @@ def wrap_dos_command(
         *func_args,
         **func_kwargs
     )
+
+    return result
+
+
+# Cache decorator data.
+wrap_cache_data: Dict[Callable, List[Tuple[Any, Any, Any]]] = {}
+
+
+@overload
+def wrap_cache(
+    func: Callable,
+    *args: Any,
+    **kwargs: Any
+) -> float: ...
+
+@wrap_frame
+def wrap_cache(
+    func: Callable,
+    *args: Any,
+    **kwargs: Any
+) -> float:
+    """
+    Decorator, Cache the return result of function input.
+    if no cache, cache it.
+    if cached, skip execution and return result.
+
+    Parameters
+    ----------
+    func : Function to be decorated.
+    args : Position arguments of decorated function.
+    kwargs : Keyword arguments of decorated function.
+
+    Returns
+    -------
+    Function execution result.
+    """
+
+    # Index.
+    wrap_cache_data_func = wrap_cache_data.setdefault(Callable, [])
+    for cache_args, cache_kwargs, cache_result in wrap_cache_data_func:
+        if (
+            cache_args == args
+            and cache_kwargs == kwargs
+        ):
+            return cache_result
+
+    # Execute.
+    result = func(*args, **kwargs)
+
+    # Cache.
+    data = (args, kwargs, result)
+    wrap_cache_data_func.append(data)
 
     return result

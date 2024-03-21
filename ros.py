@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, List, Union, Literal, Optional, NoReturn, overload
+from typing import Any, List, Tuple, Union, Literal, Optional, NoReturn, overload
 from io import TextIOBase, BufferedIOBase
 from json import dumps as json_dumps, JSONDecodeError
 from os import (
@@ -37,7 +37,10 @@ from os.path import (
 )
 from shutil import copy
 from hashlib import md5 as hashlib_md5
-from tempfile import TemporaryFile, TemporaryDirectory, _TemporaryFileWrapper
+from tempfile import TemporaryFile, TemporaryDirectory
+from win32com.client import Dispatch, CDispatch
+from docx import Document
+from pdfplumber import open as pdfplumber_open
 
 from .rregex import search, sub
 from .rsystem import throw
@@ -1671,13 +1674,6 @@ class RTempFolder(object):
 
 
     __call__ = paths
-
-
-from typing import Optional, Tuple
-from os.path import splitext as os_splitext, split as os_split, join as os_join
-from win32com.client import Dispatch, CDispatch
-from docx import Document
-from pdfplumber import open as pdfplumber_open
 
 
 def doc_to_docx(

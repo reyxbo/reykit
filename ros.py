@@ -39,7 +39,7 @@ from shutil import copy
 from hashlib import md5 as hashlib_md5
 from tempfile import TemporaryFile, TemporaryDirectory, _TemporaryFileWrapper
 
-from .rregex import search
+from .rregex import search, sub
 from .rsystem import throw
 
 
@@ -52,7 +52,11 @@ __all__ = (
     "RFile",
     "RFolder",
     "RTempFile",
-    "RTempFolder"
+    "RTempFolder",
+    "doc_to_docx",
+    "extract_docx_text",
+    "extract_pdf_text",
+    "extract_file_text"
 )
 
 
@@ -1667,3 +1671,163 @@ class RTempFolder(object):
 
 
     __call__ = paths
+
+
+from typing import Optional, Tuple
+from os.path import splitext as os_splitext, split as os_split, join as os_join
+from win32com.client import Dispatch, CDispatch
+from docx import Document
+from pdfplumber import open as pdfplumber_open
+
+
+def doc_to_docx(
+    path: str,
+    save_path: Optional[str] = None
+) -> str:
+    """
+    Convert `DOC` file to `DOCX` file.
+
+    Parameters
+    ----------
+    path : DOC file path.
+    save_path : DOCX sve file path.
+        - `None` : DOC file Directory.
+
+    Returns
+    -------
+    DOCX file path.
+    """
+
+    # Handle parameter.
+    if save_path is None:
+        pattern = ".[dD][oO][cC]"
+        save_path = sub(
+            pattern,
+            path,
+            ".docx"
+        )
+
+    # Convert.
+    cdispatch = Dispatch('Word.Application')
+    document: CDispatch = cdispatch.Documents.Open(path)
+    document.SaveAs(save_path, 16)
+    document.Close()
+
+    return save_path
+
+
+def extract_docx_text(path: str) -> Tuple[str, List[List[List[str]]]]:
+    """
+    Extract text and tables from `DOCX` file.
+
+    Parameters
+    ----------
+    path : File path.
+
+    returns
+    -------
+    Text and tables.
+    """
+
+    # Extract.
+    document = Document(path)
+
+    ## Text.
+    text = "\n".join(
+        [
+            paragraph.text
+            for paragraph in document.paragraphs
+        ]
+    )
+
+    ## Table.
+    tables = [
+        [
+            [
+                cell.text
+                for cell in row.cells
+            ]
+            for row in table.rows
+        ]
+        for table in document.tables
+    ]
+
+    return text, tables
+
+
+def extract_pdf_text(path: str) -> Tuple[str, List[List[List[str]]]]:
+    """
+    Extract text and tables from `PDF` file.
+
+    Parameters
+    ----------
+    path : File path.
+
+    returns
+    -------
+    Text and tables.
+    """
+
+    # Extract.
+    document = pdfplumber_open(path)
+
+    ## Text.
+    text = "\n".join(
+        [
+            pages.extract_text()
+            for pages in document.pages
+        ]
+    )
+
+    ## Table.
+    tables = [
+        [
+            [
+                cell
+                for cell in row
+                if cell is not None
+            ]
+            for row in table
+        ]
+        for pages in document.pages
+        for table in pages.extract_tables()
+    ]
+
+    return text, tables
+
+
+def extract_file_text(path: str) -> Tuple[str, List[List[List[str]]]]:
+    """
+    Extract text and tables from `DOC` or `DOCX` or `PDF` file.
+
+    Parameters
+    ----------
+    path : File path.
+
+    returns
+    -------
+    Text and tables.
+    """
+
+    # Handle parameter.
+    _, suffix = os_splitext(path)
+    suffix = suffix.lower()
+    if suffix == ".doc":
+        path = doc_to_docx(path)
+        suffix = ".docx"
+
+    # Extract.
+
+    ## DOCX.
+    if suffix == ".docx":
+        text, tables = extract_docx_text(path)
+
+    ## PDF.
+    elif suffix == ".pdf":
+        text, tables = extract_pdf_text(path)
+
+    ## Raise.
+    else:
+        throw(value=suffix)
+
+    return text, tables

@@ -39,7 +39,8 @@ from shutil import copy
 from hashlib import md5 as hashlib_md5
 from tempfile import TemporaryFile, TemporaryDirectory
 from win32com.client import Dispatch, CDispatch
-from docx import Document
+from docx import Document as docx_document
+from docx.document import Document
 from pdfplumber import open as pdfplumber_open
 
 from .rregex import search, sub
@@ -1726,7 +1727,7 @@ def extract_docx_text(path: str) -> Tuple[str, List[List[List[str]]]]:
     """
 
     # Extract.
-    document = Document(path)
+    document: Document = docx_document(path)
 
     ## Text.
     text = "\n".join(
@@ -1740,8 +1741,12 @@ def extract_docx_text(path: str) -> Tuple[str, List[List[List[str]]]]:
     tables = [
         [
             [
-                cell.text
+                cell.text.replace("\n", " ").strip()
                 for cell in row.cells
+                if (
+                    cell.text is not None
+                    and cell.text.strip() != ""
+                )
             ]
             for row in table.rows
         ]
@@ -1779,9 +1784,12 @@ def extract_pdf_text(path: str) -> Tuple[str, List[List[List[str]]]]:
     tables = [
         [
             [
-                cell
+                cell.replace("\n", " ").strip()
                 for cell in row
-                if cell is not None
+                if (
+                    cell is not None
+                    and cell.strip() != ""
+                )
             ]
             for row in table
         ]

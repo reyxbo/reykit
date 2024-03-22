@@ -41,6 +41,11 @@ from tempfile import TemporaryFile, TemporaryDirectory
 from win32com.client import Dispatch, CDispatch
 from docx import Document as docx_document
 from docx.document import Document
+from docx.text.paragraph import Paragraph
+from docx.table import Table
+from docx.oxml.text.paragraph import CT_P
+from docx.oxml.table import CT_Tbl
+from lxml.etree import ElementChildIterator
 from pdfplumber import open as pdfplumber_open
 
 from .rregex import search, sub
@@ -58,9 +63,9 @@ __all__ = (
     "RTempFile",
     "RTempFolder",
     "doc_to_docx",
-    "extract_docx_text",
-    "extract_pdf_text",
-    "extract_file_text"
+    "extract_docx_content",
+    "extract_pdf_content",
+    "extract_file_content"
 )
 
 
@@ -1713,9 +1718,9 @@ def doc_to_docx(
     return save_path
 
 
-def extract_docx_text(path: str) -> Tuple[str, List[List[List[str]]]]:
+def extract_docx_content(path: str) -> str:
     """
-    Extract text and tables from `DOCX` file.
+    Extract content from `DOCX` file.
 
     Parameters
     ----------
@@ -1723,42 +1728,50 @@ def extract_docx_text(path: str) -> Tuple[str, List[List[List[str]]]]:
 
     returns
     -------
-    Text and tables.
+    Content.
     """
 
     # Extract.
     document: Document = docx_document(path)
+    childs_iter: ElementChildIterator = document.element.body.iterchildren()
+    contents = []
+    for child in childs_iter:
 
-    ## Text.
-    text = "\n".join(
-        [
-            paragraph.text
-            for paragraph in document.paragraphs
-        ]
-    )
+        ## Text.
+        if child.__class__ == CT_P:
+            paragraph = Paragraph(child, document)
+            contents.append(paragraph.text)
 
-    ## Table.
-    tables = [
-        [
-            [
-                cell.text.replace("\n", " ").strip()
-                for cell in row.cells
-                if (
-                    cell.text is not None
-                    and cell.text.strip() != ""
-                )
-            ]
-            for row in table.rows
-        ]
-        for table in document.tables
-    ]
+        ## Table.
+        elif child.__class__ == CT_Tbl:
+            table = Table(child, document)
+            table_text = "\n".join(
+                [
+                    " | ".join(
+                        [
+                            cell.text.strip().replace("\n", " ")
+                            for cell in row.cells
+                            if (
+                                cell.text is not None
+                                and cell.text.strip() != ""
+                            )
+                        ]
+                    )
+                    for row in table.rows
+                ]
+            )
+            table_text = "\n%s\n" % table_text
+            contents.append(table_text)
 
-    return text, tables
+    ## Join.
+    content = "\n".join(contents)
+
+    return content
 
 
-def extract_pdf_text(path: str) -> Tuple[str, List[List[List[str]]]]:
+def extract_pdf_content(path: str) -> str:
     """
-    Extract text and tables from `PDF` file.
+    Extract content from `PDF` file.
 
     Parameters
     ----------
@@ -1766,43 +1779,25 @@ def extract_pdf_text(path: str) -> Tuple[str, List[List[List[str]]]]:
 
     returns
     -------
-    Text and tables.
+    Content.
     """
 
     # Extract.
     document = pdfplumber_open(path)
-
-    ## Text.
-    text = "\n".join(
-        [
-            pages.extract_text()
-            for pages in document.pages
-        ]
-    )
-
-    ## Table.
-    tables = [
-        [
-            [
-                cell.replace("\n", " ").strip()
-                for cell in row
-                if (
-                    cell is not None
-                    and cell.strip() != ""
-                )
-            ]
-            for row in table
-        ]
-        for pages in document.pages
-        for table in pages.extract_tables()
+    contents = [
+        page.extract_text()
+        for page in document.pages
     ]
 
-    return text, tables
+    ## Join.
+    content = "\n".join(contents)
+
+    return content
 
 
-def extract_file_text(path: str) -> Tuple[str, List[List[List[str]]]]:
+def extract_file_content(path: str) -> str:
     """
-    Extract text and tables from `DOC` or `DOCX` or `PDF` file.
+    Extract content from `DOC` or `DOCX` or `PDF` file.
 
     Parameters
     ----------
@@ -1810,7 +1805,7 @@ def extract_file_text(path: str) -> Tuple[str, List[List[List[str]]]]:
 
     returns
     -------
-    Text and tables.
+    Content.
     """
 
     # Handle parameter.
@@ -1824,14 +1819,14 @@ def extract_file_text(path: str) -> Tuple[str, List[List[List[str]]]]:
 
     ## DOCX.
     if suffix == ".docx":
-        text, tables = extract_docx_text(path)
+        content = extract_docx_content(path)
 
     ## PDF.
     elif suffix == ".pdf":
-        text, tables = extract_pdf_text(path)
+        content = extract_pdf_content(path)
 
     ## Raise.
     else:
         throw(value=suffix)
 
-    return text, tables
+    return content

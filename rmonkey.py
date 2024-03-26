@@ -251,35 +251,15 @@ def monkey_patch_pprint_modify_width_judgment() -> None:
 
 
     from pprint import PrettyPrinter, _recursion
-    from urwid import old_str_util
-
-
-    # Chinese width can be determined.
-    def get_width(text: str) -> int:
-        """
-        Get text display width.
-
-        Parameters
-        ----------
-        text : Text.
-
-        Returns
-        -------
-        Text display width.
-        """
-
-        # Get width.
-        total_width = 0
-        for char in text:
-            char_unicode = ord(char)
-            char_width = old_str_util.get_width(char_unicode)
-            total_width += char_width
-
-        return total_width
 
 
     # New method.
     def _format(_self, obj, stream, indent, allowance, context, level):
+
+
+        from .rtext import get_width
+
+
         objid = id(obj)
         if objid in context:
             stream.write(_recursion(obj))

@@ -11,7 +11,6 @@
 
 from typing import Any, List, Tuple, Literal, Iterable, Optional
 from decimal import Decimal
-from urwid import old_str_util
 from pprint import pformat as pprint_pformat
 from json import dumps as json_dumps
 
@@ -98,11 +97,63 @@ def get_width(text: str) -> int:
     Text display width.
     """
 
+    # Set parameter.
+    widths = (
+        (126, 1),
+        (159, 0),
+        (687, 1),
+        (710, 0),
+        (711, 1),
+        (727, 0),
+        (733, 1),
+        (879, 0),
+        (1154, 1),
+        (1161, 0),
+        (4347, 1),
+        (4447, 2),
+        (7467, 1),
+        (7521, 0),
+        (8369, 1),
+        (8426, 0),
+        (9000, 1),
+        (9002, 2),
+        (11021, 1),
+        (12350, 2),
+        (12351, 1),
+        (12438, 2),
+        (12442, 0),
+        (19893, 2),
+        (19967, 1),
+        (55203, 2),
+        (63743, 1),
+        (64106, 2),
+        (65039, 1),
+        (65059, 0),
+        (65131, 2),
+        (65279, 1),
+        (65376, 2),
+        (65500, 1),
+        (65510, 2),
+        (120831, 1),
+        (262141, 2),
+        (1114109, 1)
+    )
+
     # Get width.
     total_width = 0
     for char in text:
         char_unicode = ord(char)
-        char_width = old_str_util.get_width(char_unicode)
+        if (
+            char_unicode == 0xe
+            or char_unicode == 0xf
+        ):
+            char_width = 0
+        else:
+            char_width = 1
+            for num, wid in widths:
+                if char_unicode <= num:
+                    char_width = wid
+                    break
         total_width += char_width
 
     return total_width

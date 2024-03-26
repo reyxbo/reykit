@@ -9,11 +9,6 @@
 """
 
 
-from ctypes import create_string_buffer
-
-from .rdll_inject_core import InjectDLL
-
-
 def inject_dll(
     id_: int,
     path: str
@@ -26,6 +21,12 @@ def inject_dll(
     id_ : Process ID.
     path : DLL file path.
     """
+
+
+    from ctypes import create_string_buffer
+
+    from .rdll_inject_core import InjectDLL
+
 
     # Get parameter.
     path_bytes = path.encode()

@@ -38,7 +38,6 @@ from os.path import (
 from shutil import copy
 from hashlib import md5 as hashlib_md5
 from tempfile import TemporaryFile, TemporaryDirectory
-from win32com.client import Dispatch, CDispatch
 from docx import Document as docx_document
 from docx.document import Document
 from docx.text.paragraph import Paragraph
@@ -1699,6 +1698,10 @@ def doc_to_docx(
     -------
     DOCX file path.
     """
+
+
+    from win32com.client import Dispatch, CDispatch
+
 
     # Handle parameter.
     if save_path is None:

@@ -9,6 +9,11 @@
 """
 
 
+__all__ = (
+    "inject_dll",
+)
+
+
 def inject_dll(
     id_: int,
     path: str

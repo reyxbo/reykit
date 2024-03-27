@@ -15,8 +15,3 @@ rdll_inject : DLL file inject method.
 
 
 from .rdll_inject import *
-
-
-__all__ = (
-    "inject_dll",
-)

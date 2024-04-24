@@ -9,10 +9,11 @@
 """
 
 
+from __future__ import annotations
 from typing import List, Optional
 from zipfile import ZipFile, is_zipfile, ZIP_DEFLATED
 from os import getcwd as os_getcwd, walk as os_walk
-from os.path import join as os_join
+from os.path import join as os_join, isfile as os_isfile
 
 from .ros import RFile, RFolder
 
@@ -42,37 +43,41 @@ def compress(
     overwrite : Whether to overwrite.
     """
 
-    # Handle parameter.
+    # Get parameter.
     build_dir = RFolder(build_dir).path
     if overwrite:
         mode = "w"
     else:
         mode = "x"
-
-    # Generate build path.
-    rfile = RFile(obj_path)
-    build_name = rfile.name
-    build_name += ".zip"
+    is_file = os_isfile(obj_path)
+    if is_file:
+        rfile = RFile(obj_path)
+        obj_name = rfile.name_suffix
+    else:
+        rfolder = RFolder(obj_path)
+        obj_name = rfolder.name
+    build_name = obj_name + ".zip"
     build_path = os_join(build_dir, build_name)
 
     # Compress.
     with ZipFile(build_path, mode, ZIP_DEFLATED) as zip_file:
-        zip_file.write(obj_path)
-        rfolder = RFolder(obj_path)
 
-        ## Recursive compress.
-        if rfolder:
-            dirname = rfolder.dir
-            dirname_len = len(dirname)
-            dirs = os_walk(obj_path)
+        ## File.
+        if is_file:
+            zip_file.write(rfile.path, rfile.name_suffix)
+
+        ## Folder.
+        else:
+            dir_path_len = len(rfolder.path)
+            dirs = os_walk(rfolder.path)
             for folder_name, sub_folders_name, files_name in dirs:
                 for sub_folder_name in sub_folders_name:
                     sub_folder_path = os_join(folder_name, sub_folder_name)
-                    zip_path = sub_folder_path[dirname_len:]
+                    zip_path = sub_folder_path[dir_path_len:]
                     zip_file.write(sub_folder_path, zip_path)
                 for file_name in files_name:
                     file_path = os_join(folder_name, file_name)
-                    zip_path = file_path[dirname_len:]
+                    zip_path = file_path[dir_path_len:]
                     zip_file.write(file_path, zip_path)
 
 

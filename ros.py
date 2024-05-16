@@ -1708,7 +1708,7 @@ def doc_to_docx(
         pattern = ".[dD][oO][cC]"
         save_path = sub(
             pattern,
-            path,
+            path.replace("\\", "/"),
             ".docx"
         )
 

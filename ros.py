@@ -1791,6 +1791,7 @@ def extract_pdf_content(path: str) -> str:
         page.extract_text()
         for page in document.pages
     ]
+    document.close()
 
     ## Join.
     content = "\n".join(contents)

@@ -327,9 +327,9 @@ def wrap_retry(
 
             ## Report.
             if _report is not None:
-                exception_msg, *_ = catch_exc()
+                exc_report, *_ = catch_exc()
                 echo(
-                    exception_msg,
+                    exc_report,
                     "Retrying...",
                     title=_report,
                     frame="half"

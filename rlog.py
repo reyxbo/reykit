@@ -791,7 +791,7 @@ class RLog(object):
             level is None
             or catch
         ):
-            exc_stack, exc_type, *_ = catch_exc()
+            exc_report, exc_type, *_ = catch_exc()
 
         ## Messages.
         messages_len = len(messages)
@@ -822,7 +822,7 @@ class RLog(object):
         ):
             messages = "%s\n%s" % (
                 messages,
-                exc_stack
+                exc_report
             )
 
         # Record.

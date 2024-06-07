@@ -413,9 +413,9 @@ def catch_exc(
     """
 
     # Get parameter.
-    exception_report = format_exc()
-    exception_report = exception_report.strip()
-    exception_type, exception_instance, traceback_instance = sys_exc_info()
+    exc_report = format_exc()
+    exc_report = exc_report.strip()
+    exc_type, exc_instance, exc_traceback = sys_exc_info()
 
     # Print.
     if title is not None:
@@ -424,9 +424,9 @@ def catch_exc(
         from .rstdout import echo
 
         ## Execute.
-        echo(exception_report, title=title, frame="half")
+        echo(exc_report, title=title, frame="half")
 
-    return exception_report, exception_type, exception_instance, traceback_instance
+    return exc_report, exc_type, exc_instance, exc_traceback
 
 
 def check_least_one(*values: Any) -> None:

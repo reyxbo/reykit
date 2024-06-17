@@ -48,7 +48,7 @@ from lxml.etree import ElementChildIterator
 from pdfplumber import open as pdfplumber_open
 
 from .rregex import search, sub
-from .rsystem import throw
+from .rsystem import throw, dos_command
 
 
 __all__ = (
@@ -403,7 +403,14 @@ class RFile(object):
         """
 
         # Copy.
-        os_remove(self.path)
+        try:
+            os_remove(self.path)
+
+        # Read only.
+        except PermissionError:
+            command = f"attrib -r \"{self.path}\""
+            dos_command(command)
+            os_remove(self.path)
 
 
     @property

@@ -11,7 +11,7 @@
 
 from typing import Any, List, Tuple, Union, Literal, Optional, NoReturn, overload
 from io import TextIOBase, BufferedIOBase
-from json import dumps as json_dumps, JSONDecodeError
+from json import JSONDecodeError
 from os import (
     walk as os_walk,
     listdir as os_listdir,
@@ -49,6 +49,7 @@ from pdfplumber import open as pdfplumber_open
 
 from .rregex import search, sub
 from .rsystem import throw, dos_command
+from .rtext import to_json
 
 
 __all__ = (
@@ -348,7 +349,7 @@ class RFile(object):
         ## Convert data to string.
         if data.__class__ not in (str, bytes):
             try:
-                data = json_dumps(data, ensure_ascii=False)
+                data = to_json(data)
             except (JSONDecodeError, TypeError):
                 data = str(data)
 

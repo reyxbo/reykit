@@ -91,14 +91,14 @@ def randn(*thresholds: float, precision: Optional[int] = None) -> Union[int, flo
     return number
 
 
-def randb(pr: float) -> bool:
+def randb(pr: float = 0.5) -> bool:
     """
     Random bool.
 
     Parameters
     ----------
     pr : Probability setting.
-        - `∈(0, 1)` : Random probability, formula is `randn(1, int(1 / temp * 100)) <= 100`.
+        - `∈(0, 1)` : Random probability, formula is `randn(1, int(1 / pr * 100)) <= 100`.
         - `∈(1, +∞)` : Random range, formula is `randn(1, ceil(pr)) == 1`.
 
     Returns

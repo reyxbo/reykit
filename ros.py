@@ -9,7 +9,8 @@
 """
 
 
-from typing import Any, List, Tuple, Union, Literal, Optional, NoReturn, overload
+from __future__ import annotations
+from typing import Any, List, Union, Literal, Optional, NoReturn, overload
 from io import TextIOBase, BufferedIOBase
 from json import JSONDecodeError
 from os import (

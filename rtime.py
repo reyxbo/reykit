@@ -61,6 +61,9 @@ def now(format_: Literal["datetime_str", "date_str", "time_str"] = "datetime") -
 @overload
 def now(format_: Literal["timestamp"] = "datetime") -> int: ...
 
+@overload
+def now(format_: Any) -> NoReturn: ...
+
 def now(
     format_: Literal[
         "datetime",

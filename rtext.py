@@ -361,7 +361,7 @@ def add_text_frame(
             frame_bottom = None
         _contents = texts
 
-    ## Raise.
+    ## Throw exception.
     else:
         throw(ValueError, frame)
 

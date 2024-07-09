@@ -206,7 +206,7 @@ def time_to(
             if obj.days != 0:
                 text = f"{obj.days}day " + text
 
-        ## Raise.
+        ## Throw exception.
         elif raising:
             throw(ValueError, obj)
 
@@ -222,7 +222,7 @@ def time_to(
             format_ = "%Y-%m-%d %H:%M:%S"
         text = time_strftime(format_, obj)
 
-    # Raise.
+    # Throw exception.
     elif raising:
         throw(TypeError, obj)
 
@@ -391,7 +391,7 @@ def to_time(
     # No time object.
     if time_obj is None:
 
-        ## Raise.
+        ## Throw exception.
         if raising:
             throw(ValueError, obj)
 

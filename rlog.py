@@ -524,7 +524,7 @@ class RLog(object):
 
         # Create handler.
 
-        ## Raise.
+        ## Throw exception.
         if (
             mb is not None
             and time is not None
@@ -579,7 +579,7 @@ class RLog(object):
                     delay=True
                 )
 
-            ### Raise.
+            ### Throw exception.
             else:
                 throw(ValueError, time)
 

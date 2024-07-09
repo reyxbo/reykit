@@ -330,7 +330,7 @@ def throw(
     if value is not None:
         text += ", %s is %s" % (value_name, repr(value))
 
-    # Raise.
+    # Throw exception.
     exception = exception(text)
     raise exception
 
@@ -493,7 +493,7 @@ def check_file_found(path: str) -> None:
     # Check.
     exist = os_exists(path)
 
-    # Raise.
+    # Throw exception.
     if not exist:
         throw(FileNotFoundError, path, 3)
 
@@ -510,7 +510,7 @@ def check_file_exist(path: str) -> None:
     # Check.
     exist = os_exists(path)
 
-    # Raise.
+    # Throw exception.
     if exist:
         throw(FileExistsError, path, 3)
 
@@ -545,7 +545,7 @@ def check_response_code(
     else:
         throw(TypeError, range_)
 
-    # Raise.
+    # Throw exception.
     if not result:
         throw(value=code, frame=3)
 
@@ -764,7 +764,7 @@ def get_stack_text(format_: Literal["plain", "full"] = "plain", limit: int = 2) 
         text = "".join(stacks)
         text = text[:-1]
 
-    # Raise.
+    # Throw exception.
     else:
         throw(ValueError, format_)
 

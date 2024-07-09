@@ -227,7 +227,7 @@ async def async_request(
                 if iscoroutine(result):
                     result = await result
 
-            ## Raise.
+            ## Throw exception.
             else:
                 throw(TypeError, handler)
 

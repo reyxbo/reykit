@@ -203,7 +203,7 @@ def get_file_str(file: FileStr) -> str:
     elif isinstance(file, TextIOBase):
         file_str = file.read()
 
-    # Raise.
+    # Throw exception.
     else:
         throw(TypeError, file)
 
@@ -245,7 +245,7 @@ def get_file_bytes(file: FileBytes) -> bytes:
     elif isinstance(file, BufferedIOBase):
         file_bytes = file.read()
 
-    # Raise.
+    # Throw exception.
     else:
         throw(TypeError, file)
 
@@ -1838,7 +1838,7 @@ def extract_file_content(path: str) -> str:
     elif suffix == ".pdf":
         content = extract_pdf_content(path)
 
-    ## Raise.
+    ## Throw exception.
     else:
         throw(value=suffix)
 

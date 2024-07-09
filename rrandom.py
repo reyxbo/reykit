@@ -116,7 +116,7 @@ def randb(pr: float = 0.5) -> bool:
         high = math_ceil(pr)
         result = randn(1, high) == 1
 
-    # Raise.
+    # Throw exception.
     else:
         throw(ValueError, pr)
 

@@ -49,13 +49,17 @@ def digits(number: Union[int, float]) -> Tuple[int, int]:
     return int_digits, dec_digits
 
 
-def number(string: str) -> Union[int, float]:
+def number(
+    string: str,
+    raising: bool = True
+) -> Any:
     """
     convert string to number.
 
     Parameters
     ----------
     string : String.
+    raising : When parameter `string` value error, whether throw exception, otherwise return original value.
 
     Returns
     -------
@@ -71,8 +75,10 @@ def number(string: str) -> Union[int, float]:
         return number
 
     # Throw exception.
-    else:
+    elif raising:
         throw(ValueError, string)
+
+    return string
 
 
 def number_ch(number: int) -> str:

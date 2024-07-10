@@ -16,7 +16,7 @@ from .rsystem import throw, is_number_str
 
 __all__ = (
     "digits",
-    "number",
+    "to_number",
     "number_ch"
 )
 
@@ -49,16 +49,16 @@ def digits(number: Union[int, float]) -> Tuple[int, int]:
     return int_digits, dec_digits
 
 
-def number(
-    string: str,
+def to_number(
+    data: Any,
     raising: bool = True
 ) -> Any:
     """
-    convert string to number.
+    Convert data to number.
 
     Parameters
     ----------
-    string : String.
+    data : Data.
     raising : When parameter `string` value error, whether throw exception, otherwise return original value.
 
     Returns
@@ -66,19 +66,20 @@ def number(
     Converted number.
     """
 
-    # Number.
-    if is_number_str(string):
-        if "." in string:
-            number = float(string)
-        else:
-            number = int(string)
-        return number
+    # Convert.
+    try:
+        data = float(data)
+    except (ValueError, TypeError):
 
-    # Throw exception.
-    elif raising:
-        throw(ValueError, string)
+        # Throw exception.
+        if raising:
+            throw(ValueError, data)
 
-    return string
+    else:
+        if data % 1 == 0:
+            data = int(data)
+
+    return data
 
 
 def number_ch(number: int) -> str:

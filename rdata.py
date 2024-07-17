@@ -11,7 +11,8 @@
 
 from typing import Any, List, Tuple, Dict, Iterable, Literal, Optional, NoReturn, Callable, Generator, overload
 
-from .rsystem import is_iterable, check_least_one, check_most_one
+from .rexception import check_least_one, check_most_one
+from .rsystem import is_iterable
 
 
 __all__ = (

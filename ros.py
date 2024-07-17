@@ -48,8 +48,9 @@ from docx.oxml.table import CT_Tbl
 from lxml.etree import ElementChildIterator
 from pdfplumber import open as pdfplumber_open
 
+from .rexception import throw
 from .rregex import search, sub
-from .rsystem import throw, dos_command
+from .rsystem import dos_command
 from .rtext import to_json
 
 

@@ -28,11 +28,11 @@ from datetime import (
     timedelta as datetime_timedelta
 )
 
+from .rexception import throw
 from .rnumber import digits
 from .rrandom import randn
 from .rregex import search
 from .rstdout import echo
-from .rsystem import throw
 
 
 __all__ = (

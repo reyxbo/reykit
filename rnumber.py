@@ -11,7 +11,7 @@
 
 from typing import Any, Tuple, Union
 
-from .rsystem import throw, is_number_str
+from .rexception import throw
 
 
 __all__ = (

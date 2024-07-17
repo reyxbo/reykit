@@ -16,9 +16,9 @@ from qrcode.image.pil import PilImage
 from PIL.Image import Image
 from PIL.Image import open as pil_open, LANCZOS
 
+from .rexception import catch_exc
 from .rmonkey import monkey_path_pil_image_get_bytes
 from .ros import RFile
-from .rsystem import catch_exc
 
 try:
     from pyzbar.pyzbar import decode as pyzbar_decode

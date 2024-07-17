@@ -14,7 +14,7 @@ rcomm : Network communication methods.
 rdata : Data methods.
 rdll : DLL file methods.
 remail : E-mail methods.
-ros : Operation system methods.
+rexception : Exception methods.
 rimage : Image methods.
 rlog : Log methods.
 rmonkey : Monkey patch methods.
@@ -37,4 +37,4 @@ rzip : File compress methods.
 from typing import Final
 
 
-__version__: Final[str] = "0.409"
+__version__: Final[str] = "0.410"

@@ -14,8 +14,8 @@ from decimal import Decimal
 from pprint import pformat as pprint_pformat
 from json import dumps as json_dumps
 
+from .rexception import throw
 from .rmonkey import monkey_patch_pprint_modify_width_judgment
-from .rsystem import throw
 
 
 __all__ = (

@@ -24,7 +24,7 @@ from asyncio import (
 from asyncio.queues import QueueEmpty
 from aiohttp import ClientSession, ClientResponse
 
-from .rsystem import throw, check_most_one, check_response_code
+from .rexception import throw, check_most_one, check_response_code
 from .rtime import sleep, RTimeMark
 from .rwrap import wrap_thread
 

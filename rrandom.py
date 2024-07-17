@@ -13,8 +13,8 @@ from typing import Any, Union, Optional, Literal, Sequence, overload
 from math import ceil as math_ceil
 from random import randint as random_randint
 
+from .rexception import throw
 from .rnumber import digits
-from .rsystem import throw
 
 
 __all__ = (

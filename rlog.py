@@ -29,10 +29,11 @@ from logging import (
 from logging.handlers import QueueHandler
 from concurrent_log_handler import ConcurrentRotatingFileHandler, ConcurrentTimedRotatingFileHandler
 
+from .rexception import throw, catch_exc
 from .ros import RFile
 from .rregex import search, sub
 from .rstdout import modify_print, reset_print, path_rprint
-from .rsystem import throw, catch_exc, get_first_notnull, get_stack_param
+from .rsystem import get_first_notnull, get_stack_param
 from .rtext import to_text
 from .rtime import now, time_to
 from .rwrap import wrap_thread

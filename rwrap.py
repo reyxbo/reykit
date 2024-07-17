@@ -15,8 +15,9 @@ from functools import wraps as functools_wraps
 from threading import Thread
 from argparse import ArgumentParser
 
+from .rexception import catch_exc
 from .rstdout import echo
-from .rsystem import catch_exc, get_arg_info
+from .rsystem import get_arg_info
 from .rtime import now, time_to, RTimeMark
 
 

@@ -18,9 +18,9 @@ from requests.models import Response
 from mimetypes import guess_type
 from filetype import guess as filetype_guess
 
+from .rexception import throw, check_response_code
 from .ros import RFile
 from .rregex import search
-from .rsystem import throw, check_response_code
 
 
 __all__ = (

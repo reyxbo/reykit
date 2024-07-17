@@ -13,6 +13,7 @@ from .rcomm import *
 from .rdata import *
 from .rdll import *
 from .remail import *
+from .rexception import *
 from .rimage import *
 from .rlog import *
 from .rmonkey import *

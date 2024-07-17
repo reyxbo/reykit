@@ -17,8 +17,8 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 
 from .rdata import unique
-from .ros import FileBytes, RFile, get_file_bytes
-from .rsystem import throw
+from .rexception import throw
+from .ros import FileBytes, get_file_bytes
 
 
 __all__ = (

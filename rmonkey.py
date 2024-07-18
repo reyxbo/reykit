@@ -35,49 +35,49 @@ def monkey_patch_sqlalchemy_result_more_fetch():
 
     from .rstdout import echo
     from .rtable import (
-        fetch_table as rtable_fetch_table,
-        fetch_dict as rtable_fetch_dict,
-        fetch_list as rtable_fetch_list,
-        fetch_df as rtable_fetch_df,
-        fetch_json as rtable_fetch_json,
-        fetch_text as rtable_fetch_text,
-        fetch_sql as rtable_fetch_sql,
-        fetch_html as rtable_fetch_html,
-        fetch_csv as rtable_fetch_csv,
-        fetch_excel as rtable_fetch_excel
+        to_table,
+        to_dict,
+        to_list,
+        to_df,
+        to_json,
+        to_text,
+        to_sql,
+        to_html,
+        to_csv,
+        to_excel
     )
     from .rtime import time_to
 
 
     # Fetch result as table in "List[Dict]" format.
-    CursorResult.fetch_table = rtable_fetch_table
+    CursorResult.fetch_table = to_table
 
     # Fetch result as dictionary.
-    CursorResult.fetch_dict = rtable_fetch_dict
+    CursorResult.fetch_dict = to_dict
 
     # Fetch result as list.
-    CursorResult.fetch_list = rtable_fetch_list
+    CursorResult.fetch_list = to_list
 
     # Fetch result as DataFrame object.
-    CursorResult.fetch_df = rtable_fetch_df
+    CursorResult.fetch_df = to_df
 
     # Fetch result as JSON string.
-    CursorResult.fetch_json = rtable_fetch_json
+    CursorResult.fetch_json = to_json
 
     # Fetch result as text.
-    CursorResult.fetch_text = rtable_fetch_text
+    CursorResult.fetch_text = to_text
 
     # Fetch result as SQL string.
-    CursorResult.fetch_sql = rtable_fetch_sql
+    CursorResult.fetch_sql = to_sql
 
     # Fetch result as HTML string.
-    CursorResult.fetch_html = rtable_fetch_html
+    CursorResult.fetch_html = to_html
 
     # Fetch result as save csv format file.
-    CursorResult.fetch_csv = rtable_fetch_csv
+    CursorResult.fetch_csv = to_csv
 
     # Fetch result as save excel file.
-    CursorResult.fetch_excel = rtable_fetch_excel
+    CursorResult.fetch_excel = to_excel
 
 
     # Print result.
@@ -183,16 +183,16 @@ def monkey_patch_sqlalchemy_result_more_fetch():
         __doc__ = CursorResult.__doc__
 
         # Add method.
-        fetch_table = rtable_fetch_table
-        fetch_dict = rtable_fetch_dict
-        fetch_list = rtable_fetch_list
-        fetch_df = rtable_fetch_df
-        fetch_json = rtable_fetch_json
-        fetch_text = rtable_fetch_text
-        fetch_sql = rtable_fetch_sql
-        fetch_html = rtable_fetch_html
-        fetch_csv = rtable_fetch_csv
-        fetch_excel = rtable_fetch_excel
+        fetch_table = to_table
+        fetch_dict = to_dict
+        fetch_list = to_list
+        fetch_df = to_df
+        fetch_json = to_json
+        fetch_text = to_text
+        fetch_sql = to_sql
+        fetch_html = to_html
+        fetch_csv = to_csv
+        fetch_excel = to_excel
         show = method_show
         exist = method_exist
         empty = method_empty

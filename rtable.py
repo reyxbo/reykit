@@ -20,28 +20,28 @@ from .rtime import time_to
 
 
 __all__ = (
-    "fetch_table",
-    "fetch_dict",
-    "fetch_list",
-    "fetch_df",
-    "fetch_json",
-    "fetch_text",
-    "fetch_sql",
-    "fetch_html",
-    "fetch_csv",
-    "fetch_excel"
+    "to_table",
+    "to_dict",
+    "to_list",
+    "to_df",
+    "to_json",
+    "to_text",
+    "to_sql",
+    "to_html",
+    "to_csv",
+    "to_excel"
 )
 
 # Table format data type.
 Table = Union[List[Dict], Dict, CursorResult, DataFrame]
 
 
-def fetch_table(
+def to_table(
     data: Union[Table, Iterable[Iterable]],
     fields: Optional[Iterable] = None
 ) -> List[Dict]:
     """
-    Fetch data to table in `List[Dict]` format, keys and keys sort of the dictionary are the same.
+    Convert data to table in `List[Dict]` format, keys and keys sort of the dictionary are the same.
 
     Parameters
     ----------
@@ -68,7 +68,7 @@ def fetch_table(
 
     ## From DataFrame object.
     elif data.__class__ == DataFrame:
-        data_df = fetch_df(data, fields)
+        data_df = to_df(data, fields)
         fields = data_df.columns
         data_table = [
             dict(zip(
@@ -83,33 +83,33 @@ def fetch_table(
 
     ## From other object.
     else:
-        data_df = fetch_df(data, fields)
-        data_table = fetch_table(data_df)
+        data_df = to_df(data, fields)
+        data_table = to_table(data_df)
 
     return data_table
 
 
 @overload
-def fetch_dict(
+def to_dict(
     data: Union[Table, Iterable[Iterable]],
     key_field: Union[int, str] = 0,
     val_field: None = None
 ) -> Dict[Any, Dict]: ...
 
 @overload
-def fetch_dict(
+def to_dict(
     data: Union[Table, Iterable[Iterable]],
     key_field: Union[int, str] = 0,
     val_field: Union[int, str] = None
 ) -> Dict: ...
 
-def fetch_dict(
+def to_dict(
     data: Union[Table, Iterable[Iterable]],
     key_field: Union[int, str] = 0,
     val_field: Optional[Union[int, str]] = None
 ) -> Union[Dict[Any, Dict], Dict]:
     """
-    Fetch result as dictionary.
+    Convert data as dictionary.
 
     Parameters
     ----------
@@ -129,7 +129,7 @@ def fetch_dict(
     """
 
     # Handle parameter.
-    data = fetch_table(data)
+    data = to_table(data)
 
     ## Check parameter.
     if len(data) == 0:
@@ -165,12 +165,12 @@ def fetch_dict(
     return data_dict
 
 
-def fetch_list(
+def to_list(
     data: Union[Table, Iterable[Iterable]],
     field: Union[int, str] = 0,
 ) -> List:
     """
-    Fetch result as list.
+    Convert data as list.
 
     Parameters
     ----------
@@ -185,7 +185,7 @@ def fetch_list(
     """
 
     # Handle parameter.
-    data = fetch_table(data)
+    data = to_table(data)
 
     ## Check parameter.
     if len(data) == 0:
@@ -205,12 +205,12 @@ def fetch_list(
     return data_list
 
 
-def fetch_df(
+def to_df(
     data: Union[Table, Iterable[Iterable]],
     fields: Optional[Iterable] = None
 ) -> DataFrame:
     """
-    Fetch data to table of `DataFrame` object.
+    Convert data to table of `DataFrame` object.
 
     Parameters
     ----------
@@ -249,13 +249,13 @@ def fetch_df(
     return data_df
 
 
-def fetch_json(
+def to_json(
     data: Union[Table, Iterable[Iterable]],
     fields: Optional[Iterable] = None,
     compact: bool = True
 ) -> str:
     """
-    Fetch data to JSON string.
+    Convert data to JSON string.
 
     Parameters
     ----------
@@ -272,7 +272,7 @@ def fetch_json(
     """
 
     # Handle parameter.
-    data = fetch_table(data, fields)
+    data = to_table(data, fields)
 
     # Convert.
     string = to_json(data, compact)
@@ -280,13 +280,13 @@ def fetch_json(
     return string
 
 
-def fetch_text(
+def to_text(
     data: Union[Table, Iterable[Iterable]],
     fields: Optional[Iterable] = None,
     width: int = 100
 ) -> str:
     """
-    Fetch data to text.
+    Convert data to text.
 
     Parameters
     ----------
@@ -303,7 +303,7 @@ def fetch_text(
     """
 
     # Handle parameter.
-    data = fetch_table(data, fields)
+    data = to_table(data, fields)
 
     # Convert.
     text = to_text(data, width)
@@ -311,12 +311,12 @@ def fetch_text(
     return text
 
 
-def fetch_sql(
+def to_sql(
     data: Union[Table, Iterable[Iterable]],
     fields: Optional[Iterable] = None
 ) -> str:
     """
-    Fetch data to SQL string.
+    Convert data to SQL string.
 
     Parameters
     ----------
@@ -335,7 +335,7 @@ def fetch_sql(
         if fields is None:
             fields = data.keys()
     else:
-        data = fetch_table(data, fields)
+        data = to_table(data, fields)
         fields = data[0].keys()
 
     # Generate SQL.
@@ -364,12 +364,12 @@ def fetch_sql(
     return data_sql
 
 
-def fetch_html(
+def to_html(
     data: Union[Table, Iterable[Iterable]],
     fields: Optional[Iterable] = None
 ) -> str:
     """
-    Fetch data to HTML string.
+    Convert data to HTML string.
 
     Parameters
     ----------
@@ -384,7 +384,7 @@ def fetch_html(
     """
 
     # Handle parameter.
-    data_df = fetch_df(data, fields)
+    data_df = to_df(data, fields)
 
     # Convert.
     data_html = data_df.to_html(col_space=50, index=False, justify="center")
@@ -392,13 +392,13 @@ def fetch_html(
     return data_html
 
 
-def fetch_csv(
+def to_csv(
     data: Union[Table, Iterable[Iterable]],
     path: str = "data.csv",
     fields: Optional[Iterable] = None
 ) -> str:
     """
-    Fetch data to save CSV format file.
+    Convert data to save CSV format file.
     When file exist, then append data.
 
     Parameters
@@ -415,7 +415,7 @@ def fetch_csv(
     """
 
     # Handle parameter.
-    data_df = fetch_df(data, fields)
+    data_df = to_df(data, fields)
     rfile = RFile(path)
     if rfile:
         header = False
@@ -428,14 +428,14 @@ def fetch_csv(
     return rfile.path
 
 
-def fetch_excel(
+def to_excel(
     data: Union[Table, Iterable[Iterable]],
     path: str = "data.xlsx",
     group_field: Optional[str] = None,
     sheets_set: Dict[Union[str, int], Dict[Literal["name", "index", "fields"], Any]] = {}
 ) -> str:
     """
-    Fetch data to save Excel format file and return sheet name and sheet data.
+    Convert data to save Excel format file and return sheet name and sheet data.
     When file exist, then rebuild file.
 
     Parameters
@@ -464,12 +464,12 @@ def fetch_excel(
     ...     'one': {'name': 'age', 'index': 2, 'fields': ['id', 'age']},
     ...     'two': {'name': 'id', 'index': 1, 'fields': 'id'}
     ... }
-    >>> fetch_excel(data, 'file.xlsx', 'group', sheets_set)
+    >>> to_excel(data, 'file.xlsx', 'group', sheets_set)
     """
 
     # Handle parameter.
     if data.__class__ != DataFrame:
-        data = fetch_df(data)
+        data = to_df(data)
     path = os_abspath(path)
 
     # Generate sheets.

@@ -32,6 +32,7 @@ from psutil import (
 )
 from traceback import format_stack, extract_stack
 from subprocess import Popen, PIPE
+from pymem import Pymem
 from argparse import ArgumentParser
 from time import sleep as time_sleep
 from datetime import datetime
@@ -1058,3 +1059,74 @@ def get_idle_port(min: int = 49152) -> int:
             min += 1
         else:
             return min
+
+
+def memory_read(
+    process: Union[int, str],
+    dll: str,
+    offset: int
+) -> int:
+    """
+    Read memory value.
+
+    Parameters
+    ----------
+    process : Process ID or name.
+    dll : DLL file name.
+    offset : Memory address offset.
+
+    Returns
+    -------
+    Memory value.
+    """
+
+    # Get DLL address.
+    pymem = Pymem(process)
+    dll_address = None
+    for module in pymem.list_modules():
+        if module.name == dll:
+            dll_address: int = module.lpBaseOfDll
+            break
+
+    ## Check.
+    if dll_address is None:
+        throw(value=dll_address)
+
+    # Get memory address.
+    memory_address = dll_address + offset
+
+    # Read.
+    value = pymem.read_int(memory_address)
+
+    return value
+
+
+def memory_write(
+    process: Union[int, str],
+    dll: str,
+    offset: int,
+    value: int
+) -> None:
+    """
+    Write memory value.
+
+    Parameters
+    ----------
+    process : Process ID or name.
+    dll : DLL file name.
+    offset : Memory address offset.
+    value : Memory value.
+    """
+
+    # Get DLL address.
+    pymem = Pymem(process)
+    for module in pymem.list_modules():
+        if module.name == dll:
+            dll_address: int = module.lpBaseOfDll
+            break
+
+    # Get memory address.
+    memory_address = dll_address + offset
+
+    # Read.
+    pymem.write_int(memory_address, value)

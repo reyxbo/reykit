@@ -43,13 +43,13 @@ __all__ = (
 
 class RError(Exception):
     """
-    Rey `error` type.
+    Rey `exception` type.
     """
 
 
 def throw(
     exception: Type[BaseException] = AssertionError,
-    value: Optional[Any] = None,
+    value: Optional[Any] = "_None",
     frame: int = 2
 ) -> NoReturn:
     """
@@ -65,7 +65,7 @@ def throw(
     # Get parameter.
 
     ## Value name.
-    if value is not None:
+    if value != "_None":
         from .rsystem import get_name
         name = get_name(value, frame)
         if name is None:
@@ -101,7 +101,7 @@ def throw(
         text = "use error"
 
     ### Join.
-    if value is not None:
+    if value != "_None":
         text += ", %s is %s" % (value_name, repr(value))
 
     # Throw exception.

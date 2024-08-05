@@ -25,7 +25,7 @@ def monkey_patch_sqlalchemy_result_more_fetch():
 
     Returns
     -------
-    Result object.
+    Modified type.
     """
 
 

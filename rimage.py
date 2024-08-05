@@ -13,7 +13,6 @@ from typing import List, Union, Optional
 from io import BytesIO
 from qrcode import make as qrcode_make
 from qrcode.image.pil import PilImage
-from PIL.Image import Image
 from PIL.Image import open as pil_open, LANCZOS
 
 from .rexception import catch_exc
@@ -36,7 +35,8 @@ __all__ = (
 
 
 # Monkey path.
-RImage = monkey_path_pil_image_get_bytes()
+monkey_image_type = monkey_path_pil_image_get_bytes()
+RImage = monkey_image_type
 
 
 def encode_qrcode(text: str, path: Optional[str] = None) -> bytes:

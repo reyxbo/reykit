@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, List, Tuple, Dict, Literal, Iterable, Callable, Optional, Union
+from typing import Any, Tuple, Dict, Literal, Iterable, Callable, Optional, Union
 from warnings import filterwarnings
 from os.path import abspath as os_abspath, isfile as os_isfile
 from socket import socket as  Socket

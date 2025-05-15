@@ -10,6 +10,7 @@
 
 
 from typing import Any, List, Tuple, Dict, Literal, Iterable, Callable, Optional, Union
+from warnings import filterwarnings
 from os.path import abspath as os_abspath, isfile as os_isfile
 from socket import socket as  Socket
 from urllib.parse import urlsplit as urllib_urlsplit, quote as urllib_quote, unquote as urllib_unquote
@@ -190,6 +191,7 @@ def request(
     timeout: Optional[float] = None,
     proxies: Dict[str, str] = {},
     stream: bool = False,
+    verify: bool = False,
     method: Optional[Literal["get", "post", "put", "patch", "delete", "options", "head"]] = None,
     check: Union[bool, int, Iterable[int]] = False
 ) -> Response:
@@ -226,6 +228,7 @@ def request(
         - `Dict[str, str]` : Name and use IP of each protocol.
 
     stream : Whether use stream request.
+    verify : Whether verify certificate.
     method : Request method.
         - `None` : Automatic judge.
             * When parameter `data` or `json` or `files` not has value, then request method is `get`.
@@ -278,6 +281,11 @@ def request(
                 item_headers.get("Content-Type"),
                 item_headers
             )
+    if not verify:
+        filterwarnings(
+            "ignore",
+            "Unverified HTTPS request is being made to host"
+        )
 
     # Request.
     response = requests_request(
@@ -290,6 +298,7 @@ def request(
         headers=headers,
         timeout=timeout,
         proxies=proxies,
+        verify=verify,
         stream=stream
     )
 

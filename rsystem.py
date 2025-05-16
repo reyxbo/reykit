@@ -36,7 +36,7 @@ from pymem import Pymem
 from argparse import ArgumentParser
 from time import sleep as time_sleep
 from datetime import datetime
-from varname import argname
+from varname import VarnameRetrievingError, argname
 
 from .rexception import throw
 
@@ -447,7 +447,10 @@ def get_name(obj: Any, frame: int = 2) -> Optional[Union[str, Tuple[str, ...]]]:
     for frame_ in range(1, frame + 1):
         if name.__class__ != str:
             return
-        name = argname(name, frame=frame_)
+        try:
+            name = argname(name, frame=frame_)
+        except VarnameRetrievingError:
+            return
     if name.__class__ == tuple:
         for element in name:
             if element.__class__ != str:

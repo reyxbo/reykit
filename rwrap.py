@@ -10,10 +10,12 @@
 
 
 from typing import Any, List, Tuple, Dict, Callable, Optional, Union, Literal, overload
+from io import IOBase, StringIO
 from inspect import getdoc
 from functools import wraps as functools_wraps
 from threading import Thread
 from argparse import ArgumentParser
+from contextlib import redirect_stdout
 
 from .rexception import catch_exc
 from .rstdout import echo
@@ -28,8 +30,9 @@ __all__ = (
     "wrap_exc",
     "wrap_retry",
     "wrap_dos_command",
+    "wrap_cache_data",
     "wrap_cache",
-    "wrap_cache_data"
+    "wrap_redirect_stdout"
 )
 
 
@@ -144,13 +147,27 @@ def wrap_frame(decorator: Callable) -> Callable:
 
 
 @overload
-def wrap_runtime(func: Callable, *args: Any, _return_report: Literal[False] = False, **kwargs: Any) -> Any: ...
+def wrap_runtime(
+    func: Callable,
+    *args: Any,
+    _return_report: Literal[False] = False,
+    **kwargs: Any
+) -> Any: ...
 
 @overload
-def wrap_runtime(func: Callable, *args: Any, _return_report: Literal[True] = False, **kwargs: Any) -> Tuple[Any, str]: ...
+def wrap_runtime(func: Callable,
+    *args: Any,
+    _return_report: Literal[True] = False,
+    **kwargs: Any
+) -> Tuple[Any, str]: ...
 
 @wrap_frame
-def wrap_runtime(func: Callable, *args: Any, _return_report: bool = False, **kwargs: Any) -> Union[Any, Tuple[Any, str]]:
+def wrap_runtime(
+    func: Callable,
+    *args: Any,
+    _return_report: bool = False,
+    **kwargs: Any
+) -> Union[Any, Tuple[Any, str]]:
     """
     Decorator, print or return runtime report of the function.
 
@@ -197,10 +214,20 @@ def wrap_runtime(func: Callable, *args: Any, _return_report: bool = False, **kwa
 
 
 @overload
-def wrap_thread(func: Callable, *args: Any, _daemon: bool = True, **kwargs: Any) -> Thread: ...
+def wrap_thread(
+    func: Callable,
+    *args: Any,
+    _daemon: bool = True,
+    **kwargs: Any
+) -> Thread: ...
 
 @wrap_frame
-def wrap_thread(func: Callable, *args: Any, _daemon: bool = True, **kwargs: Any) -> Thread:
+def wrap_thread(
+    func: Callable,
+    *args: Any,
+    _daemon: bool = True,
+    **kwargs: Any
+) -> Thread:
     """
     Decorator, function start in thread.
 
@@ -360,14 +387,14 @@ def wrap_dos_command(
     func: Callable,
     *args: Any,
     **kwargs: Any
-) -> float: ...
+) -> Any: ...
 
 @wrap_frame
 def wrap_dos_command(
     func: Callable,
     *args: Any,
     **kwargs: Any
-) -> float:
+) -> Any:
     """
     Decorator, use DOS command to input arguments to function.
     Use DOS command `python file --help` to view help information.
@@ -484,14 +511,14 @@ def wrap_cache(
     func: Callable,
     *args: Any,
     **kwargs: Any
-) -> float: ...
+) -> Any: ...
 
 @wrap_frame
 def wrap_cache(
     func: Callable,
     *args: Any,
     **kwargs: Any
-) -> float:
+) -> Any:
     """
     Decorator, Cache the return result of function input.
     if no cache, cache it.
@@ -509,7 +536,7 @@ def wrap_cache(
     """
 
     # Index.
-    wrap_cache_data_func = wrap_cache_data.setdefault(Callable, [])
+    wrap_cache_data_func = wrap_cache_data.setdefault(func, [])
     for cache_args, cache_kwargs, cache_result in wrap_cache_data_func:
         if (
             cache_args == args
@@ -523,5 +550,53 @@ def wrap_cache(
     # Cache.
     data = (args, kwargs, result)
     wrap_cache_data_func.append(data)
+
+    return result
+
+
+@overload
+def wrap_redirect_stdout(
+    func: Callable,
+    *args: Any,
+    _redirect: Optional[Union[List, IOBase]] = None,
+    **kwargs: Any
+) -> Any: ...
+
+@wrap_frame
+def wrap_redirect_stdout(
+    func: Callable,
+    *args: Any,
+    _redirect: Optional[Union[List, IOBase]] = None,
+    **kwargs: Any
+) -> Any:
+    """
+    Redirect standard output.
+
+    Parameters
+    ----------
+    func : Function to be decorated.
+    args : Position arguments of decorated function.
+    _redirect : Redirect output list or IO object.
+    kwargs : Keyword arguments of decorated function.
+
+    Returns
+    -------
+    Function execution result.
+    """
+
+    # Get parameter.
+    if isinstance(_redirect, IOBase):
+        str_io = _redirect
+    else:
+        str_io = StringIO()
+
+    # Execute.
+    with redirect_stdout(str_io):
+        result = func(*args, **kwargs)
+
+    # Save.
+    if _redirect.__class__ == list:
+        value = str_io.getvalue()
+        _redirect.append(value)
 
     return result

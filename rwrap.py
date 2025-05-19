@@ -510,6 +510,7 @@ wrap_cache_data: Dict[Callable, List[Tuple[Any, Any, Any]]] = {}
 def wrap_cache(
     func: Callable,
     *args: Any,
+    _overwrite: bool = False,
     **kwargs: Any
 ) -> Any: ...
 
@@ -517,6 +518,7 @@ def wrap_cache(
 def wrap_cache(
     func: Callable,
     *args: Any,
+    _overwrite: bool = False,
     **kwargs: Any
 ) -> Any:
     """
@@ -528,6 +530,7 @@ def wrap_cache(
     ----------
     func : Function to be decorated.
     args : Position arguments of decorated function.
+    _overwrite : Whether to overwrite cache.
     kwargs : Keyword arguments of decorated function.
 
     Returns
@@ -537,19 +540,27 @@ def wrap_cache(
 
     # Index.
     wrap_cache_data_func = wrap_cache_data.setdefault(func, [])
-    for cache_args, cache_kwargs, cache_result in wrap_cache_data_func:
+    cache_index = None
+    for index, (cache_args, cache_kwargs, cache_result) in enumerate(wrap_cache_data_func):
         if (
             cache_args == args
             and cache_kwargs == kwargs
         ):
-            return cache_result
+            if _overwrite:
+                cache_index = index
+                break
+            else:
+                return cache_result
 
     # Execute.
     result = func(*args, **kwargs)
 
     # Cache.
     data = (args, kwargs, result)
-    wrap_cache_data_func.append(data)
+    if cache_index is None:
+        wrap_cache_data_func.append(data)
+    else:
+        wrap_cache_data_func[cache_index] = data
 
     return result
 

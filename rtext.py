@@ -11,11 +11,13 @@
 
 from typing import Any, List, Tuple, Literal, Iterable, Optional
 from decimal import Decimal
+from string import digits as string_digits, ascii_letters as string_ascii_letters, punctuation as string_punctuation
 from pprint import pformat as pprint_pformat
 from json import dumps as json_dumps
 
 from .rexception import throw
 from .rmonkey import monkey_patch_pprint_modify_width_judgment
+from .rrandom import randi
 
 
 __all__ = (
@@ -26,7 +28,8 @@ __all__ = (
     "join_filter_text",
     "add_text_frame",
     "to_json",
-    "to_text"
+    "to_text",
+    "generate_password"
 )
 
 
@@ -451,3 +454,36 @@ def to_text(
         text = str(data)
 
     return text
+
+
+def generate_password(
+    length: int,
+    punctuation: bool = True
+) -> str:
+    """
+    Generate random password.
+
+    Parameters
+    ----------
+    length : Password length.
+    punctuation : Whether contain punctuation.
+
+    Returns
+    -------
+    Random password.
+    """
+
+    # Get parameter.
+    chars = string_digits + string_ascii_letters
+    if punctuation:
+        chars += string_punctuation
+
+    # Generate.
+    password = "".join(
+        [
+            randi(chars)
+            for _ in range(length)
+        ]
+    )
+
+    return password

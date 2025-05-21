@@ -11,7 +11,7 @@
 
 from typing import Any, Union, Optional, Literal, Sequence, overload
 from math import ceil as math_ceil
-from random import randint as random_randint
+from secrets import randbelow as secrets_randbelow
 
 from .rexception import throw
 from .rnumber import digits
@@ -39,6 +39,7 @@ def randn(*thresholds: float, precision: int = None) -> float: ...
 def randn(*thresholds: float, precision: Optional[int] = None) -> Union[int, float]:
     """
     Random number.
+    True random based on secrets package.
 
     Parameters
     ----------
@@ -81,7 +82,9 @@ def randn(*thresholds: float, precision: Optional[int] = None) -> Union[int, flo
     magnifier = 10 ** precision
     threshold_low = int(threshold_low * magnifier)
     threshold_high = int(threshold_high * magnifier)
-    number = random_randint(threshold_low, threshold_high)
+    range_ = threshold_high - threshold_low + 1
+    number = secrets_randbelow(range_)
+    number += threshold_low
     number = number / magnifier
 
     # Convert Integer.
@@ -94,6 +97,7 @@ def randn(*thresholds: float, precision: Optional[int] = None) -> Union[int, flo
 def randb(pr: float = 0.5) -> bool:
     """
     Random bool.
+    True random based on secrets package.
 
     Parameters
     ----------
@@ -126,6 +130,7 @@ def randb(pr: float = 0.5) -> bool:
 def randi(data: Sequence) -> Any:
     """
     Random index data.
+    True random based on secrets package.
 
     Parameters
     ----------

@@ -37,4 +37,4 @@ rzip : File compress methods.
 from typing import Final
 
 
-__version__: Final[str] = "0.420"
+__version__: Final[str] = "0.421"

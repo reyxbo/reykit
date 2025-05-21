@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, List, Dict, Iterable, Literal, Optional, Union, overload
+from typing import Any, List, Dict, TypedDict, Iterable, Literal, Optional, Union, overload
 from os.path import abspath as os_abspath
 from pandas import DataFrame, ExcelWriter, isnull
 from sqlalchemy.engine.cursor import CursorResult
@@ -32,8 +32,9 @@ __all__ = (
     "to_excel"
 )
 
-# Table format data type.
+
 Table = Union[List[Dict], Dict, CursorResult, DataFrame]
+SheetSet = TypedDict("SheetsSet", {"name": str, "index": int, "fields": Union[str, List[str]]})
 
 
 def to_table(
@@ -432,7 +433,7 @@ def to_excel(
     data: Union[Table, Iterable[Iterable]],
     path: str = "data.xlsx",
     group_field: Optional[str] = None,
-    sheets_set: Dict[Union[str, int], Dict[Literal["name", "index", "fields"], Any]] = {}
+    sheets_set: Dict[Union[str, int], SheetSet] = {}
 ) -> str:
     """
     Convert data to save Excel format file and return sheet name and sheet data.

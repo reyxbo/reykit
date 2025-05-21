@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, List, Tuple, Dict, Iterable, Literal, Optional, NoReturn, Callable, Generator, overload
+from typing import Any, List, Tuple, Dict, TypedDict, Iterable, Optional, NoReturn, Callable, Generator, overload
 
 from .rexception import check_least_one, check_most_one
 from .rsystem import is_iterable
@@ -26,10 +26,13 @@ __all__ = (
 )
 
 
+CountResult = TypedDict("CountResult", {"value": Any, "count": int})
+
+
 def count(
     data: Iterable,
     ascend: bool = False
-) -> List[Dict[Literal["value", "count"], Any]]:
+) -> List[CountResult]:
     """
     Group count data element value.
 

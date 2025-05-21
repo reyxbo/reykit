@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, List, Dict, Tuple, Iterable, Literal, Optional, Sequence, Callable, Union, Type, overload
+from typing import Any, List, Dict, TypedDict, Tuple, Iterable, Literal, Optional, Sequence, Callable, Union, Type, overload
 from inspect import signature as inspect_signature, _ParameterKind, _empty
 from sys import path as sys_path, modules as sys_modules
 from os import getpid as os_getpid
@@ -65,6 +65,39 @@ __all__ = (
     "start_process",
     "get_idle_port"
 )
+
+
+LoginUsers = TypedDict("LoginUsers", {"time": datetime, "name": str, "host": str})
+ComputerInfo = TypedDict(
+    "ComputerInfo",
+    {
+        "boot_time": float,
+        "cpu_count": int,
+        "cpu_frequency": int,
+        "cpu_percent": float,
+        "memory_total": float,
+        "memory_percent": float,
+        "disk_total": float,
+        "disk_percent": float,
+        "process_count": int,
+        "network_count": int,
+        "login_users":LoginUsers
+    }
+)
+NetWorkInfo = TypedDict(
+    "NetWorkTable",
+    {
+        "family": Optional[str],
+        "socket": Optional[str],
+        "local_ip": str,
+        "local_port": int,
+        "remote_ip": Optional[str],
+        "remote_port": Optional[int],
+        "status": Optional[str],
+        "pid": Optional[int]
+    }
+)
+ProcessInfo = TypedDict("ProcessInfo", {"create_time": datetime, "id": int, "name": str, "ports": Optional[List[int]]})
 
 
 # Added environment path.
@@ -636,22 +669,7 @@ def get_arg_info(func: Callable) -> List[
     return info
 
 
-def get_computer_info() -> Dict[
-    Literal[
-        "boot_time",
-        "cpu_count",
-        "cpu_frequency",
-        "cpu_percent",
-        "memory_total",
-        "memory_percent",
-        "disk_total",
-        "disk_percent",
-        "process_count",
-        "network_count",
-        "users"
-    ],
-    Any
-]:
+def get_computer_info() -> ComputerInfo:
     """
     Get computer information.
 
@@ -738,12 +756,7 @@ def get_computer_info() -> Dict[
     return info
 
 
-def get_network_table() -> List[
-    Dict[
-        Literal["family", "socket", "local_ip", "local_port", "remote_ip", "remote_port", "status", "pid"],
-        Any
-    ]
-]:
+def get_network_table() -> List[NetWorkInfo]:
     """
     Get network information table.
 
@@ -801,12 +814,7 @@ def get_network_table() -> List[
     return table
 
 
-def get_process_table() -> List[
-    Dict[
-        Literal["create_time", "id", "name", "ports"],
-        Any
-    ]
-]:
+def get_process_table() -> List[ProcessInfo]:
     """
     Get process information table.
 

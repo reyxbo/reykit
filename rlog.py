@@ -282,7 +282,7 @@ class RLog(object):
     def get_default_filter_method(
         self,
         format_: str,
-        type_ : Optional[Literal["print", "file"]] = None
+        mode : Optional[Literal["print", "file"]] = None
     ) -> Callable[[LogRecord], Literal[True]]:
         """
         Get default filter method of handler.
@@ -290,7 +290,7 @@ class RLog(object):
         Parameters
         ----------
         format_ : Record format.
-        type_ : Handler type.
+        mode : Handler mode.
             - `None` : Standard filter method.
             - `Literal['print'] : Print handler filter method.
             - `Literal['file'] : File handler filter method.
@@ -321,11 +321,11 @@ class RLog(object):
             self._supply_format_standard(format_, record)
 
             # Format print.
-            if type_ == "print":
+            if mode == "print":
                 self._supply_format_print(format_, record)
 
             # Format file.
-            elif type_ == "file":
+            elif mode == "file":
                 self._supply_format_file(format_, record)
 
             return True

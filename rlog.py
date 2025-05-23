@@ -228,7 +228,7 @@ class RLog(object):
         if not self.print_colour: return
 
         ## Added.
-        result = search("\033\[[\d;]+?m", format_)
+        result = search(r"\033\[[\d;]+?m", format_)
         if result is not None: return
 
         # "format_time".
@@ -250,7 +250,7 @@ class RLog(object):
         # "format_message".
         if (
             "%(format_message)s" in format_
-            and search("\033\[[\d;]+?m", record.format_message) is None
+            and search(r"\033\[[\d;]+?m", record.format_message) is None
         ):
             level_color_code = self.get_level_color_ansi(record.levelno)
             record.format_message = "%s%s\033[0m" % (
@@ -275,7 +275,7 @@ class RLog(object):
 
         # Format "format_message".
         if "%(format_message)s" in format_:
-            pattern = "\033\[[\d;]+?m"
+            pattern = r"\033\[[\d;]+?m"
             record.format_message = sub(pattern, record.format_message)
 
 

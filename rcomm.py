@@ -304,7 +304,7 @@ def request(
 
     # Set encod type.
     if response.encoding == "ISO-8859-1":
-        pattern = "<meta [^>]*charset=([\w-]+)[^>]*>"
+        pattern = r"<meta [^>]*charset=([\w-]+)[^>]*>"
         charset = search(pattern, response.text)
         if charset is None:
             charset = "utf-8"
@@ -345,7 +345,7 @@ def download(url: str, path: Optional[str] = None) -> str:
         Content_disposition = response.headers.get("Content-Disposition", "")
         if "filename" in Content_disposition:
             file_name = search(
-                "filename=['\"]?([^\s'\"]+)",
+                r"filename=['\"]?([^\s'\"]+)",
                 Content_disposition
             )
         else:

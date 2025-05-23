@@ -290,7 +290,7 @@ def text_to_time(
 
     ### Type "datetime".
     if 14 <= str_len <= 21:
-        pattern = "^(\d{4})\S(\d{1,2})\S(\d{1,2})\S?.(\d{1,2})\S(\d{1,2})\S(\d{1,2})\S?$"
+        pattern = r"^(\d{4})\S(\d{1,2})\S(\d{1,2})\S?.(\d{1,2})\S(\d{1,2})\S(\d{1,2})\S?$"
         result = search(pattern, string)
         if result is not None:
             year, month, day, hour, minute, second = [
@@ -302,7 +302,7 @@ def text_to_time(
 
     ### Type "date".
     if 8 <= str_len <= 11:
-        pattern = "^(\d{4})\S(\d{1,2})\S(\d{1,2})\S?$"
+        pattern = r"^(\d{4})\S(\d{1,2})\S(\d{1,2})\S?$"
         result = search(pattern, string)
         if result is not None:
             year, month, day = [
@@ -314,7 +314,7 @@ def text_to_time(
 
     ### Type "time".
     if 5 <= str_len <= 9:
-        pattern = "^(\d{1,2})\S(\d{1,2})\S(\d{1,2})\S?$"
+        pattern = r"^(\d{1,2})\S(\d{1,2})\S(\d{1,2})\S?$"
         result = search(pattern, string)
         if result is not None:
             hour, minute, second = [

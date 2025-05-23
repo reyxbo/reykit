@@ -139,12 +139,12 @@ def find_relpath(abspath: str, relpath: str) -> str:
     Examples
     --------
     >>> old_abspath = os.getcwd()
-    >>> relpath = '..\Folder4\File.txt'
+    >>> relpath = '../Folder4/File.txt'
     >>> new_abspath = convert_relpath(old_abspath, relpath)
     >>> old_abspath
-    C:\Folder1\Folder2\Folder3
+    C:/Folder1/Folder2/Folder3
     >>> new_abspath
-    C:\Folder1\Folder4\File.txt
+    C:/Folder1/Folder4/File.txt
     """
 
     # Get parameter.
@@ -1715,7 +1715,7 @@ def doc_to_docx(
 
     # Handle parameter.
     if save_path is None:
-        pattern = ".[dD][oO][cC]"
+        pattern = r".[dD][oO][cC]"
         save_path = sub(
             pattern,
             path.replace("\\", "/"),

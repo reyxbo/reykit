@@ -28,5 +28,6 @@ from .rsystem import *
 from .rtable import *
 from .rtext import *
 from .rtime import *
+from .rtype import *
 from .rwrap import *
 from .rzip import *

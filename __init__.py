@@ -29,6 +29,7 @@ rsystem : Interpreter system methods.
 rtable : Table methods.
 rtext : Text methods.
 rtime : Time methods.
+rtype : Type methods.
 rwrap : Decorators.
 rzip : File compress methods.
 """
@@ -37,4 +38,4 @@ rzip : File compress methods.
 from typing import Final
 
 
-__version__: Final[str] = "0.422"
+__version__: Final[str] = "0.423"

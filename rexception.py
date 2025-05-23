@@ -28,8 +28,10 @@ from traceback import format_exc
 from warnings import warn as warnings_warn
 
 
+from .rtype import RNull
+
+
 __all__ = (
-    "RError",
     "throw",
     "warn",
     "catch_exc",
@@ -41,15 +43,9 @@ __all__ = (
 )
 
 
-class RError(Exception):
-    """
-    Rey `exception` type.
-    """
-
-
 def throw(
     exception: Type[BaseException] = AssertionError,
-    value: Optional[Any] = "_None",
+    value: Any = RNull,
     frame: int = 2
 ) -> NoReturn:
     """
@@ -62,47 +58,38 @@ def throw(
     frame : Number of code to upper level.
     """
 
-    # Get parameter.
+    # Text.
 
-    ## Value name.
-    if value != "_None":
+    ## Describe.
+    if exception.__doc__ is not None:
+        text = exception.__doc__.strip()
+    if (
+        text is None
+        or text == ""
+    ):
+        text = "use error"
+    else:
+        text = text[0].lower() + text[1:]
+
+    ## Value.
+    if value != RNull:
+        if exception == TypeError:
+            if value is not None:
+                value = value.__class__
+        elif exception == TimeoutError:
+            if value.__class__ == float:
+                value = round(value, 3)
+                if value % 1 == 0:
+                    value = int(value)
+
+        ###  Name.
         from .rsystem import get_name
         name = get_name(value, frame)
         if name is None:
-            value_name = "now"
+            name = "now"
         else:
-            value_name = "parameter '%s'" % name
-
-    ## Text.
-    if exception == AssertionError:
-        text = "use error"
-    elif exception == ValueError:
-        text = "value error"
-    elif exception == TypeError:
-        text = "value type error"
-        if value is not None:
-            value = value.__class__
-    elif exception == FileNotFoundError:
-        text = "file path not found"
-    elif exception == FileExistsError:
-        text = "file path already exists"
-    elif exception == TimeoutError:
-        text = "execute timeout"
-        if value.__class__ == float:
-            value = round(value, 3)
-            if value % 1 == 0:
-                value = int(value)
-    elif exception == ConnectionError:
-        text = "connection failed"
-
-    ### Other.
-    else:
-        exception = AssertionError
-        text = "use error"
-
-    ### Join.
-    if value != "_None":
-        text += ", %s is %s" % (value_name, repr(value))
+            name = "parameter '%s'" % name
+        text += ", %s is %s" % (name, repr(value))
 
     # Throw exception.
     exception = exception(text)

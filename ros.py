@@ -71,8 +71,11 @@ __all__ = (
 )
 
 
-FileStr: TypeAlias = Union[str, TextIOBase]
-FileBytes: TypeAlias = Union[bytes, str, BufferedIOBase]
+FilePath: TypeAlias = str
+FileText: TypeAlias = str
+FileData: TypeAlias = bytes
+FileStr: TypeAlias = Union[FilePath, FileText, TextIOBase]
+FileBytes: TypeAlias = Union[FilePath, FileData, BufferedIOBase]
 File: TypeAlias = Union[FileStr, FileBytes]
 
 
@@ -97,7 +100,7 @@ def get_md5(file: Union[str, bytes]) -> str:
         file_bytes = rfile.bytes
 
     ## Bytes.
-    elif file.__class__ == bytes:
+    elif file.__class__ in (bytes, bytearray):
         file_bytes = file
 
     # Calculate.
@@ -236,6 +239,8 @@ def get_file_bytes(file: FileBytes) -> bytes:
     # Bytes.
     if file.__class__ == bytes:
         file_bytes = file
+    elif file.__class__ == bytearray:
+        file_bytes = bytes(file)
 
     # Path.
     elif file.__class__ == str:
@@ -345,11 +350,11 @@ class RFile(object):
             mode = "a"
         else:
             mode = "w"
-        if data.__class__ == bytes:
+        if data.__class__ in (bytes, bytearray):
             mode += "b"
 
         ## Convert data to string.
-        if data.__class__ not in (str, bytes):
+        if data.__class__ not in (str, bytes, bytearray):
             try:
                 data = to_json(data)
             except (JSONDecodeError, TypeError):
@@ -687,7 +692,7 @@ class RFile(object):
         # Get parameter.
         if value.__class__ == str:
             content = self.str
-        elif value.__class__ == bytes:
+        elif value.__class__ in (bytes, bytearray):
             content = self.bytes
         else:
             throw(TypeError, value)

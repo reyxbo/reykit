@@ -107,8 +107,7 @@ def decompress(
         raise AssertionError("file format that cannot be decompressed")
 
     # Handle parameter.
-    if build_dir is None:
-        build_dir = os_getcwd()
+    build_dir = build_dir or os_getcwd()
 
     # Decompress.
     with ZipFile(obj_path) as zip_file:

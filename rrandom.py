@@ -10,6 +10,7 @@
 
 
 from typing import Any, Union, Optional, Literal, Sequence, overload
+from string import digits as string_digits, ascii_letters as string_ascii_letters, punctuation as string_punctuation
 from math import ceil as math_ceil
 from secrets import randbelow as secrets_randbelow
 
@@ -20,7 +21,8 @@ from .rnumber import digits
 __all__ = (
     "randn",
     "randb",
-    "randi"
+    "randi",
+    "randchar"
 )
 
 
@@ -149,3 +151,36 @@ def randi(data: Sequence) -> Any:
     element = data[index]
 
     return element
+
+
+def randchar(
+    length: int,
+    punctuation: bool = True
+) -> str:
+    """
+    Generate random characters.
+
+    Parameters
+    ----------
+    length : Character length.
+    punctuation : Whether contain punctuation.
+
+    Returns
+    -------
+    Random characters.
+    """
+
+    # Get parameter.
+    char_range = string_digits + string_ascii_letters
+    if punctuation:
+        char_range += string_punctuation
+
+    # Generate.
+    chars = "".join(
+        [
+            randi(char_range)
+            for _ in range(length)
+        ]
+    )
+
+    return chars

@@ -60,8 +60,7 @@ def to_table(
 
     ## From CursorResult object.
     if isinstance(data, CursorResult):
-        if fields is None:
-            fields = data.keys()
+        fields = fields or data.keys()
         data_table = [
             dict(zip(fields, row))
             for row in data
@@ -229,8 +228,7 @@ def to_df(
 
     ## From CursorResult object.
     if isinstance(data, CursorResult):
-        if fields is None:
-            fields = data.keys()
+        fields = fields or data.keys()
         data_df = DataFrame(data, columns=fields)
         data_df = data_df.convert_dtypes()
 
@@ -333,8 +331,7 @@ def to_sql(
 
     # Get fields of table.
     if isinstance(data, CursorResult):
-        if fields is None:
-            fields = data.keys()
+        fields = fields or data.keys()
     else:
         data = to_table(data, fields)
         fields = data[0].keys()

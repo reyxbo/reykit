@@ -229,19 +229,16 @@ class REmail(object):
             cc = cc.split(",")
 
         ## Show from.
-        if show_from is None:
-            show_from = self.username
+        show_from = show_from or self.username
 
         ## Show to.
-        if show_to is None:
-            show_to = to
-        elif show_to.__class__ == str:
+        show_to = show_to or to
+        if show_to.__class__ == str:
             show_to = show_to.split(",")
 
         ## Show cc.
-        if show_cc is None:
-            show_cc = cc
-        elif show_cc.__class__ == str:
+        show_cc = show_cc or cc
+        if show_cc.__class__ == str:
             show_cc = show_cc.split(",")
 
         ## Attachment.

@@ -9,15 +9,17 @@
 """
 
 
-from typing import List, Union, Optional
+from typing import Any, List, Union, Optional
 from io import BytesIO
 from qrcode import make as qrcode_make
 from qrcode.image.pil import PilImage
 from PIL.Image import open as pil_open, LANCZOS
+from captcha.image import ImageCaptcha
 
 from .rexception import catch_exc
 from .rmonkey import monkey_path_pil_image_get_bytes
 from .ros import RFile
+from .rrandom import randchar
 
 try:
     from pyzbar.pyzbar import decode as pyzbar_decode
@@ -30,7 +32,8 @@ __all__ = (
     "encode_qrcode",
     "decode_qrcode",
     "compress_image",
-    "to_image"
+    "to_pimage",
+    "generate_captcha_image"
 )
 
 
@@ -88,7 +91,7 @@ def decode_qrcode(image: Union[str, bytes]) -> List[str]:
         raise pyzbar_decode
 
     # Handle parameter.
-    if image.__class__ == bytes:
+    if image.__class__ in (bytes, bytearray):
         image = BytesIO(image)
 
     # Decode.
@@ -187,7 +190,7 @@ def compress_image(
         rfile(content)
 
 
-def to_image(image: Union[str, bytes]) -> RImage:
+def to_pimage(image: Union[str, bytes]) -> RImage:
     """
     Get `Image` instance of `PIL` package.
 
@@ -207,8 +210,57 @@ def to_image(image: Union[str, bytes]) -> RImage:
         pil_image = pil_open(image)
 
     # Bytes data.
-    if image.__class__ == bytes:
+    if image.__class__ in (bytes, bytearray):
         bytes_io = BytesIO(image)
         pil_image = pil_open(bytes_io)
 
     return pil_image
+
+
+def generate_captcha_image(
+    text: Optional[Union[int, str]] = None,
+    path: Optional[str] = None,
+    **kwargs: Any
+) -> bytes:
+    """
+    Generate captcha image, based `captcha` package.
+
+    Parameters
+    ----------
+    text : Text, contains digits and Uppercase letters and lowercase letters.
+        - `None` : Random five characters.
+        - `int` : Given length Random characters.
+        - `str` : Given characters.
+
+    path : File save path.
+        - `None` : Not save.
+
+    kwargs : `ImageCaptcha` Parameters.
+
+    Returns
+    -------
+    Captcha image bytes data.
+    """
+
+    # Get parameter.
+    text = text or 5
+    if text.__class__ == int:
+        text = randchar(text, False)
+
+    # Generate.
+    default_kwargs = {
+        "width": 240,
+        "height": 90,
+        "font_sizes": (61, 75, 84)
+    }
+    default_kwargs.update(kwargs)
+    icaptcha = ImageCaptcha(**default_kwargs)
+    image: RImage = icaptcha.generate_image(text)
+    file_bytes = image.get_bytes()
+
+    # Save.
+    if path is not None:
+        rfile = RFile(path)
+        rfile.write(file_bytes)
+
+    return file_bytes

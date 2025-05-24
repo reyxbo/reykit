@@ -390,7 +390,7 @@ def get_file_stream_time(
     if file.__class__ == str:
         rfile = RFile(file)
         file_size = rfile.size
-    elif file.__class__ == bytes:
+    elif file.__class__ in (bytes, bytearray):
         file_size = len(file)
     elif file.__class__ == int:
         file_size = file

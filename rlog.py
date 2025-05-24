@@ -413,8 +413,7 @@ class RLog(object):
 
         # Get parameter.
         format_ = get_first_notnull(format_, self.default_format, default="exception")
-        if filter_ is None:
-            filter_ = self.get_default_filter_method(format_, "print")
+        filter_ = filter_ or self.get_default_filter_method(format_, "print")
 
         # Create handler.
         handler = StreamHandler()
@@ -518,10 +517,8 @@ class RLog(object):
 
         # Get parameter.
         format_ = get_first_notnull(format_, self.default_format, default="exception")
-        if path is None:
-            path = self.name
-        if filter_ is None:
-            filter_ = self.get_default_filter_method(format_, "file")
+        path = path or self.name
+        filter_ = filter_ or self.get_default_filter_method(format_, "file")
 
         # Create handler.
 
@@ -629,8 +626,7 @@ class RLog(object):
         """
 
         ## Create queue.
-        if queue is None:
-            queue = Queue()
+        queue = queue or Queue()
 
         # Create handler.
         handler = QueueHandler(queue)

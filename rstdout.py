@@ -32,7 +32,7 @@ __all__ = (
 
 
 # Module path.
-path_rprint: Final[str] = os_abspath(__file__)
+path_echo: Final[str] = os_abspath(__file__)
 
 # Status.
 _stoped: bool = False
@@ -347,7 +347,7 @@ def add_print_position() -> None:
 
         ## Compatible "echo".
         if (
-            stack_floor["filename"] == path_rprint
+            stack_floor["filename"] == path_echo
             and stack_floor["name"] == "echo"
         ):
             stack_floor = stack_params[-2]

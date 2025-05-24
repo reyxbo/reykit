@@ -32,7 +32,7 @@ from concurrent_log_handler import ConcurrentRotatingFileHandler, ConcurrentTime
 from .rexception import throw, catch_exc
 from .ros import RFile
 from .rregex import search, sub
-from .rstdout import modify_print, reset_print, path_rprint
+from .rstdout import modify_print, reset_print, path_echo
 from .rsystem import get_first_notnull, get_stack_param
 from .rtext import to_text
 from .rtime import now, time_to
@@ -132,7 +132,7 @@ class RLog(object):
 
         ## Compatible "echo".
         if (
-            stack_param["filename"] == path_rprint
+            stack_param["filename"] == path_echo
             and stack_param["name"] == "echo"
         ):
             stack_param = stack_params[-4]

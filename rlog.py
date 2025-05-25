@@ -10,7 +10,7 @@
 
 
 from __future__ import annotations
-from typing import Any, Tuple, Dict, Optional, Union, Literal, Final, Callable, NoReturn, overload
+from typing import Any, Tuple, Dict, Optional, Union, Literal, Final, Callable, NoReturn, overload, override
 from queue import Queue
 from os.path import abspath as os_abspath
 from logging import (
@@ -358,6 +358,7 @@ class RLog(object):
             """
 
 
+            @override
             def filter(
                 record: LogRecord
             ) -> Literal[True]:

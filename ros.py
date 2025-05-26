@@ -10,7 +10,7 @@
 
 
 from __future__ import annotations
-from typing import Any, List, Union, Literal, Optional, NoReturn, TypeAlias, overload
+from typing import Any, List, Union, Literal, Optional, NoReturn, overload
 from io import TextIOBase, BufferedIOBase
 from json import JSONDecodeError
 from os import (
@@ -71,12 +71,12 @@ __all__ = (
 )
 
 
-FilePath: TypeAlias = str
-FileText: TypeAlias = str
-FileData: TypeAlias = bytes
-FileStr: TypeAlias = Union[FilePath, FileText, TextIOBase]
-FileBytes: TypeAlias = Union[FilePath, FileData, BufferedIOBase]
-File: TypeAlias = Union[FileStr, FileBytes]
+type FilePath = str
+type FileText = str
+type FileData = bytes
+type FileStr = Union[FilePath, FileText, TextIOBase]
+type FileBytes = Union[FilePath, FileData, BufferedIOBase]
+type File = Union[FileStr, FileBytes]
 
 
 def get_md5(file: Union[str, bytes]) -> str:

@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, List, Dict, TypedDict, Iterable, Optional, Union, TypeAlias, overload
+from typing import Any, List, Dict, TypedDict, Iterable, Optional, Union, overload
 from os.path import abspath as os_abspath
 from pandas import DataFrame, ExcelWriter, isnull
 from sqlalchemy.engine.cursor import CursorResult
@@ -33,7 +33,7 @@ __all__ = (
 )
 
 
-Table: TypeAlias = Union[List[Dict], Dict, CursorResult, DataFrame]
+type Table = Union[List[Dict], Dict, CursorResult, DataFrame]
 SheetSet = TypedDict("SheetsSet", {"name": str, "index": int, "fields": Union[str, List[str]]})
 
 

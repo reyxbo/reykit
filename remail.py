@@ -223,10 +223,11 @@ class REmail(object):
             to = to.split(",")
 
         ## Cc.
-        if cc is None:
-            cc = []
-        elif cc.__class__ == str:
-            cc = cc.split(",")
+        match cc:
+            case None:
+                cc = []
+            case str():
+                cc = cc.split(",")
 
         ## Show from.
         show_from = show_from or self.username

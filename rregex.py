@@ -65,7 +65,6 @@ def search(
             result = obj_re[0]
         elif len(result) == 1:
             result = obj_re[1]
-        return result
 
 
 def findall(

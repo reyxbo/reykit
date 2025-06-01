@@ -174,62 +174,64 @@ async def async_request(
                 check_response_code(response.status, range_)
 
             # Receive.
-                
-            ## Auto.
-            if handler is None:
-                if response.content_type == "application/json":
-                    result = await response.json()
-                elif response.content_type == "text/plain; charset=utf-8":
+            match handler:
 
-                    # Set encode type.
-                    if response.get_encoding() == "ISO-8859-1":
-                        encoding = "utf-8"
-                    else:
-                        encoding = None
+                ## Auto.
+                case None:
+                    match response.content_type:
+                        case "application/json":
+                            result = await response.json()
+                        case "text/plain; charset=utf-8":
 
-                    result = await response.text(encoding=encoding)
-                else:
-                    result = await response.read()
+                            # Set encode type.
+                            if response.get_encoding() == "ISO-8859-1":
+                                encoding = "utf-8"
+                            else:
+                                encoding = None
 
-            ## Attribute.
-            elif handler.__class__ == str:
-                result = getattr(response, handler)
+                            result = await response.text(encoding=encoding)
+                        case _:
+                            result = await response.read()
 
-                ### Method.
-                if callable(result):
-                    result = result()
+                ## Attribute.
+                case str():
+                    result = getattr(response, handler)
 
-                    #### Coroutine.
+                    ### Method.
+                    if callable(result):
+                        result = result()
+
+                        #### Coroutine.
+                        if iscoroutine(result):
+                            result = await result
+
+                ## Attributes.
+                case tuple():
+                    result = []
+                    for key in handler:
+                        result_element = getattr(response, key)
+
+                        ### Method.
+                        if callable(result_element):
+                            result_element = result_element()
+
+                            #### Coroutine.
+                            if iscoroutine(result_element):
+                                result_element = await result_element
+
+                        result.append(result_element)
+
+                ## Method.
+                case _ if callable(handler):
+                    result = handler(response)
+
+                    ### Coroutine.
                     if iscoroutine(result):
                         result = await result
 
-            ## Attributes.
-            elif handler.__class__ == tuple:
-                result = []
-                for key in handler:
-                    result_element = getattr(response, key)
-
-                    ### Method.
-                    if callable(result_element):
-                        result_element = result_element()
-
-                        #### Coroutine.
-                        if iscoroutine(result_element):
-                            result_element = await result_element
-
-                    result.append(result_element)
-
-            ## Method.
-            elif callable(handler):
-                result = handler(response)
-
-                ### Coroutine.
-                if iscoroutine(result):
-                    result = await result
-
-            ## Throw exception.
-            else:
-                throw(TypeError, handler)
+                ## Throw exception.
+                case _:
+                    throw(TypeError, handler)
 
             return result
 

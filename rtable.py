@@ -57,34 +57,35 @@ def to_table(
     """
 
     # Convert.
+    match data:
 
-    ## From CursorResult object.
-    if isinstance(data, CursorResult):
-        fields = fields or data.keys()
-        data_table = [
-            dict(zip(fields, row))
-            for row in data
-        ]
+        ## From CursorResult object.
+        case CursorResult():
+            fields = fields or data.keys()
+            data_table = [
+                dict(zip(fields, row))
+                for row in data
+            ]
 
-    ## From DataFrame object.
-    elif data.__class__ == DataFrame:
-        data_df = to_df(data, fields)
-        fields = data_df.columns
-        data_table = [
-            dict(zip(
-                fields,
-                [
-                    None if isnull(value) else value
-                    for value in row
-                ]
-            ))
-            for row in data_df.values
-        ]
+        ## From DataFrame object.
+        case DataFrame():
+            data_df = to_df(data, fields)
+            fields = data_df.columns
+            data_table = [
+                dict(zip(
+                    fields,
+                    [
+                        None if isnull(value) else value
+                        for value in row
+                    ]
+                ))
+                for row in data_df.values
+            ]
 
-    ## From other object.
-    else:
-        data_df = to_df(data, fields)
-        data_table = to_table(data_df)
+        ## From other object.
+        case _:
+            data_df = to_df(data, fields)
+            data_table = to_table(data_df)
 
     return data_table
 
@@ -225,25 +226,26 @@ def to_df(
     """
 
     # Convert.
+    match data:
 
-    ## From CursorResult object.
-    if isinstance(data, CursorResult):
-        fields = fields or data.keys()
-        data_df = DataFrame(data, columns=fields)
-        data_df = data_df.convert_dtypes()
+        ## From CursorResult object.
+        case CursorResult():
+            fields = fields or data.keys()
+            data_df = DataFrame(data, columns=fields)
+            data_df = data_df.convert_dtypes()
 
-    ## From DataFrame object.
-    elif data.__class__ == DataFrame:
-        data_df = data.convert_dtypes()
-        if fields is not None:
-            data_df.columns = fields
+        ## From DataFrame object.
+        case DataFrame():
+            data_df = data.convert_dtypes()
+            if fields is not None:
+                data_df.columns = fields
 
-    ## From other object.
-    else:
-        if data.__class__ == dict:
-            data = [data]
-        data_df = DataFrame(data, columns=fields)
-        data_df = data_df.convert_dtypes()
+        ## From other object.
+        case _:
+            if data.__class__ == dict:
+                data = [data]
+            data_df = DataFrame(data, columns=fields)
+            data_df = data_df.convert_dtypes()
 
     return data_df
 

@@ -73,14 +73,15 @@ def throw(
 
     ## Value.
     if value != RNull:
-        if exception == TypeError:
-            if value is not None:
-                value = value.__class__
-        elif exception == TimeoutError:
-            if value.__class__ == float:
-                value = round(value, 3)
-                if value % 1 == 0:
-                    value = int(value)
+        match exception:
+            case TypeError():
+                if value is not None:
+                    value = value.__class__
+            case TimeoutError():
+                if value.__class__ == float:
+                    value = round(value, 3)
+                    if value % 1 == 0:
+                        value = int(value)
 
         ###  Name.
         from .rsystem import get_name
@@ -273,14 +274,15 @@ def check_response_code(
     """
 
     # Check.
-    if range_ is None:
-        result = code // 100 == 2
-    elif range_.__class__ == int:
-        result = code == range_
-    elif hasattr(range_, "__contains__"):
-        result = code in range_
-    else:
-        throw(TypeError, range_)
+    match range_:
+        case None:
+            result = code // 100 == 2
+        case int():
+            result = code == range_
+        case _ if hasattr(range_, "__contains__"):
+            result = code in range_
+        case _:
+            throw(TypeError, range_)
 
     # Throw exception.
     if not result:

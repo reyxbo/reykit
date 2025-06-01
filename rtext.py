@@ -189,16 +189,17 @@ def fill_width(text: str, char: str, width: int, align: Literal["left", "right",
     text_width = get_width(text)
     fill_width = width - text_width
     if fill_width > 0:
-        if align == "left":
-            new_text = "".join((char * fill_width, text))
-        elif align == "right":
-            new_text = "".join((text, char * fill_width))
-        elif align == "center":
-            fill_width_left = int(fill_width / 2)
-            fill_width_right = fill_width - fill_width_left
-            new_text = "".join((char * fill_width_left, text, char * fill_width_right))
-        else:
-            throw(ValueError, align)
+        match align:
+            case "left":
+                new_text = "".join((char * fill_width, text))
+            case "right":
+                new_text = "".join((text, char * fill_width))
+            case "center":
+                fill_width_left = int(fill_width / 2)
+                fill_width_right = fill_width - fill_width_left
+                new_text = "".join((char * fill_width_left, text, char * fill_width_right))
+            case _:
+                throw(ValueError, align)
     else:
         new_text = text
 
@@ -312,61 +313,64 @@ def add_text_frame(
         title = ""
 
     # Generate frame.
+    match frame:
 
-    ## Full type.
-    if frame == "full":
-        if title != "":
-            title = f"╡ {title} ╞"
-        width_in = width - 2
-        _contents = []
-        try:
-            for content in texts:
-                content_str = str(content)
-                pieces_str = content_str.split("\n")
-                content_str = [
-                    "║%s║" % fill_width(line_str, " ", width_in)
-                    for piece_str in pieces_str
-                    for line_str in split_text(piece_str, width_in, True)
-                ]
-                content = "\n".join(content_str)
-                _contents.append(content)
-        except:
+        ## Full type.
+        case "full":
+            if title != "":
+                title = f"╡ {title} ╞"
+            width_in = width - 2
+            _contents = []
+            try:
+                for content in texts:
+                    content_str = str(content)
+                    pieces_str = content_str.split("\n")
+                    content_str = [
+                        "║%s║" % fill_width(line_str, " ", width_in)
+                        for piece_str in pieces_str
+                        for line_str in split_text(piece_str, width_in, True)
+                    ]
+                    content = "\n".join(content_str)
+                    _contents.append(content)
+            except:
+                frame_top = fill_width(title, "═", width, "center")
+                frame_split = "─" * width
+                frame_bottom = "═" * width
+                _contents = texts
+            else:
+                frame_top = "╔%s╗" % fill_width(title, "═", width_in, "center")
+                frame_split = "╟%s╢" % ("─" * width_in)
+                frame_bottom = "╚%s╝" % ("═" * width_in)
+
+        ## Half type.
+        case "half" | "top":
+            if title != "":
+                title = f"╡ {title} ╞"
             frame_top = fill_width(title, "═", width, "center")
             frame_split = "─" * width
-            frame_bottom = "═" * width
+            match frame:
+                case "half":
+                    frame_bottom = "═" * width
+                case "top":
+                    frame_bottom = None
             _contents = texts
-        else:
-            frame_top = "╔%s╗" % fill_width(title, "═", width_in, "center")
-            frame_split = "╟%s╢" % ("─" * width_in)
-            frame_bottom = "╚%s╝" % ("═" * width_in)
 
-    ## Half type.
-    elif frame in ("half", "top"):
-        if title != "":
-            title = f"╡ {title} ╞"
-        frame_top = fill_width(title, "═", width, "center")
-        frame_split = "─" * width
-        if frame == "half":
-            frame_bottom = "═" * width
-        elif frame == "top":
-            frame_bottom = None
-        _contents = texts
+        ## Plain type.
+        case "half_plain" | "top_plain":
+            if title != "":
+                title = f"| {title} |"
+            frame_top = fill_width(title, "=", width, "center")
+            frame_split = "-" * width
+            match frame:
+                case "half_plain":
+                    frame_bottom = "=" * width
+                case "top_plain":
+                    frame_bottom = None
+            _contents = texts
 
-    ## Plain type.
-    elif frame in ("half_plain", "top_plain"):
-        if title != "":
-            title = f"| {title} |"
-        frame_top = fill_width(title, "=", width, "center")
-        frame_split = "-" * width
-        if frame == "half_plain":
-            frame_bottom = "=" * width
-        elif frame == "top_plain":
-            frame_bottom = None
-        _contents = texts
-
-    ## Throw exception.
-    else:
-        throw(ValueError, frame)
+        ## Throw exception.
+        case _:
+            throw(ValueError, frame)
 
     # Join.
     texts = [frame_top]
@@ -440,18 +444,19 @@ def to_text(
     """
 
     # Format.
+    match data:
 
-    ## Replace tab.
-    if data.__class__ == str:
-        text = data.replace("\t", "    ")
+        ## Replace tab.
+        case str():
+            text = data.replace("\t", "    ")
 
-    ## Format contents.
-    elif data.__class__ in (list, tuple, dict, set):
-        text = pprint_pformat(data, width=width, sort_dicts=False)
+        ## Format contents.
+        case list() | tuple() | dict() | set():
+            text = pprint_pformat(data, width=width, sort_dicts=False)
 
-    ## Other.
-    else:
-        text = str(data)
+        ## Other.
+        case _:
+            text = str(data)
 
     return text
 

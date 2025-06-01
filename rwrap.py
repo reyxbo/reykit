@@ -479,10 +479,11 @@ def wrap_dos_command(
             kw_value = getattr(namespace, kw_name)
             if kw_value.__class__ == list:
                 kw_value_len = len(kw_value)
-                if kw_value_len == 0:
-                    kw_value = None
-                elif kw_value_len == 1:
-                    kw_value = kw_value[0]
+                match kw_value_len:
+                    case 0:
+                        kw_value = None
+                    case 1:
+                        kw_value = kw_value[0]
                 command_kwargs[info["name"]] = kw_value
 
     # Execute function.

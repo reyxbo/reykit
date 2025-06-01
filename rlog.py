@@ -320,13 +320,15 @@ class RLog(object):
             # Format standard.
             self._supply_format_standard(format_, record)
 
-            # Format print.
-            if mode == "print":
-                self._supply_format_print(format_, record)
+            match mode:
 
-            # Format file.
-            elif mode == "file":
-                self._supply_format_file(format_, record)
+                # Format print.
+                case "print":
+                    self._supply_format_print(format_, record)
+
+                # Format file.
+                case "file":
+                    self._supply_format_file(format_, record)
 
             return True
 
@@ -548,39 +550,40 @@ class RLog(object):
 
         ## By time split.
         elif time is not None:
+            match time:
 
-            ### Interval hours.
-            if time.__class__ in (int, float):
-                second = int(time * 60 * 60)
-                handler = ConcurrentTimedRotatingFileHandler(
-                    path,
-                    "S",
-                    second,
-                    1_0000_0000,
-                    delay=True
-                )
+                ### Interval hours.
+                case int() | float():
+                    second = int(time * 60 * 60)
+                    handler = ConcurrentTimedRotatingFileHandler(
+                        path,
+                        "S",
+                        second,
+                        1_0000_0000,
+                        delay=True
+                    )
 
-            ### Everyday midnight.
-            elif time == "m":
-                handler = ConcurrentTimedRotatingFileHandler(
-                    path,
-                    "MIDNIGHT",
-                    backupCount=1_0000_0000,
-                    delay=True
-                )
+                ### Everyday midnight.
+                case "m":
+                    handler = ConcurrentTimedRotatingFileHandler(
+                        path,
+                        "MIDNIGHT",
+                        backupCount=1_0000_0000,
+                        delay=True
+                    )
 
-            ### Weekly midnight
-            elif time in ("w0", "w1", "w2", "w3", "w4", "w5", "w6"):
-                handler = ConcurrentTimedRotatingFileHandler(
-                    path,
-                    time,
-                    backupCount=1_0000_0000,
-                    delay=True
-                )
+                ### Weekly midnight
+                case "w0" | "w1" | "w2" | "w3" | "w4" | "w5" | "w6":
+                    handler = ConcurrentTimedRotatingFileHandler(
+                        path,
+                        time,
+                        backupCount=1_0000_0000,
+                        delay=True
+                    )
 
-            ### Throw exception.
-            else:
-                throw(ValueError, time)
+                ### Throw exception.
+                case _:
+                    throw(ValueError, time)
 
         ## Not split.
         else:

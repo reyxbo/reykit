@@ -106,12 +106,13 @@ def beautify_text(
     ## Frame.
     global is_frame_plain
     if is_frame_plain:
-        if frame == "full":
-            frame = "half_plain"
-        elif frame == "half":
-            frame = "half_plain"
-        elif frame == "top":
-            frame = "top_plain"
+        match frame:
+            case "full":
+                frame = "half_plain"
+            case "half":
+                frame = "half_plain"
+            case "top":
+                frame = "top_plain"
 
     # To text.
     text_list = [

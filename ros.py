@@ -93,15 +93,16 @@ def get_md5(file: Union[str, bytes]) -> str:
     """
 
     # Get bytes.
+    match file:
 
-    ## Path.
-    if file.__class__ == str:
-        rfile = RFile(file)
-        file_bytes = rfile.bytes
+        ## Path.
+        case str():
+            rfile = RFile(file)
+            file_bytes = rfile.bytes
 
-    ## Bytes.
-    elif file.__class__ in (bytes, bytearray):
-        file_bytes = file
+        ## Bytes.
+        case bytes() | bytearray():
+            file_bytes = file
 
     # Calculate.
     hash = hashlib_md5(file_bytes)
@@ -190,26 +191,28 @@ def get_file_str(file: FileStr) -> str:
     File string data.
     """
 
-    # Path or string.
-    if file.__class__ == str:
-        exist = os_exists(file)
+    match file:
 
-        # Path.
-        if exist:
-            rfile = RFile(file)
-            file_str = rfile.str
+        # Path or string.
+        case str():
+            exist = os_exists(file)
 
-        # String.
-        else:
-            file_str = file
+            # Path.
+            if exist:
+                rfile = RFile(file)
+                file_str = rfile.str
 
-    # IO.
-    elif isinstance(file, TextIOBase):
-        file_str = file.read()
+            # String.
+            else:
+                file_str = file
 
-    # Throw exception.
-    else:
-        throw(TypeError, file)
+        # IO.
+        case TextIOBase():
+            file_str = file.read()
+
+        # Throw exception.
+        case _:
+            throw(TypeError, file)
 
     return file_str
 
@@ -236,24 +239,26 @@ def get_file_bytes(file: FileBytes) -> bytes:
     File bytes data.
     """
 
-    # Bytes.
-    if file.__class__ == bytes:
-        file_bytes = file
-    elif file.__class__ == bytearray:
-        file_bytes = bytes(file)
+    match file:
 
-    # Path.
-    elif file.__class__ == str:
-        rfile = RFile(file)
-        file_bytes = rfile.bytes
+        # Bytes.
+        case bytes():
+            file_bytes = file
+        case bytearray():
+            file_bytes = bytes(file)
 
-    # IO.
-    elif isinstance(file, BufferedIOBase):
-        file_bytes = file.read()
+        # Path.
+        case str():
+            rfile = RFile(file)
+            file_bytes = rfile.bytes
 
-    # Throw exception.
-    else:
-        throw(TypeError, file)
+        # IO.
+        case BufferedIOBase():
+            file_bytes = file.read()
+
+        # Throw exception.
+        case _:
+            throw(TypeError, file)
 
     return file_bytes
 
@@ -311,12 +316,13 @@ class RFile(object):
         """
 
         # Handle parameter.
-        if type_ == "bytes":
-            mode = "rb"
-            encoding = None
-        elif type_ == "str":
-            mode = "r"
-            encoding="utf-8"
+        match type_:
+            case "bytes":
+                mode = "rb"
+                encoding = None
+            case "str":
+                mode = "r"
+                encoding="utf-8"
 
         # Read.
         with open(self.path, mode, encoding=encoding) as file:
@@ -690,12 +696,13 @@ class RFile(object):
         """
 
         # Get parameter.
-        if value.__class__ == str:
-            content = self.str
-        elif value.__class__ in (bytes, bytearray):
-            content = self.bytes
-        else:
-            throw(TypeError, value)
+        match value:
+            case str():
+                content = self.str
+            case bytes() | bytearray():
+                content = self.bytes
+            case _:
+                throw(TypeError, value)
 
         # Judge.
         judge = value in content
@@ -760,47 +767,49 @@ class RFolder(object):
         ## Recursive.
         if recursion:
             obj_walk = os_walk(self.path)
-            if target == "all":
-                targets_path = [
-                    os_join(path, file_name)
-                    for path, folders_name, files_name in obj_walk
-                    for file_name in files_name + folders_name
-                ]
-                paths.extend(targets_path)
-            elif target == "file":
-                targets_path = [
-                    os_join(path, file_name)
-                    for path, _, files_name in obj_walk
-                    for file_name in files_name
-                ]
-                paths.extend(targets_path)
-            elif target in ("all", "folder"):
-                targets_path = [
-                    os_join(path, folder_name)
-                    for path, folders_name, _ in obj_walk
-                    for folder_name in folders_name
-                ]
-                paths.extend(targets_path)
+            match target:
+                case "all":
+                    targets_path = [
+                        os_join(path, file_name)
+                        for path, folders_name, files_name in obj_walk
+                        for file_name in files_name + folders_name
+                    ]
+                    paths.extend(targets_path)
+                case "file":
+                    targets_path = [
+                        os_join(path, file_name)
+                        for path, _, files_name in obj_walk
+                        for file_name in files_name
+                    ]
+                    paths.extend(targets_path)
+                case "all" | "folder":
+                    targets_path = [
+                        os_join(path, folder_name)
+                        for path, folders_name, _ in obj_walk
+                        for folder_name in folders_name
+                    ]
+                    paths.extend(targets_path)
 
         ## Non recursive.
         else:
             names = os_listdir(self.path)
-            if target == "all":
-                for name in names:
-                    target_path = os_join(self.path, name)
-                    paths.append(target_path)
-            elif target == "file":
-                for name in names:
-                    target_path = os_join(self.path, name)
-                    is_file = os_isfile(target_path)
-                    if is_file:
+            match target:
+                case "all":
+                    for name in names:
+                        target_path = os_join(self.path, name)
                         paths.append(target_path)
-            elif target == "folder":
-                for name in names:
-                    target_path = os_join(self.path, name)
-                    is_dir = os_isdir(target_path)
-                    if is_dir:
-                        paths.append(target_path)
+                case "file":
+                    for name in names:
+                        target_path = os_join(self.path, name)
+                        is_file = os_isfile(target_path)
+                        if is_file:
+                            paths.append(target_path)
+                case "folder":
+                    for name in names:
+                        target_path = os_join(self.path, name)
+                        is_dir = os_isdir(target_path)
+                        if is_dir:
+                            paths.append(target_path)
 
         return paths
 
@@ -1102,12 +1111,13 @@ class RTempFile(object):
         """
 
         # Get parameter.
-        if type_ == "bytes":
-            mode = "w+b"
-        elif type_ == "str":
-            mode = "w+"
-        else:
-            throw(ValueError, type_)
+        match type_:
+            case "bytes":
+                mode = "w+b"
+            case "str":
+                mode = "w+"
+            case _:
+                throw(ValueError, type_)
 
         # Set attribute.
         self.file = TemporaryFile(
@@ -1414,47 +1424,49 @@ class RTempFolder(object):
         ## Recursive.
         if recursion:
             obj_walk = os_walk(self.path)
-            if target == "all":
-                targets_path = [
-                    os_join(path, file_name)
-                    for path, folders_name, files_name in obj_walk
-                    for file_name in files_name + folders_name
-                ]
-                paths.extend(targets_path)
-            elif target == "file":
-                targets_path = [
-                    os_join(path, file_name)
-                    for path, _, files_name in obj_walk
-                    for file_name in files_name
-                ]
-                paths.extend(targets_path)
-            elif target in ("all", "folder"):
-                targets_path = [
-                    os_join(path, folder_name)
-                    for path, folders_name, _ in obj_walk
-                    for folder_name in folders_name
-                ]
-                paths.extend(targets_path)
+            match target:
+                case "all":
+                    targets_path = [
+                        os_join(path, file_name)
+                        for path, folders_name, files_name in obj_walk
+                        for file_name in files_name + folders_name
+                    ]
+                    paths.extend(targets_path)
+                case "file":
+                    targets_path = [
+                        os_join(path, file_name)
+                        for path, _, files_name in obj_walk
+                        for file_name in files_name
+                    ]
+                    paths.extend(targets_path)
+                case "all" | "folder":
+                    targets_path = [
+                        os_join(path, folder_name)
+                        for path, folders_name, _ in obj_walk
+                        for folder_name in folders_name
+                    ]
+                    paths.extend(targets_path)
 
         ## Non recursive.
         else:
             names = os_listdir(self.path)
-            if target == "all":
-                for name in names:
-                    target_path = os_join(self.path, name)
-                    paths.append(target_path)
-            elif target == "file":
-                for name in names:
-                    target_path = os_join(self.path, name)
-                    is_file = os_isfile(target_path)
-                    if is_file:
+            match target:
+                case "all":
+                    for name in names:
+                        target_path = os_join(self.path, name)
                         paths.append(target_path)
-            elif target == "folder":
-                for name in names:
-                    target_path = os_join(self.path, name)
-                    is_dir = os_isdir(target_path)
-                    if is_dir:
-                        paths.append(target_path)
+                case "file":
+                    for name in names:
+                        target_path = os_join(self.path, name)
+                        is_file = os_isfile(target_path)
+                        if is_file:
+                            paths.append(target_path)
+                case "folder":
+                    for name in names:
+                        target_path = os_join(self.path, name)
+                        is_dir = os_isdir(target_path)
+                        if is_dir:
+                            paths.append(target_path)
 
         return paths
 
@@ -1754,32 +1766,33 @@ def extract_docx_content(path: str) -> str:
     childs_iter: ElementChildIterator = document.element.body.iterchildren()
     contents = []
     for child in childs_iter:
+        match child:
 
-        ## Text.
-        if child.__class__ == CT_P:
-            paragraph = Paragraph(child, document)
-            contents.append(paragraph.text)
+            ## Text.
+            case CT_P():
+                paragraph = Paragraph(child, document)
+                contents.append(paragraph.text)
 
-        ## Table.
-        elif child.__class__ == CT_Tbl:
-            table = Table(child, document)
-            table_text = "\n".join(
-                [
-                    " | ".join(
-                        [
-                            cell.text.strip().replace("\n", " ")
-                            for cell in row.cells
-                            if (
-                                cell.text is not None
-                                and cell.text.strip() != ""
-                            )
-                        ]
-                    )
-                    for row in table.rows
-                ]
-            )
-            table_text = "\n%s\n" % table_text
-            contents.append(table_text)
+            ## Table.
+            case CT_Tbl():
+                table = Table(child, document)
+                table_text = "\n".join(
+                    [
+                        " | ".join(
+                            [
+                                cell.text.strip().replace("\n", " ")
+                                for cell in row.cells
+                                if (
+                                    cell.text is not None
+                                    and cell.text.strip() != ""
+                                )
+                            ]
+                        )
+                        for row in table.rows
+                    ]
+                )
+                table_text = "\n%s\n" % table_text
+                contents.append(table_text)
 
     ## Join.
     content = "\n".join(contents)
@@ -1835,17 +1848,18 @@ def extract_file_content(path: str) -> str:
         suffix = ".docx"
 
     # Extract.
+    match suffix:
 
-    ## DOCX.
-    if suffix == ".docx":
-        content = extract_docx_content(path)
+        ## DOCX.
+        case ".docx":
+            content = extract_docx_content(path)
 
-    ## PDF.
-    elif suffix == ".pdf":
-        content = extract_pdf_content(path)
+        ## PDF.
+        case ".pdf":
+            content = extract_pdf_content(path)
 
-    ## Throw exception.
-    else:
-        throw(value=suffix)
+        ## Throw exception.
+        case _:
+            throw(value=suffix)
 
     return content

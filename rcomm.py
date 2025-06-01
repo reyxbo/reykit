@@ -387,15 +387,16 @@ def get_file_stream_time(
     """
 
     # Get parameter.
-    if file.__class__ == str:
-        rfile = RFile(file)
-        file_size = rfile.size
-    elif file.__class__ in (bytes, bytearray):
-        file_size = len(file)
-    elif file.__class__ == int:
-        file_size = file
-    else:
-        throw(TypeError, file)
+    match file:
+        case str():
+            rfile = RFile(file)
+            file_size = rfile.size
+        case bytes() | bytearray():
+            file_size = len(file)
+        case int():
+            file_size = file
+        case _:
+            throw(TypeError, file)
 
     # Calculate.
     seconds = file_size / 125_000 / bandwidth

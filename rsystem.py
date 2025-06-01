@@ -288,10 +288,11 @@ def dos_command_var(*vars: Any) -> List[Any]:
         dos_value = getattr(namespace, kw_name)
         if dos_value.__class__ == list:
             value_len = len(dos_value)
-            if value_len == 0:
-                dos_value = None
-            elif value_len == 1:
-                dos_value = dos_value[0]
+            match value_len:
+                case 0:
+                    dos_value = None
+                case 1:
+                    dos_value = dos_value[0]
             values.append(dos_value)
             continue
 
@@ -509,41 +510,43 @@ def get_stack_text(format_: Literal["plain", "full"] = "plain", limit: int = 2) 
     Code stack text.
     """
 
-    # Plain.
-    if format_ == "plain":
-        limit += 1
-        stacks = format_stack(limit=limit)
+    match format_:
 
-        ## Check.
-        if len(stacks) != limit:
-            throw(value=limit)
+        # Plain.
+        case "plain":
+            limit += 1
+            stacks = format_stack(limit=limit)
 
-        ## Convert.
-        text = stacks[0]
-        index_end = text.find(", in ")
-        text = text[2:index_end]
+            ## Check.
+            if len(stacks) != limit:
+                throw(value=limit)
 
-    # Full.
-    elif format_ == "full":
-        stacks = format_stack()
-        index_limit = len(stacks) - limit
-        stacks = stacks[:index_limit]
+            ## Convert.
+            text = stacks[0]
+            index_end = text.find(", in ")
+            text = text[2:index_end]
 
-        ## Check.
-        if len(stacks) == 0:
-            throw(value=limit)
+        # Full.
+        case "full":
+            stacks = format_stack()
+            index_limit = len(stacks) - limit
+            stacks = stacks[:index_limit]
 
-        ## Convert.
-        stacks = [
-            stack[2:].replace("\n  ", "\n", 1)
-            for stack in stacks
-        ]
-        text = "".join(stacks)
-        text = text[:-1]
+            ## Check.
+            if len(stacks) == 0:
+                throw(value=limit)
 
-    # Throw exception.
-    else:
-        throw(ValueError, format_)
+            ## Convert.
+            stacks = [
+                stack[2:].replace("\n  ", "\n", 1)
+                for stack in stacks
+            ]
+            text = "".join(stacks)
+            text = text[:-1]
+
+        # Throw exception.
+        case _:
+            throw(ValueError, format_)
 
     return text
 
@@ -581,28 +584,29 @@ def get_stack_param(format_: Literal["floor", "full"] = "floor", limit: int = 2)
         throw(value=limit)
 
     # Convert.
+    match format_:
 
-    ## Floor.
-    if format_ == "floor":
-        stack = stacks[-1]
-        params = {
-            "filename": stack.filename,
-            "lineno": stack.lineno,
-            "name": stack.name,
-            "line": stack.line
-        }
-
-    ## Full.
-    elif format_ == "full":
-        params = [
-            {
+        ## Floor.
+        case "floor":
+            stack = stacks[-1]
+            params = {
                 "filename": stack.filename,
                 "lineno": stack.lineno,
                 "name": stack.name,
                 "line": stack.line
             }
-            for stack in stacks
-        ]
+
+        ## Full.
+        case "full":
+            params = [
+                {
+                    "filename": stack.filename,
+                    "lineno": stack.lineno,
+                    "name": stack.name,
+                    "line": stack.line
+                }
+                for stack in stacks
+            ]
 
     return params
 
@@ -875,24 +879,27 @@ def search_process(
     """
 
     # Handle parameter.
-    if id_ is None:
-        ids = []
-    elif id_.__class__ == int:
-        ids = [id_]
-    else:
-        ids = id_
-    if name is None:
-        names = []
-    elif name.__class__ == str:
-        names = [name]
-    else:
-        names = name
-    if port is None:
-        ports = []
-    elif port.__class__ in (str, int):
-        ports = [port]
-    else:
-        ports = port
+    match id_:
+        case None:
+            ids = []
+        case int():
+            ids = [id_]
+        case _:
+            ids = id_
+    match name:
+        case None:
+            names = []
+        case str():
+            names = [name]
+        case _:
+            names = name
+    match port:
+        case None:
+            ports = []
+        case str() | int():
+            ports = [port]
+        case _:
+            ports = port
     ports = [
         int(port)
         for port in ports

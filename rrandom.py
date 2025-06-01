@@ -63,17 +63,18 @@ def randn(*thresholds: float, precision: Optional[int] = None) -> Union[int, flo
 
     # Handle parameter.
     thresholds_len = len(thresholds)
-    if thresholds_len == 0:
-        threshold_low = 0
-        threshold_high = 10
-    elif thresholds_len == 1:
-        threshold_low = 0
-        threshold_high = thresholds[0]
-    elif thresholds_len == 2:
-        threshold_low = thresholds[0]
-        threshold_high = thresholds[1]
-    else:
-        raise ValueError("number of parameter 'thresholds' must is 0 or 1 or 2")
+    match thresholds_len:
+        case 0:
+            threshold_low = 0
+            threshold_high = 10
+        case 1:
+            threshold_low = 0
+            threshold_high = thresholds[0]
+        case 2:
+            threshold_low = thresholds[0]
+            threshold_high = thresholds[1]
+        case _:
+            raise ValueError("number of parameter 'thresholds' must is 0 or 1 or 2")
     if precision is None:
         threshold_low_desimal_digits = digits(threshold_low)[1]
         threshold_high_desimal_digits = digits(threshold_high)[1]

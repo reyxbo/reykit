@@ -104,22 +104,23 @@ def now(
     """
 
     # Return.
-    if format_ == "datetime":
-        return datetime_datetime.now()
-    elif format_ == "date":
-        return datetime_datetime.now().date()
-    elif format_ == "time":
-        return datetime_datetime.now().time()
-    elif format_ == "datetime_str":
-        return datetime_datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    elif format_ == "date_str":
-        return datetime_datetime.now().strftime("%Y-%m-%d")
-    elif format_ == "time_str":
-        return datetime_datetime.now().strftime("%H:%M:%S")
-    elif format_ == "timestamp":
-        return int(time_time() * 1000)
-    else:
-        throw(ValueError, format_)
+    match format_:
+        case "datetime":
+            return datetime_datetime.now()
+        case "date":
+            return datetime_datetime.now().date()
+        case "time":
+            return datetime_datetime.now().time()
+        case "datetime_str":
+            return datetime_datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        case "date_str":
+            return datetime_datetime.now().strftime("%Y-%m-%d")
+        case "time_str":
+            return datetime_datetime.now().strftime("%H:%M:%S")
+        case "timestamp":
+            return int(time_time() * 1000)
+        case _:
+            throw(ValueError, format_)
 
 
 @overload
@@ -175,63 +176,65 @@ def time_to(
     Converted text.
     """
 
-    # Type "datetime".
-    if obj.__class__ in (datetime_datetime, pd_timestamp):
-        if decimal:
-            format_ = "%Y-%m-%d %H:%M:%S.%f"
-        else:
-            format_ = "%Y-%m-%d %H:%M:%S"
-        text = obj.strftime(format_)
+    match obj:
 
-    # Type "date".
-    elif obj.__class__ == datetime_date:
-        text = obj.strftime("%Y-%m-%d")
+        # Type "datetime".
+        case datetime_datetime() | pd_timestamp():
+            if decimal:
+                format_ = "%Y-%m-%d %H:%M:%S.%f"
+            else:
+                format_ = "%Y-%m-%d %H:%M:%S"
+            text = obj.strftime(format_)
 
-    # Type "time".
-    elif obj.__class__ == datetime_time:
-        if decimal:
-            format_ = "%H:%M:%S.%f"
-        else:
-            format_ = "%H:%M:%S"
-        text = obj.strftime(format_)
+        # Type "date".
+        case datetime_date():
+            text = obj.strftime("%Y-%m-%d")
 
-    # Type "timedelta".
-    elif obj.__class__ in (datetime_timedelta, pd_timedelta):
-        timestamp = obj.seconds + obj.microseconds / 1000_000
-        if timestamp >= 0:
-            timestamp += 57600
-            time = datetime_datetime.fromtimestamp(timestamp).time()
+        # Type "time".
+        case datetime_time():
             if decimal:
                 format_ = "%H:%M:%S.%f"
             else:
                 format_ = "%H:%M:%S"
-            text = time.strftime(format_)
-            if obj.days != 0:
-                text = f"{obj.days}day " + text
+            text = obj.strftime(format_)
 
-        ## Throw exception.
-        elif raising:
-            throw(ValueError, obj)
+        # Type "timedelta".
+        case datetime_timedelta() | pd_timedelta():
+            timestamp = obj.seconds + obj.microseconds / 1000_000
+            if timestamp >= 0:
+                timestamp += 57600
+                time = datetime_datetime.fromtimestamp(timestamp).time()
+                if decimal:
+                    format_ = "%H:%M:%S.%f"
+                else:
+                    format_ = "%H:%M:%S"
+                text = time.strftime(format_)
+                if obj.days != 0:
+                    text = f"{obj.days}day " + text
 
-        ## Not raise.
-        else:
+            ## Throw exception.
+            elif raising:
+                throw(ValueError, obj)
+
+            ## Not raise.
+            else:
+                return obj
+
+        # Type "struct_time".
+        case time_struct_time():
+            if decimal:
+                format_ = "%Y-%m-%d %H:%M:%S.%f"
+            else:
+                format_ = "%Y-%m-%d %H:%M:%S"
+            text = time_strftime(format_, obj)
+
+        # Throw exception.
+        case _ if raising:
+            throw(TypeError, obj)
+
+        # Not raise.
+        case _:
             return obj
-
-    # Type "struct_time".
-    elif obj.__class__ == time_struct_time:
-        if decimal:
-            format_ = "%Y-%m-%d %H:%M:%S.%f"
-        else:
-            format_ = "%Y-%m-%d %H:%M:%S"
-        text = time_strftime(format_, obj)
-
-    # Throw exception.
-    elif raising:
-        throw(TypeError, obj)
-
-    # Not raise.
-    else:
-        return obj
 
     return text
 
@@ -366,30 +369,33 @@ def to_time(
     Time object.
     """
 
-    # Type "str".
-    if obj.__class__ == str:
-        time_obj = text_to_time(obj)
+    match obj:
 
-    # Type "struct_time".
-    elif obj.__class__ == time_struct_time:
-        time_obj = datetime_datetime(
-            obj.tm_year,
-            obj.tm_mon,
-            obj.tm_mday,
-            obj.tm_hour,
-            obj.tm_min,
-            obj.tm_sec
-        )
+        # Type "str".
+        case str():
+            time_obj = text_to_time(obj)
 
-    # Type "float".
-    elif obj.__class__ in (int, float):
-        int_len, _ = digits(obj)
-        if int_len == 10:
-            time_obj = datetime_datetime.fromtimestamp(obj)
-        elif int_len == 13:
-            time_obj = datetime_datetime.fromtimestamp(obj / 1000)
-        else:
-            time_obj = None
+        # Type "struct_time".
+        case time_struct_time():
+            time_obj = datetime_datetime(
+                obj.tm_year,
+                obj.tm_mon,
+                obj.tm_mday,
+                obj.tm_hour,
+                obj.tm_min,
+                obj.tm_sec
+            )
+
+        # Type "float".
+        case int() | float():
+            int_len, _ = digits(obj)
+            match int_len:
+                case 10:
+                    time_obj = datetime_datetime.fromtimestamp(obj)
+                case 13:
+                    time_obj = datetime_datetime.fromtimestamp(obj / 1000)
+                case _:
+                    time_obj = None
 
     # No time object.
     if time_obj is None:

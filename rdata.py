@@ -88,7 +88,7 @@ def count(
     return result
 
 
-def flatten(data: Any, *, _flattern_data: List = []) -> List:
+def flatten(data: Any, *, _flattern_data: Optional[List] = None) -> List:
     """
     Flatten data.
 
@@ -102,12 +102,15 @@ def flatten(data: Any, *, _flattern_data: List = []) -> List:
     Data after flatten.
     """
 
+    # Handle parameter.
+    _flattern_data = _flattern_data or []
+
     # Flatten.
 
     ## Recursion dict object.
     if data.__class__ == dict:
         for element in data.values():
-            flatten(
+            _flattern_data = flatten(
                 element,
                 _flattern_data = _flattern_data
             )
@@ -115,7 +118,7 @@ def flatten(data: Any, *, _flattern_data: List = []) -> List:
     ## Recursion iterator.
     elif is_iterable(data):
         for element in data:
-            flatten(
+            _flattern_data = flatten(
                 element,
                 _flattern_data = _flattern_data
             )

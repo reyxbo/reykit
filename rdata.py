@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, List, Tuple, Dict, TypedDict, Iterable, Optional, NoReturn, Callable, Generator, overload
+from typing import Any, List, Tuple, Dict, TypedDict, Iterable, Optional, Literal, NoReturn, Callable, Generator, TypeVar, overload
 
 from .rexception import check_least_one, check_most_one
 from .rsystem import is_iterable
@@ -27,6 +27,7 @@ __all__ = (
 
 
 CountResult = TypedDict("CountResult", {"value": Any, "count": int})
+Element = TypeVar("Element")
 
 
 def count(
@@ -87,14 +88,14 @@ def count(
     return result
 
 
-def flatten(data: Any, flattern_data: List = []) -> List:
+def flatten(data: Any, *, _flattern_data: List = []) -> List:
     """
     Flatten data.
 
     Parameters
     ----------
     data : Data.
-    flattern_data : Recursion cumulative data.
+    _flattern_data : Recursion cumulative data.
 
     Returns
     -------
@@ -106,37 +107,43 @@ def flatten(data: Any, flattern_data: List = []) -> List:
     ## Recursion dict object.
     if data.__class__ == dict:
         for element in data.values():
-            _ = flatten(element, flattern_data)
+            flatten(
+                element,
+                _flattern_data = _flattern_data
+            )
 
     ## Recursion iterator.
     elif is_iterable(data):
         for element in data:
-            _ = flatten(element, flattern_data)
+            flatten(
+                element,
+                _flattern_data = _flattern_data
+            )
 
     ## Other.
     else:
-        flattern_data.append(data)
+        _flattern_data.append(data)
 
-    return flattern_data
+    return _flattern_data
 
-
-@overload
-def split(data: Iterable, share: None = None, bin_size: None = None) -> NoReturn: ...
 
 @overload
-def split(data: Iterable, share: int = None, bin_size: int = None) -> NoReturn: ...
+def split(data: Iterable[Element], share: None = None, bin_size: None = None) -> NoReturn: ...
 
 @overload
-def split(data: Iterable, share: Optional[int] = None, bin_size: Optional[int] = None) -> List[List]: ...
+def split(data: Iterable[Element], share: int = None, bin_size: int = None) -> NoReturn: ...
 
-def split(data: Iterable, share: Optional[int] = None, bin_size: Optional[int] = None) -> List[List]:
+@overload
+def split(data: Iterable[Element], share: Optional[int] = None, bin_size: Optional[int] = None) -> List[List[Element]]: ...
+
+def split(data: Iterable[Element], share: Optional[int] = None, bin_size: Optional[int] = None) -> List[List[Element]]:
     """
     Split data into multiple data.
 
     Parameters
     ----------
     data : Data.
-    share : Number of splie share.
+    share : Number of split share.
     bin_size : Size of each bin.
 
     Returns
@@ -177,7 +184,7 @@ def split(data: Iterable, share: Optional[int] = None, bin_size: Optional[int] =
     return _data
 
 
-def unique(data: Iterable) -> List:
+def unique(data: Iterable[Element]) -> List[Element]:
     """
     De duplication of data.
 
@@ -199,7 +206,7 @@ def unique(data: Iterable) -> List:
     return data_unique
 
 
-def in_arrs(ojb: Any, *arrs: Iterable) -> bool:
+def in_arrs(ojb: Any, *arrs: Iterable, mode: Literal["or", "and"] = "or") -> bool:
     """
     Judge whether the one object is in multiple arrays.
 
@@ -207,6 +214,9 @@ def in_arrs(ojb: Any, *arrs: Iterable) -> bool:
     ----------
     obj : One object.
     arrs : Multiple arrays.
+    mode : Judge mode.
+        - `Literal["or"]` : Judge whether the in a certain array.
+        - `Literal["and"]` : Judge whether the in all arrays.
 
     Returns
     -------
@@ -214,13 +224,26 @@ def in_arrs(ojb: Any, *arrs: Iterable) -> bool:
     """
 
     # Judge.
-    for arr in arrs:
-        if ojb in arr:
+    match mode:
+
+        ## Or.
+        case "or":
+            for arr in arrs:
+                if ojb in arr:
+                    return True
+
+            return False
+
+        ## And.
+        case "and":
+            for arr in arrs:
+                if ojb not in arr:
+                    return False
+
             return True
-    return False
 
 
-def objs_in(arr: Iterable, *objs: Any) -> bool:
+def objs_in(arr: Iterable, *objs: Any, mode: Literal["or", "and"] = "or") -> bool:
     """
     Judge whether the multiple objects is in one array.
 
@@ -228,6 +251,9 @@ def objs_in(arr: Iterable, *objs: Any) -> bool:
     ----------
     arr : One array.
     objs : Multiple objects.
+    mode : Judge mode.
+        - `Literal["or"]` : Judge whether contain a certain object.
+        - `Literal["and"]` : Judge whether contain all objects.
 
     Returns
     -------
@@ -235,10 +261,23 @@ def objs_in(arr: Iterable, *objs: Any) -> bool:
     """
 
     # Judge.
-    for obj in objs:
-        if obj in arr:
+    match mode:
+
+        ## Or.
+        case "or":
+            for obj in objs:
+                if obj in arr:
+                    return True
+
+            return False
+
+        ## And.
+        case "and":
+            for obj in objs:
+                if obj not in arr:
+                    return False
+
             return True
-    return False
 
 
 class RGenerator(object):

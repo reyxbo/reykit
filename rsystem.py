@@ -456,19 +456,27 @@ def get_first_notnull(
     return default
 
 
+@overload
+def get_name(obj: Tuple, frame: int = 2) -> Optional[Tuple[str, ...]]: ...
+
+@overload
+def get_name(obj: Any, frame: int = 2) -> Optional[str]: ...
+
 def get_name(obj: Any, frame: int = 2) -> Optional[Union[str, Tuple[str, ...]]]:
     """
-    Get object name.
-    Cannot get name of element in the sequence.
+    Get name of object or variable.
 
     Parameters
     ----------
     obj : Object.
+        - `Tuple` : Variable length position parameter of previous layer.
+        - `Any` : Parameter of any layer.
+
     frame : Number of code to upper level.
 
     Returns
     -------
-    Object name or None.
+    Name or None.
     """
 
     # Get name using built in method.

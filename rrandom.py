@@ -9,11 +9,12 @@
 """
 
 
-from typing import Any, Union, Optional, Literal, Sequence, overload
+from typing import Any, List, Union, Optional, Literal, Sequence, overload
 from string import digits as string_digits, ascii_letters as string_ascii_letters, punctuation as string_punctuation
 from math import ceil as math_ceil
 from secrets import randbelow as secrets_randbelow
 
+from .rdata import Element
 from .rexception import throw
 from .rnumber import digits
 
@@ -22,7 +23,8 @@ __all__ = (
     "randn",
     "randb",
     "randi",
-    "randchar"
+    "randchar",
+    "randsort"
 )
 
 
@@ -41,7 +43,7 @@ def randn(*thresholds: float, precision: int = None) -> float: ...
 def randn(*thresholds: float, precision: Optional[int] = None) -> Union[int, float]:
     """
     Random number.
-    True random based on secrets package.
+    Random method based on secrets package.
 
     Parameters
     ----------
@@ -100,7 +102,6 @@ def randn(*thresholds: float, precision: Optional[int] = None) -> Union[int, flo
 def randb(pr: float = 0.5) -> bool:
     """
     Random bool.
-    True random based on secrets package.
 
     Parameters
     ----------
@@ -130,28 +131,80 @@ def randb(pr: float = 0.5) -> bool:
     return result
 
 
-def randi(data: Sequence) -> Any:
+@overload
+def randi(
+    data: Sequence[Element],
+    multi: None = None,
+    unique: bool = True
+) -> Element: ...
+
+@overload
+def randi(
+    data: Sequence,
+    multi: int = None,
+    unique: bool = True
+) -> List[Element]: ...
+
+def randi(
+    data: Sequence,
+    multi: Optional[int] = None,
+    unique: bool = True
+) -> Union[Element, List[Element]]:
     """
-    Random index data.
-    True random based on secrets package.
+    Random index data element.
 
     Parameters
     ----------
     data : Sequence data.
+    multi : Whether index multiple data elements.
+        - `None` : Return a value.
+        - `int` : Return multiple values.
+    unique : Whether index unique, non value constraint.
 
     Returns
     -------
     Element.
     """
 
-    # Get parameter.
-    data_len = len(data)
-
     # Random.
-    index = randn(data_len - 1)
-    element = data[index]
+    data_len = len(data)
+    match multi:
 
-    return element
+        ## One.
+        case None:
+            index = randn(data_len - 1)
+            result = data[index]
+
+        ## Multiple.
+        case _:
+            match unique:
+
+                ### Unique.
+                case True:
+
+                    #### Check.
+                    if multi > data_len:
+                        throw(IndexError, multi, data_len)
+
+                    indexes = list(range(data_len))
+                    indexes_randsort = [
+                        indexes.pop(randn(indexes_len - 1))
+                        for indexes_len in range(data_len, data_len - multi, -1)
+                    ]
+                    result = [
+                        data[index]
+                        for index in indexes_randsort
+                    ]
+
+                ### Not unique.
+                case False:
+                    rand_max = data_len - 1
+                    result = [
+                        data[randn(rand_max)]
+                        for _ in range(multi)
+                    ]
+
+    return result
 
 
 def randchar(
@@ -177,11 +230,27 @@ def randchar(
         char_range += string_punctuation
 
     # Generate.
-    chars = "".join(
-        [
-            randi(char_range)
-            for _ in range(length)
-        ]
-    )
+    char_list = randi(char_range, length, False)
+    chars = "".join(char_list)
 
     return chars
+
+
+def randsort(data: Sequence[Element]) -> List[Element]:
+    """
+    Random sorting data.
+
+    Parameters
+    ----------
+    data : Sequence data.
+
+    Returns
+    -------
+    Sorted data.
+    """
+
+    # Random.
+    data_len = len(data)
+    data_randsort = randi(data, data_len)
+
+    return data_randsort

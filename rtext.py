@@ -28,8 +28,7 @@ __all__ = (
     "join_filter_text",
     "add_text_frame",
     "to_json",
-    "to_text",
-    "generate_password"
+    "to_text"
 )
 
 
@@ -459,36 +458,3 @@ def to_text(
             text = str(data)
 
     return text
-
-
-def generate_password(
-    length: int,
-    punctuation: bool = True
-) -> str:
-    """
-    Generate random password.
-
-    Parameters
-    ----------
-    length : Password length.
-    punctuation : Whether contain punctuation.
-
-    Returns
-    -------
-    Random password.
-    """
-
-    # Get parameter.
-    chars = string_digits + string_ascii_letters
-    if punctuation:
-        chars += string_punctuation
-
-    # Generate.
-    password = "".join(
-        [
-            randi(chars)
-            for _ in range(length)
-        ]
-    )
-
-    return password

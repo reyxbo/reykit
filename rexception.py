@@ -46,6 +46,7 @@ __all__ = (
 def throw(
     exception: Type[BaseException] = AssertionError,
     value: Any = RNull,
+    *values: Any,
     frame: int = 2
 ) -> NoReturn:
     """
@@ -55,6 +56,7 @@ def throw(
     ----------
     exception : Exception Type.
     value : Exception value.
+    values : Exception values.
     frame : Number of code to upper level.
     """
 
@@ -72,25 +74,56 @@ def throw(
         text = text[0].lower() + text[1:]
 
     ## Value.
-    if value != RNull:
-        match exception:
-            case TypeError():
-                if value is not None:
-                    value = value.__class__
-            case TimeoutError():
-                if value.__class__ == float:
-                    value = round(value, 3)
-                    if value % 1 == 0:
-                        value = int(value)
+    if value is not RNull:
+        values = (value,) + values
 
-        ###  Name.
+        ### Name.
         from .rsystem import get_name
         name = get_name(value, frame)
-        if name is None:
-            name = "now"
+        names = (name,)
+        if values != ():
+            names_values = get_name(values)
+            if names_values is not None:
+                names += names_values
+
+        ### Convert.
+        match exception:
+            case TypeError():
+                values = [
+                    value.__class__
+                    for value in values
+                    if value is not None
+                ]
+            case TimeoutError():
+                values = [
+                    int(value)
+                    if value % 1 == 0
+                    else round(value, 3)
+                    for value in values
+                    if value.__class__ == float
+                ]
+        values = [
+            repr(value)
+            for value in values
+        ]
+
+        ### Join.
+        if names == ():
+            values_len = len(values)
+            text_value = ", ".join(values)
+            if values_len == 1:
+                text_value = "value is " + text_value
+            else:
+                text_value = "values is (%s)" % text_value
         else:
-            name = "parameter '%s'" % name
-        text += ", %s is %s" % (name, repr(value))
+            names_values = zip(names, values)
+            text_value = ", ".join(
+                [
+                    "parameter '%s' is %s" % (name, value)
+                    for name, value in names_values
+                ]
+            )
+        text += " %s." % text_value
 
     # Throw exception.
     exception = exception(text)
@@ -233,7 +266,7 @@ def check_file_found(path: str) -> None:
 
     # Throw exception.
     if not exist:
-        throw(FileNotFoundError, path, 3)
+        throw(FileNotFoundError, path)
 
 
 def check_file_exist(path: str) -> None:
@@ -250,7 +283,7 @@ def check_file_exist(path: str) -> None:
 
     # Throw exception.
     if exist:
-        throw(FileExistsError, path, 3)
+        throw(FileExistsError, path)
 
 
 def check_response_code(
@@ -286,6 +319,6 @@ def check_response_code(
 
     # Throw exception.
     if not result:
-        throw(value=code, frame=3)
+        throw(value=code)
 
     return result

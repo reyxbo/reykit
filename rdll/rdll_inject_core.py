@@ -173,8 +173,8 @@ def InjectDLL(
         None
     )
 
-    module_handle = GetModuleHandleA(b"Kernel32")
-    target_LoadLibraryA = GetProcAddress(module_handle, b"LoadLibraryA")
+    module_handle = GetModuleHandleA(b'Kernel32')
+    target_LoadLibraryA = GetProcAddress(module_handle, b'LoadLibraryA')
 
     thread_handle = CreateRemoteThread(
         target_handle,

@@ -10,7 +10,7 @@
 
 
 __all__ = (
-    "inject_dll",
+    'inject_dll',
 )
 
 

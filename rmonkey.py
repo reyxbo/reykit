@@ -13,9 +13,9 @@ from __future__ import annotations
 
 
 __all__ = (
-    "monkey_patch_sqlalchemy_result_more_fetch",
-    "monkey_patch_sqlalchemy_row_index_field",
-    "monkey_patch_pprint_modify_width_judgment"
+    'monkey_patch_sqlalchemy_result_more_fetch',
+    'monkey_patch_sqlalchemy_row_index_field',
+    'monkey_patch_pprint_modify_width_judgment'
 )
 
 
@@ -49,7 +49,7 @@ def monkey_patch_sqlalchemy_result_more_fetch():
     from .rtime import time_to
 
 
-    # Fetch result as table in "List[Dict]" format.
+    # Fetch result as table in 'List[Dict]' format.
     CursorResult.fetch_table = to_table
 
     # Fetch result as dictionary.
@@ -100,11 +100,11 @@ def monkey_patch_sqlalchemy_result_more_fetch():
         df: DataFrame = self.fetch_df()
         df = df.applymap(time_to, raising=False)
         df = df.astype(str)
-        df.replace(["NaT", "<NA>"], "None", inplace=True)
+        df.replace(['NaT', '<NA>'], 'None', inplace=True)
         row_len, column_len = df.shape
 
         # Create omit row.
-        omit_row = (("...",) * column_len,)
+        omit_row = (('...',) * column_len,)
         omit_row = DataFrame(
             omit_row,
             columns=df.columns
@@ -127,7 +127,7 @@ def monkey_patch_sqlalchemy_result_more_fetch():
             df = concat((omit_row, df))
 
         # Print.
-        echo(df, title="Result")
+        echo(df, title='Result')
 
 
     CursorResult.show = method_show
@@ -315,7 +315,7 @@ def monkey_path_pil_image_get_bytes():
 
         # Extract.
         bytes_io = BytesIO()
-        self.save(bytes_io, "JPEG")
+        self.save(bytes_io, 'JPEG')
         image_bytes = bytes_io.getvalue()
 
         return image_bytes

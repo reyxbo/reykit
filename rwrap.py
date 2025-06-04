@@ -24,15 +24,15 @@ from .rtime import now, time_to, RTimeMark
 
 
 __all__ = (
-    "wrap_frame",
-    "wrap_runtime",
-    "wrap_thread",
-    "wrap_exc",
-    "wrap_retry",
-    "wrap_dos_command",
-    "wrap_cache_data",
-    "wrap_cache",
-    "wrap_redirect_stdout"
+    'wrap_frame',
+    'wrap_runtime',
+    'wrap_thread',
+    'wrap_exc',
+    'wrap_retry',
+    'wrap_dos_command',
+    'wrap_cache_data',
+    'wrap_cache',
+    'wrap_redirect_stdout'
 )
 
 
@@ -190,13 +190,13 @@ def wrap_runtime(
     rtm()
 
     # Generate report.
-    start_time = rtm.record[0]["datetime"]
-    spend_time = rtm.record[1]["timedelta"]
-    end_time = rtm.record[1]["datetime"]
+    start_time = rtm.record[0]['datetime']
+    spend_time = rtm.record[1]['timedelta']
+    end_time = rtm.record[1]['datetime']
     start_str = time_to(start_time, True)[:-3]
     spend_str = time_to(spend_time, True)[:-3]
     end_str = time_to(end_time, True)[:-3]
-    report = "Start: %s -> Spend: %ss -> End: %s" % (
+    report = 'Start: %s -> Spend: %ss -> End: %s' % (
         start_str,
         spend_str,
         end_str
@@ -244,7 +244,7 @@ def wrap_thread(
     """
 
     # Handle parameter.
-    thread_name = "%s_%d" % (func.__name__, now("timestamp"))
+    thread_name = '%s_%d' % (func.__name__, now('timestamp'))
 
     # Create thread.
     thread = Thread(target=func, name=thread_name, args=args, kwargs=kwargs)
@@ -358,9 +358,9 @@ def wrap_retry(
                 exc_report, *_ = catch_exc()
                 echo(
                     exc_report,
-                    "Retrying...",
+                    'Retrying...',
                     title=_report,
-                    frame="half"
+                    frame='half'
                 )
 
             ### Retry.
@@ -416,46 +416,46 @@ def wrap_dos_command(
     # Set DOS command.
     usage = getdoc(func)
     if usage is not None:
-        usage = "input arguments to function '%s'\n\n%s" % (func.__name__, usage)
+        usage = 'input arguments to function "%s"\n\n%s' % (func.__name__, usage)
     parser = ArgumentParser(usage=usage)
     for info in arg_info:
-        annotation_text = str(info["annotation"])
-        if info["annotation"] is None:
+        annotation_text = str(info['annotation'])
+        if info['annotation'] is None:
             arg_type = str
             arg_help = None
         else:
-            if "str" in annotation_text:
+            if 'str' in annotation_text:
                 arg_type = str
-            elif "float" in annotation_text:
+            elif 'float' in annotation_text:
                 arg_type = float
-            elif "int" in annotation_text:
+            elif 'int' in annotation_text:
                 arg_type = int
-            elif "bool" in annotation_text:
+            elif 'bool' in annotation_text:
                 arg_type = bool
             else:
                 arg_type = str
             arg_help = annotation_text
-        if info["type"] in ("var_position", "var_position"):
+        if info['type'] in ('var_position', 'var_position'):
             parser.add_argument(
-                info["name"],
-                nargs="*",
+                info['name'],
+                nargs='*',
                 type=arg_type,
                 help=arg_help
             )
         else:
             parser.add_argument(
-                info["name"],
-                nargs="?",
+                info['name'],
+                nargs='?',
                 type=arg_type,
                 help=arg_help
             )
-            kw_name = "--" + info["name"]
+            kw_name = '--' + info['name']
             parser.add_argument(
                 kw_name,
-                nargs="*",
+                nargs='*',
                 type=arg_type,
                 help=arg_help,
-                metavar="value",
+                metavar='value',
                 dest=kw_name
             )
 
@@ -466,7 +466,7 @@ def wrap_dos_command(
     for info in arg_info:
 
         ## Position argument.
-        value = getattr(namespace, info["name"])
+        value = getattr(namespace, info['name'])
         if value is not None:
             if value.__class__ == list:
                 command_args.extend(value)
@@ -474,8 +474,8 @@ def wrap_dos_command(
                 command_args.append(value)
 
         ## Keyword argument.
-        if info["type"] not in ("var_position", "var_position"):
-            kw_name = "--" + info["name"]
+        if info['type'] not in ('var_position', 'var_position'):
+            kw_name = '--' + info['name']
             kw_value = getattr(namespace, kw_name)
             if kw_value.__class__ == list:
                 kw_value_len = len(kw_value)
@@ -484,7 +484,7 @@ def wrap_dos_command(
                         kw_value = None
                     case 1:
                         kw_value = kw_value[0]
-                command_kwargs[info["name"]] = kw_value
+                command_kwargs[info['name']] = kw_value
 
     # Execute function.
     if command_args == []:

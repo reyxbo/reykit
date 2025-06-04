@@ -16,18 +16,18 @@ from .rsystem import is_iterable
 
 
 __all__ = (
-    "count",
-    "flatten",
-    "split",
-    "unique",
-    "in_arrs",
-    "objs_in",
-    "RGenerator"
+    'count',
+    'flatten',
+    'split',
+    'unique',
+    'in_arrs',
+    'objs_in',
+    'RGenerator'
 )
 
 
-CountResult = TypedDict("CountResult", {"value": Any, "count": int})
-Element = TypeVar("Element")
+CountResult = TypedDict('CountResult', {'value': Any, 'count': int})
+Element = TypeVar('Element')
 
 
 def count(
@@ -73,15 +73,15 @@ def count(
     # Convert.
     result = [
         {
-            "value": value,
-            "count": count
+            'value': value,
+            'count': count
         }
         for value, count in zip(value_list, count_list)
     ]
 
     # Sort.
     result.sort(
-        key=lambda info: info["count"],
+        key=lambda info: info['count'],
         reverse=not ascend
     )
 
@@ -209,7 +209,7 @@ def unique(data: Iterable[Element]) -> List[Element]:
     return data_unique
 
 
-def in_arrs(ojb: Any, *arrs: Iterable, mode: Literal["or", "and"] = "or") -> bool:
+def in_arrs(ojb: Any, *arrs: Iterable, mode: Literal['or', 'and'] = 'or') -> bool:
     """
     Judge whether the one object is in multiple arrays.
 
@@ -218,8 +218,8 @@ def in_arrs(ojb: Any, *arrs: Iterable, mode: Literal["or", "and"] = "or") -> boo
     obj : One object.
     arrs : Multiple arrays.
     mode : Judge mode.
-        - `Literal["or"]` : Judge whether the in a certain array.
-        - `Literal["and"]` : Judge whether the in all arrays.
+        - `Literal['or']` : Judge whether the in a certain array.
+        - `Literal['and']` : Judge whether the in all arrays.
 
     Returns
     -------
@@ -230,7 +230,7 @@ def in_arrs(ojb: Any, *arrs: Iterable, mode: Literal["or", "and"] = "or") -> boo
     match mode:
 
         ## Or.
-        case "or":
+        case 'or':
             for arr in arrs:
                 if ojb in arr:
                     return True
@@ -238,7 +238,7 @@ def in_arrs(ojb: Any, *arrs: Iterable, mode: Literal["or", "and"] = "or") -> boo
             return False
 
         ## And.
-        case "and":
+        case 'and':
             for arr in arrs:
                 if ojb not in arr:
                     return False
@@ -246,7 +246,7 @@ def in_arrs(ojb: Any, *arrs: Iterable, mode: Literal["or", "and"] = "or") -> boo
             return True
 
 
-def objs_in(arr: Iterable, *objs: Any, mode: Literal["or", "and"] = "or") -> bool:
+def objs_in(arr: Iterable, *objs: Any, mode: Literal['or', 'and'] = 'or') -> bool:
     """
     Judge whether the multiple objects is in one array.
 
@@ -255,8 +255,8 @@ def objs_in(arr: Iterable, *objs: Any, mode: Literal["or", "and"] = "or") -> boo
     arr : One array.
     objs : Multiple objects.
     mode : Judge mode.
-        - `Literal["or"]` : Judge whether contain a certain object.
-        - `Literal["and"]` : Judge whether contain all objects.
+        - `Literal['or']` : Judge whether contain a certain object.
+        - `Literal['and']` : Judge whether contain all objects.
 
     Returns
     -------
@@ -267,7 +267,7 @@ def objs_in(arr: Iterable, *objs: Any, mode: Literal["or", "and"] = "or") -> boo
     match mode:
 
         ## Or.
-        case "or":
+        case 'or':
             for obj in objs:
                 if obj in arr:
                     return True
@@ -275,7 +275,7 @@ def objs_in(arr: Iterable, *objs: Any, mode: Literal["or", "and"] = "or") -> boo
             return False
 
         ## And.
-        case "and":
+        case 'and':
             for obj in objs:
                 if obj not in arr:
                     return False

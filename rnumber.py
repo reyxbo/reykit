@@ -15,9 +15,9 @@ from .rexception import throw
 
 
 __all__ = (
-    "digits",
-    "to_number",
-    "number_ch"
+    'digits',
+    'to_number',
+    'number_ch'
 )
 
 
@@ -38,8 +38,8 @@ def digits(number: Union[int, float]) -> Tuple[int, int]:
     number_str = str(number)
 
     # Get digits.
-    if "." in number_str:
-        int_str, dec_str = number_str.split(".")
+    if '.' in number_str:
+        int_str, dec_str = number_str.split('.')
         int_digits = len(int_str)
         dec_digits = len(dec_str)
     else:
@@ -100,35 +100,35 @@ def number_ch(number: int) -> str:
 
     # Set parameter.
     map_digit = {
-        "0": "零",
-        "1": "一",
-        "2": "二",
-        "3": "三",
-        "4": "四",
-        "5": "五",
-        "6": "六",
-        "7": "七",
-        "8": "八",
-        "9": "九",
+        '0': '零',
+        '1': '一',
+        '2': '二',
+        '3': '三',
+        '4': '四',
+        '5': '五',
+        '6': '六',
+        '7': '七',
+        '8': '八',
+        '9': '九',
     }
     map_digits = {
-        0: "",
-        1: "十",
-        2: "百",
-        3: "千",
-        4: "万",
-        5: "十",
-        6: "百",
-        7: "千",
-        8: "亿",
-        9: "十",
-        10: "百",
-        11: "千",
-        12: "万",
-        13: "十",
-        14: "百",
-        15: "千",
-        16: "兆"
+        0: '',
+        1: '十',
+        2: '百',
+        3: '千',
+        4: '万',
+        5: '十',
+        6: '百',
+        7: '千',
+        8: '亿',
+        9: '十',
+        10: '百',
+        11: '千',
+        12: '万',
+        13: '十',
+        14: '百',
+        15: '千',
+        16: '兆'
     }
 
     # Handle parameter.
@@ -144,18 +144,18 @@ def number_ch(number: int) -> str:
         digits_ch = map_digits[index]
         number_list.insert(0, digits_ch)
         number_list.insert(0, digit_ch)
-    number_str = "".join(number_list)
+    number_str = ''.join(number_list)
 
     # Delete redundant content.
     number_str = sub_batch(
         number_str,
-        ("(?<=零)[^万亿兆]", ""),
-        ("零+", "零"),
-        ("零(?=[万亿兆])", "")
+        ('(?<=零)[^万亿兆]', ''),
+        ('零+', '零'),
+        ('零(?=[万亿兆])', '')
     )
-    if number_str.startswith("一十"):
+    if number_str.startswith('一十'):
         number_str = number_str[1:]
-    if number_str.endswith("零"):
+    if number_str.endswith('零'):
         number_str = number_str[:-1]
 
     return number_str

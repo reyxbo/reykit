@@ -28,12 +28,12 @@ except:
 
 
 __all__ = (
-    "RImage",
-    "encode_qrcode",
-    "decode_qrcode",
-    "compress_image",
-    "to_pimage",
-    "generate_captcha_image"
+    'RImage',
+    'encode_qrcode',
+    'decode_qrcode',
+    'compress_image',
+    'to_pimage',
+    'generate_captcha_image'
 )
 
 
@@ -62,7 +62,7 @@ def encode_qrcode(text: str, path: Optional[str] = None) -> bytes:
 
     # Extract.
     bytes_io = BytesIO()
-    image.save(bytes_io, "JPEG")
+    image.save(bytes_io, 'JPEG')
     file_bytes = bytes_io.getvalue()
 
     # Save.
@@ -156,13 +156,13 @@ def compress_image(
     # Read image.
     bytesio = BytesIO(input_image)
     image = pil_open(bytesio)
-    image = image.convert("RGB")
+    image = image.convert('RGB')
 
     # Step compress.
     quality = max_quality
     while now_size > target_size and quality >= min_quality:
         bytesio = BytesIO()
-        image.save(bytesio, "JPEG", quality=quality)
+        image.save(bytesio, 'JPEG', quality=quality)
         now_size = len(bytesio.read())
         quality -= rate
 
@@ -173,7 +173,7 @@ def compress_image(
             bytesio = BytesIO()
             resize = image.size[0] * ratio, image.size[1] * ratio
             image.thumbnail(resize, LANCZOS)
-            image.save(bytesio, "JPEG", quality=min_quality)
+            image.save(bytesio, 'JPEG', quality=min_quality)
             now_size = len(bytesio.read())
             ratio -= rate / 100
 
@@ -249,9 +249,9 @@ def generate_captcha_image(
 
     # Generate.
     default_kwargs = {
-        "width": 240,
-        "height": 90,
-        "font_sizes": (61, 75, 84)
+        'width': 240,
+        'height': 90,
+        'font_sizes': (61, 75, 84)
     }
     default_kwargs.update(kwargs)
     icaptcha = ImageCaptcha(**default_kwargs)

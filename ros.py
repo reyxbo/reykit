@@ -55,19 +55,19 @@ from .rtext import to_json
 
 
 __all__ = (
-    "get_md5",
-    "create_folder",
-    "find_relpath",
-    "get_file_str",
-    "get_file_bytes",
-    "RFile",
-    "RFolder",
-    "RTempFile",
-    "RTempFolder",
-    "doc_to_docx",
-    "extract_docx_content",
-    "extract_pdf_content",
-    "extract_file_content"
+    'get_md5',
+    'create_folder',
+    'find_relpath',
+    'get_file_str',
+    'get_file_bytes',
+    'RFile',
+    'RFolder',
+    'RTempFile',
+    'RTempFolder',
+    'doc_to_docx',
+    'extract_docx_content',
+    'extract_pdf_content',
+    'extract_file_content'
 )
 
 
@@ -154,13 +154,13 @@ def find_relpath(abspath: str, relpath: str) -> str:
     # Get parameter.
     level = 0
     for char in relpath:
-        if char == ".":
+        if char == '.':
             level += 1
         else:
             break
     strip_n = 0
     for char in relpath[level:]:
-        if char in ("/", "\\"):
+        if char in ('/', '\\'):
             strip_n += 1
         else:
             break
@@ -288,18 +288,18 @@ class RFile(object):
     @overload
     def read(
         self,
-        type_: Literal["bytes"] = "bytes"
+        type_: Literal['bytes'] = 'bytes'
     ) -> bytes: ...
 
     @overload
     def read(
         self,
-        type_: Literal["str"] = "bytes"
+        type_: Literal['str'] = 'bytes'
     ) -> str: ...
 
     def read(
         self,
-        type_: Literal["str", "bytes"] = "bytes"
+        type_: Literal['str', 'bytes'] = 'bytes'
     ) -> Union[bytes, str]:
         """
         Read file data.
@@ -317,12 +317,12 @@ class RFile(object):
 
         # Handle parameter.
         match type_:
-            case "bytes":
-                mode = "rb"
+            case 'bytes':
+                mode = 'rb'
                 encoding = None
-            case "str":
-                mode = "r"
-                encoding="utf-8"
+            case 'str':
+                mode = 'r'
+                encoding='utf-8'
 
         # Read.
         with open(self.path, mode, encoding=encoding) as file:
@@ -333,7 +333,7 @@ class RFile(object):
 
     def write(
         self,
-        data: Optional[Any] = "",
+        data: Optional[Any] = '',
         append: bool = False
     ) -> None:
         """
@@ -353,11 +353,11 @@ class RFile(object):
 
         ## Write mode.
         if append:
-            mode = "a"
+            mode = 'a'
         else:
-            mode = "w"
+            mode = 'w'
         if data.__class__ in (bytes, bytearray):
-            mode += "b"
+            mode += 'b'
 
         ## Convert data to string.
         if data.__class__ not in (str, bytes, bytearray):
@@ -422,7 +422,7 @@ class RFile(object):
 
         # Read only.
         except PermissionError:
-            command = f"attrib -r \"{self.path}\""
+            command = f'attrib -r "{self.path}"'
             dos_command(command)
             os_remove(self.path)
 
@@ -438,7 +438,7 @@ class RFile(object):
         """
 
         # Read.
-        file_str = self.read("str")
+        file_str = self.read('str')
 
         return file_str
 
@@ -454,7 +454,7 @@ class RFile(object):
         """
 
         # Read.
-        file_bytes = self.read("bytes")
+        file_bytes = self.read('bytes')
 
         return file_bytes
 
@@ -735,13 +735,13 @@ class RFolder(object):
 
         # Set attribute.
         if path is None:
-            path = ""
+            path = ''
         self.path = os_abspath(path)
 
 
     def paths(
         self,
-        target: Literal["all", "file", "folder"] = "all",
+        target: Literal['all', 'file', 'folder'] = 'all',
         recursion: bool = False
     ) -> List:
         """
@@ -768,21 +768,21 @@ class RFolder(object):
         if recursion:
             obj_walk = os_walk(self.path)
             match target:
-                case "all":
+                case 'all':
                     targets_path = [
                         os_join(path, file_name)
                         for path, folders_name, files_name in obj_walk
                         for file_name in files_name + folders_name
                     ]
                     paths.extend(targets_path)
-                case "file":
+                case 'file':
                     targets_path = [
                         os_join(path, file_name)
                         for path, _, files_name in obj_walk
                         for file_name in files_name
                     ]
                     paths.extend(targets_path)
-                case "all" | "folder":
+                case 'all' | 'folder':
                     targets_path = [
                         os_join(path, folder_name)
                         for path, folders_name, _ in obj_walk
@@ -794,17 +794,17 @@ class RFolder(object):
         else:
             names = os_listdir(self.path)
             match target:
-                case "all":
+                case 'all':
                     for name in names:
                         target_path = os_join(self.path, name)
                         paths.append(target_path)
-                case "file":
+                case 'file':
                     for name in names:
                         target_path = os_join(self.path, name)
                         is_file = os_isfile(target_path)
                         if is_file:
                             paths.append(target_path)
-                case "folder":
+                case 'folder':
                     for name in names:
                         target_path = os_join(self.path, name)
                         is_dir = os_isdir(target_path)
@@ -851,7 +851,7 @@ class RFolder(object):
         """
 
         # Get paths.
-        file_paths = self.paths("file", recursion)
+        file_paths = self.paths('file', recursion)
 
         # All.
         if all_:
@@ -887,12 +887,12 @@ class RFolder(object):
         # Exist.
         exist = os_exists(self.path)
         if exist:
-            text = "Folder already exists    | %s" % self.path
+            text = 'Folder already exists    | %s' % self.path
 
         # Not exist.
         else:
             os_makedirs(self.path)
-            text = "Folder creation complete | %s" % self.path
+            text = 'Folder creation complete | %s' % self.path
 
         # Report.
         if report:
@@ -977,7 +977,7 @@ class RFolder(object):
         """
 
         # Get.
-        file_paths = self.paths("file", True)
+        file_paths = self.paths('file', True)
         file_sizes = [
             os_getsize(path)
             for path in file_paths
@@ -1098,7 +1098,7 @@ class RTempFile(object):
         self,
         dir_: Optional[str] = None,
         suffix: Optional[str] = None,
-        type_: Literal["str", "bytes"] = "bytes"
+        type_: Literal['str', 'bytes'] = 'bytes'
     ) -> None:
         """
         Build `temporary file` instance.
@@ -1112,10 +1112,10 @@ class RTempFile(object):
 
         # Get parameter.
         match type_:
-            case "bytes":
-                mode = "w+b"
-            case "str":
-                mode = "w+"
+            case 'bytes':
+                mode = 'w+b'
+            case 'str':
+                mode = 'w+'
             case _:
                 throw(ValueError, type_)
 
@@ -1398,7 +1398,7 @@ class RTempFolder(object):
 
     def paths(
         self,
-        target: Literal["all", "file", "folder"] = "all",
+        target: Literal['all', 'file', 'folder'] = 'all',
         recursion: bool = False
     ) -> List:
         """
@@ -1425,21 +1425,21 @@ class RTempFolder(object):
         if recursion:
             obj_walk = os_walk(self.path)
             match target:
-                case "all":
+                case 'all':
                     targets_path = [
                         os_join(path, file_name)
                         for path, folders_name, files_name in obj_walk
                         for file_name in files_name + folders_name
                     ]
                     paths.extend(targets_path)
-                case "file":
+                case 'file':
                     targets_path = [
                         os_join(path, file_name)
                         for path, _, files_name in obj_walk
                         for file_name in files_name
                     ]
                     paths.extend(targets_path)
-                case "all" | "folder":
+                case 'all' | 'folder':
                     targets_path = [
                         os_join(path, folder_name)
                         for path, folders_name, _ in obj_walk
@@ -1451,17 +1451,17 @@ class RTempFolder(object):
         else:
             names = os_listdir(self.path)
             match target:
-                case "all":
+                case 'all':
                     for name in names:
                         target_path = os_join(self.path, name)
                         paths.append(target_path)
-                case "file":
+                case 'file':
                     for name in names:
                         target_path = os_join(self.path, name)
                         is_file = os_isfile(target_path)
                         if is_file:
                             paths.append(target_path)
-                case "folder":
+                case 'folder':
                     for name in names:
                         target_path = os_join(self.path, name)
                         is_dir = os_isdir(target_path)
@@ -1508,7 +1508,7 @@ class RTempFolder(object):
         """
 
         # Get paths.
-        file_paths = self.paths("file", recursion)
+        file_paths = self.paths('file', recursion)
 
         # All.
         if all_:
@@ -1588,7 +1588,7 @@ class RTempFolder(object):
         """
 
         # Get.
-        file_paths = self.paths("file", True)
+        file_paths = self.paths('file', True)
         file_sizes = [
             os_getsize(path)
             for path in file_paths
@@ -1732,11 +1732,11 @@ def doc_to_docx(
 
     # Handle parameter.
     if save_path is None:
-        pattern = r".[dD][oO][cC]"
+        pattern = '.[dD][oO][cC]'
         save_path = sub(
             pattern,
-            path.replace("\\", "/"),
-            ".docx"
+            path.replace('\\', '/'),
+            '.docx'
         )
 
     # Convert.
@@ -1776,26 +1776,26 @@ def extract_docx_content(path: str) -> str:
             ## Table.
             case CT_Tbl():
                 table = Table(child, document)
-                table_text = "\n".join(
+                table_text = '\n'.join(
                     [
-                        " | ".join(
+                        ' | '.join(
                             [
-                                cell.text.strip().replace("\n", " ")
+                                cell.text.strip().replace('\n', ' ')
                                 for cell in row.cells
                                 if (
                                     cell.text is not None
-                                    and cell.text.strip() != ""
+                                    and cell.text.strip() != ''
                                 )
                             ]
                         )
                         for row in table.rows
                     ]
                 )
-                table_text = "\n%s\n" % table_text
+                table_text = '\n%s\n' % table_text
                 contents.append(table_text)
 
     ## Join.
-    content = "\n".join(contents)
+    content = '\n'.join(contents)
 
     return content
 
@@ -1822,7 +1822,7 @@ def extract_pdf_content(path: str) -> str:
     document.close()
 
     ## Join.
-    content = "\n".join(contents)
+    content = '\n'.join(contents)
 
     return content
 
@@ -1843,19 +1843,19 @@ def extract_file_content(path: str) -> str:
     # Handle parameter.
     _, suffix = os_splitext(path)
     suffix = suffix.lower()
-    if suffix == ".doc":
+    if suffix == '.doc':
         path = doc_to_docx(path)
-        suffix = ".docx"
+        suffix = '.docx'
 
     # Extract.
     match suffix:
 
         ## DOCX.
-        case ".docx":
+        case '.docx':
             content = extract_docx_content(path)
 
         ## PDF.
-        case ".pdf":
+        case '.pdf':
             content = extract_pdf_content(path)
 
         ## Throw exception.

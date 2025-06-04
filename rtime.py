@@ -36,47 +36,47 @@ from .rstdout import echo
 
 
 __all__ = (
-    "now",
-    "time_to",
-    "text_to_time",
-    "to_time",
-    "sleep",
-    "wait",
-    "RTimeMark"
+    'now',
+    'time_to',
+    'text_to_time',
+    'to_time',
+    'sleep',
+    'wait',
+    'RTimeMark'
 )
 
 
-RecordData = TypedDict("RecordData", {"timestamp": int, "datetime": datetime_datetime, "timedelta": Optional[datetime_timedelta], "note": Optional[str]})
+RecordData = TypedDict('RecordData', {'timestamp': int, 'datetime': datetime_datetime, 'timedelta': Optional[datetime_timedelta], 'note': Optional[str]})
 
 
 @overload
-def now(format_: Literal["datetime"] = "datetime") -> datetime_datetime: ...
+def now(format_: Literal['datetime'] = 'datetime') -> datetime_datetime: ...
 
 @overload
-def now(format_: Literal["date"] = "datetime") -> datetime_date: ...
+def now(format_: Literal['date'] = 'datetime') -> datetime_date: ...
 
 @overload
-def now(format_: Literal["time"] = "datetime") -> datetime_time: ...
+def now(format_: Literal['time'] = 'datetime') -> datetime_time: ...
 
 @overload
-def now(format_: Literal["datetime_str", "date_str", "time_str"] = "datetime") -> str: ...
+def now(format_: Literal['datetime_str', 'date_str', 'time_str'] = 'datetime') -> str: ...
 
 @overload
-def now(format_: Literal["timestamp"] = "datetime") -> int: ...
+def now(format_: Literal['timestamp'] = 'datetime') -> int: ...
 
 @overload
 def now(format_: Any) -> NoReturn: ...
 
 def now(
     format_: Literal[
-        "datetime",
-        "date",
-        "time",
-        "datetime_str",
-        "date_str",
-        "time_str",
-        "timestamp"
-    ] = "datetime"
+        'datetime',
+        'date',
+        'time',
+        'datetime_str',
+        'date_str',
+        'time_str',
+        'timestamp'
+    ] = 'datetime'
 ) -> Union[
     datetime_datetime,
     datetime_date,
@@ -105,19 +105,19 @@ def now(
 
     # Return.
     match format_:
-        case "datetime":
+        case 'datetime':
             return datetime_datetime.now()
-        case "date":
+        case 'date':
             return datetime_datetime.now().date()
-        case "time":
+        case 'time':
             return datetime_datetime.now().time()
-        case "datetime_str":
-            return datetime_datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        case "date_str":
-            return datetime_datetime.now().strftime("%Y-%m-%d")
-        case "time_str":
-            return datetime_datetime.now().strftime("%H:%M:%S")
-        case "timestamp":
+        case 'datetime_str':
+            return datetime_datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        case 'date_str':
+            return datetime_datetime.now().strftime('%Y-%m-%d')
+        case 'time_str':
+            return datetime_datetime.now().strftime('%H:%M:%S')
+        case 'timestamp':
             return int(time_time() * 1000)
         case _:
             throw(ValueError, format_)
@@ -178,39 +178,39 @@ def time_to(
 
     match obj:
 
-        # Type "datetime".
+        # Type 'datetime'.
         case datetime_datetime() | pd_timestamp():
             if decimal:
-                format_ = "%Y-%m-%d %H:%M:%S.%f"
+                format_ = '%Y-%m-%d %H:%M:%S.%f'
             else:
-                format_ = "%Y-%m-%d %H:%M:%S"
+                format_ = '%Y-%m-%d %H:%M:%S'
             text = obj.strftime(format_)
 
-        # Type "date".
+        # Type 'date'.
         case datetime_date():
-            text = obj.strftime("%Y-%m-%d")
+            text = obj.strftime('%Y-%m-%d')
 
-        # Type "time".
+        # Type 'time'.
         case datetime_time():
             if decimal:
-                format_ = "%H:%M:%S.%f"
+                format_ = '%H:%M:%S.%f'
             else:
-                format_ = "%H:%M:%S"
+                format_ = '%H:%M:%S'
             text = obj.strftime(format_)
 
-        # Type "timedelta".
+        # Type 'timedelta'.
         case datetime_timedelta() | pd_timedelta():
             timestamp = obj.seconds + obj.microseconds / 1000_000
             if timestamp >= 0:
                 timestamp += 57600
                 time = datetime_datetime.fromtimestamp(timestamp).time()
                 if decimal:
-                    format_ = "%H:%M:%S.%f"
+                    format_ = '%H:%M:%S.%f'
                 else:
-                    format_ = "%H:%M:%S"
+                    format_ = '%H:%M:%S'
                 text = time.strftime(format_)
                 if obj.days != 0:
-                    text = f"{obj.days}day " + text
+                    text = f'{obj.days}day ' + text
 
             ## Throw exception.
             elif raising:
@@ -220,12 +220,12 @@ def time_to(
             else:
                 return obj
 
-        # Type "struct_time".
+        # Type 'struct_time'.
         case time_struct_time():
             if decimal:
-                format_ = "%Y-%m-%d %H:%M:%S.%f"
+                format_ = '%Y-%m-%d %H:%M:%S.%f'
             else:
-                format_ = "%Y-%m-%d %H:%M:%S"
+                format_ = '%Y-%m-%d %H:%M:%S'
             text = time_strftime(format_, obj)
 
         # Throw exception.
@@ -269,21 +269,21 @@ def text_to_time(
     ## Standard.
     if 14 <= str_len <= 19:
         try:
-            time_obj = datetime_datetime.strptime(string, "%Y-%m-%d %H:%M:%S")
+            time_obj = datetime_datetime.strptime(string, '%Y-%m-%d %H:%M:%S')
         except ValueError:
             pass
         else:
             return time_obj
     if 8 <= str_len <= 10:
         try:
-            time_obj = datetime_datetime.strptime(string, "%Y-%m-%d").date()
+            time_obj = datetime_datetime.strptime(string, '%Y-%m-%d').date()
         except ValueError:
             pass
         else:
             return time_obj
     if 5 <= str_len <= 8:
         try:
-            time_obj = datetime_datetime.strptime(string, "%H:%M:%S").time()
+            time_obj = datetime_datetime.strptime(string, '%H:%M:%S').time()
         except ValueError:
             pass
         else:
@@ -291,9 +291,9 @@ def text_to_time(
 
     ## Regular.
 
-    ### Type "datetime".
+    ### Type 'datetime'.
     if 14 <= str_len <= 21:
-        pattern = r"^(\d{4})\S(\d{1,2})\S(\d{1,2})\S?.(\d{1,2})\S(\d{1,2})\S(\d{1,2})\S?$"
+        pattern = r'^(\d{4})\S(\d{1,2})\S(\d{1,2})\S?.(\d{1,2})\S(\d{1,2})\S(\d{1,2})\S?$'
         result = search(pattern, string)
         if result is not None:
             year, month, day, hour, minute, second = [
@@ -303,9 +303,9 @@ def text_to_time(
             time_obj = datetime_datetime(year, month, day, hour, minute, second)
             return time_obj
 
-    ### Type "date".
+    ### Type 'date'.
     if 8 <= str_len <= 11:
-        pattern = r"^(\d{4})\S(\d{1,2})\S(\d{1,2})\S?$"
+        pattern = r'^(\d{4})\S(\d{1,2})\S(\d{1,2})\S?$'
         result = search(pattern, string)
         if result is not None:
             year, month, day = [
@@ -315,9 +315,9 @@ def text_to_time(
             time_obj = datetime_date(year, month, day)
             return time_obj
 
-    ### Type "time".
+    ### Type 'time'.
     if 5 <= str_len <= 9:
-        pattern = r"^(\d{1,2})\S(\d{1,2})\S(\d{1,2})\S?$"
+        pattern = r'^(\d{1,2})\S(\d{1,2})\S(\d{1,2})\S?$'
         result = search(pattern, string)
         if result is not None:
             hour, minute, second = [
@@ -371,11 +371,11 @@ def to_time(
 
     match obj:
 
-        # Type "str".
+        # Type 'str'.
         case str():
             time_obj = text_to_time(obj)
 
-        # Type "struct_time".
+        # Type 'struct_time'.
         case time_struct_time():
             time_obj = datetime_datetime(
                 obj.tm_year,
@@ -386,7 +386,7 @@ def to_time(
                 obj.tm_sec
             )
 
-        # Type "float".
+        # Type 'float'.
         case int() | float():
             int_len, _ = digits(obj)
             match int_len:
@@ -540,20 +540,20 @@ class RTimeMark():
 
         # Mark.
         index = len(self.record)
-        now_timestamp = now("timestamp")
-        now_datetime = now("datetime")
+        now_timestamp = now('timestamp')
+        now_datetime = now('datetime')
         record = {
-            "timestamp": now_timestamp,
-            "datetime": now_datetime,
-            "timedelta": None,
-            "note": note
+            'timestamp': now_timestamp,
+            'datetime': now_datetime,
+            'timedelta': None,
+            'note': note
         }
 
         ## Not first.
         if index != 0:
             last_index = index - 1
-            last_datetime = self.record[last_index]["datetime"]
-            record["timedelta"] = now_datetime - last_datetime
+            last_datetime = self.record[last_index]['datetime']
+            record['timedelta'] = now_datetime - last_datetime
 
         ## Record.
         self.record[index] = record
@@ -591,41 +591,41 @@ class RTimeMark():
 
         ## No record.
         if record_len == 0:
-            row = dict.fromkeys(("timestamp", "datetime", "timedelta", "note"))
+            row = dict.fromkeys(('timestamp', 'datetime', 'timedelta', 'note'))
             data = [row]
             indexes = [0]
 
         ## Add total row.
         if record_len > 2:
-            row = dict.fromkeys(("timestamp", "datetime", "timedelta", "note"))
+            row = dict.fromkeys(('timestamp', 'datetime', 'timedelta', 'note'))
             max_index = record_len - 1
-            total_timedelta = self.record[max_index]["datetime"] - self.record[0]["datetime"]
-            row["timedelta"] = total_timedelta
+            total_timedelta = self.record[max_index]['datetime'] - self.record[0]['datetime']
+            row['timedelta'] = total_timedelta
             data.append(row)
-            indexes.append("total")
+            indexes.append('total')
 
         ## Convert.
         for row in data:
-            if row["timestamp"] is not None:
-                row["timestamp"] = str(row["timestamp"])
-            if row["datetime"] is not None:
-                row["datetime"] = str(row["datetime"])[:-3]
-            if row["timedelta"] is not None:
-                if row["timedelta"].total_seconds() == 0:
-                    timedelta_str = "00:00:00.000"
+            if row['timestamp'] is not None:
+                row['timestamp'] = str(row['timestamp'])
+            if row['datetime'] is not None:
+                row['datetime'] = str(row['datetime'])[:-3]
+            if row['timedelta'] is not None:
+                if row['timedelta'].total_seconds() == 0:
+                    timedelta_str = '00:00:00.000'
                 else:
-                    timedelta_str = str(row["timedelta"])[:-3]
-                    timedelta_str = timedelta_str.rsplit(" ", 1)[-1]
-                    if timedelta_str[1] == ":":
-                        timedelta_str = "0" + timedelta_str
-                    if row["timedelta"].days != 0:
-                        timedelta_str = "%sday %s" % (
-                            row["timedelta"].days,
+                    timedelta_str = str(row['timedelta'])[:-3]
+                    timedelta_str = timedelta_str.rsplit(' ', 1)[-1]
+                    if timedelta_str[1] == ':':
+                        timedelta_str = '0' + timedelta_str
+                    if row['timedelta'].days != 0:
+                        timedelta_str = '%sday %s' % (
+                            row['timedelta'].days,
                             timedelta_str
                         )
-                row["timedelta"] = timedelta_str
+                row['timedelta'] = timedelta_str
         df_info = DataFrame(data, index=indexes)
-        df_info.fillna("-", inplace=True)
+        df_info.fillna('-', inplace=True)
 
         # Print.
         if title is not None:
@@ -648,9 +648,9 @@ class RTimeMark():
         if len(self.record) <= 1: return 0.0
 
         # Get parameter.
-        first_timestamp = self.record[0]["timestamp"]
+        first_timestamp = self.record[0]['timestamp']
         max_index = max(self.record)
-        last_timestamp = self.record[max_index]["timestamp"]
+        last_timestamp = self.record[max_index]['timestamp']
 
         # Calculate.
         seconds = round((last_timestamp - first_timestamp) / 1000, 3)

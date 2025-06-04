@@ -17,7 +17,7 @@ from apscheduler.job import Job
 
 
 __all__ = (
-    "RSchedule",
+    'RSchedule',
 )
 
 
@@ -46,10 +46,10 @@ class RSchedule(object):
 
         # Set parameter.
         executor = ThreadPoolExecutor(max_workers)
-        executors = {"default": executor}
+        executors = {'default': executor}
         job_defaults = {
-            "coalesce": coalesce,
-            "max_instances": max_instances
+            'coalesce': coalesce,
+            'max_instances': max_instances
         }
 
         # Instance.
@@ -121,7 +121,7 @@ class RSchedule(object):
     def add_task(
         self,
         func: Callable,
-        trigger: Literal["date", "interval", "cron"] = "date",
+        trigger: Literal['date', 'interval', 'cron'] = 'date',
         args: Optional[Tuple] = None,
         kwargs: Optional[Dict] = None,
         **trigger_kwargs: Any
@@ -157,7 +157,7 @@ class RSchedule(object):
     def modify_task(
         self,
         task: Union[Job, str],
-        trigger: Optional[Literal["date", "interval", "cron"]] = None,
+        trigger: Optional[Literal['date', 'interval', 'cron']] = None,
         args: Optional[Tuple] = None,
         kwargs: Optional[Dict] = None,
         **trigger_kwargs: Any
@@ -179,9 +179,9 @@ class RSchedule(object):
         ## Get parameter.
         params_arg = {}
         if args is not None:
-            params_arg["args"] = args
+            params_arg['args'] = args
         if kwargs is not None:
-            params_arg["kwargs"] = kwargs
+            params_arg['kwargs'] = kwargs
 
         ## Modify.
         if params_arg != {}:

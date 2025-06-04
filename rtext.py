@@ -21,14 +21,14 @@ from .rrandom import randi
 
 
 __all__ = (
-    "split_text",
-    "get_width",
-    "fill_width",
-    "join_data_text",
-    "join_filter_text",
-    "add_text_frame",
-    "to_json",
-    "to_text"
+    'split_text',
+    'get_width',
+    'fill_width',
+    'join_data_text',
+    'join_filter_text',
+    'add_text_frame',
+    'to_json',
+    'to_text'
 )
 
 
@@ -62,13 +62,13 @@ def split_text(text: str, man_len: int, by_width: bool = False) -> List[str]:
             char_width = get_width(char)
             str_width += char_width
             if str_width > man_len:
-                string = "".join(str_group)
+                string = ''.join(str_group)
                 texts.append(string)
                 str_group = [char]
                 str_width = char_width
             else:
                 str_group.append(char)
-        string = "".join(str_group)
+        string = ''.join(str_group)
         texts.append(string)
 
     ## By char number.
@@ -161,7 +161,7 @@ def get_width(text: str) -> int:
     return total_width
 
 
-def fill_width(text: str, char: str, width: int, align: Literal["left", "right", "center"] = "right") -> str:
+def fill_width(text: str, char: str, width: int, align: Literal['left', 'right', 'center'] = 'right') -> str:
     """
     Text fill character by display width.
 
@@ -189,14 +189,14 @@ def fill_width(text: str, char: str, width: int, align: Literal["left", "right",
     fill_width = width - text_width
     if fill_width > 0:
         match align:
-            case "left":
-                new_text = "".join((char * fill_width, text))
-            case "right":
-                new_text = "".join((text, char * fill_width))
-            case "center":
+            case 'left':
+                new_text = ''.join((char * fill_width, text))
+            case 'right':
+                new_text = ''.join((text, char * fill_width))
+            case 'center':
                 fill_width_left = int(fill_width / 2)
                 fill_width_right = fill_width - fill_width_left
-                new_text = "".join((char * fill_width_left, text, char * fill_width_right))
+                new_text = ''.join((char * fill_width_left, text, char * fill_width_right))
             case _:
                 throw(ValueError, align)
     else:
@@ -226,17 +226,17 @@ def join_data_text(data: Iterable) -> str:
         for key, value in data.items():
             key_str = str(key)
             value_str = str(value)
-            if "\n" in value_str:
-                value_str = value_str.replace("\n", "\n    ")
-                text_part = f"{key_str}:\n    {value_str}"
+            if '\n' in value_str:
+                value_str = value_str.replace('\n', '\n    ')
+                text_part = f'{key_str}:\n    {value_str}'
             else:
-                text_part = f"{key_str}: {value_str}"
+                text_part = f'{key_str}: {value_str}'
             texts.append(text_part)
-        text = "\n".join(texts)
+        text = '\n'.join(texts)
 
     ## Other type.
     else:
-        text = "\n".join(
+        text = '\n'.join(
             [
                 str(element)
                 for element in data
@@ -246,7 +246,7 @@ def join_data_text(data: Iterable) -> str:
     return text
 
 
-def join_filter_text(data: Iterable, char: str = ",", filter_: Tuple = (None, "")) -> str:
+def join_filter_text(data: Iterable, char: str = ',', filter_: Tuple = (None, '')) -> str:
     """
     Join and filter text.
 
@@ -281,7 +281,7 @@ def add_text_frame(
     *texts: str,
     title: Optional[str],
     width: int,
-    frame: Literal["full", "half", "top", "half_plain", "top_plain"]
+    frame: Literal['full', 'half', 'top', 'half_plain', 'top_plain']
 ) -> str:
     """
     Add text frame.
@@ -309,61 +309,61 @@ def add_text_frame(
 
     # Handle parameter.
     if title is None or len(title) > width - 6:
-        title = ""
+        title = ''
 
     # Generate frame.
     match frame:
 
         ## Full type.
-        case "full":
-            if title != "":
-                title = f"╡ {title} ╞"
+        case 'full':
+            if title != '':
+                title = f'╡ {title} ╞'
             width_in = width - 2
             _contents = []
             try:
                 for content in texts:
                     content_str = str(content)
-                    pieces_str = content_str.split("\n")
+                    pieces_str = content_str.split('\n')
                     content_str = [
-                        "║%s║" % fill_width(line_str, " ", width_in)
+                        '║%s║' % fill_width(line_str, ' ', width_in)
                         for piece_str in pieces_str
                         for line_str in split_text(piece_str, width_in, True)
                     ]
-                    content = "\n".join(content_str)
+                    content = '\n'.join(content_str)
                     _contents.append(content)
             except:
-                frame_top = fill_width(title, "═", width, "center")
-                frame_split = "─" * width
-                frame_bottom = "═" * width
+                frame_top = fill_width(title, '═', width, 'center')
+                frame_split = '─' * width
+                frame_bottom = '═' * width
                 _contents = texts
             else:
-                frame_top = "╔%s╗" % fill_width(title, "═", width_in, "center")
-                frame_split = "╟%s╢" % ("─" * width_in)
-                frame_bottom = "╚%s╝" % ("═" * width_in)
+                frame_top = '╔%s╗' % fill_width(title, '═', width_in, 'center')
+                frame_split = '╟%s╢' % ('─' * width_in)
+                frame_bottom = '╚%s╝' % ('═' * width_in)
 
         ## Half type.
-        case "half" | "top":
-            if title != "":
-                title = f"╡ {title} ╞"
-            frame_top = fill_width(title, "═", width, "center")
-            frame_split = "─" * width
+        case 'half' | 'top':
+            if title != '':
+                title = f'╡ {title} ╞'
+            frame_top = fill_width(title, '═', width, 'center')
+            frame_split = '─' * width
             match frame:
-                case "half":
-                    frame_bottom = "═" * width
-                case "top":
+                case 'half':
+                    frame_bottom = '═' * width
+                case 'top':
                     frame_bottom = None
             _contents = texts
 
         ## Plain type.
-        case "half_plain" | "top_plain":
-            if title != "":
-                title = f"| {title} |"
-            frame_top = fill_width(title, "=", width, "center")
-            frame_split = "-" * width
+        case 'half_plain' | 'top_plain':
+            if title != '':
+                title = f'| {title} |'
+            frame_top = fill_width(title, '=', width, 'center')
+            frame_split = '-' * width
             match frame:
-                case "half_plain":
-                    frame_bottom = "=" * width
-                case "top_plain":
+                case 'half_plain':
+                    frame_bottom = '=' * width
+                case 'top_plain':
                     frame_bottom = None
             _contents = texts
 
@@ -378,7 +378,7 @@ def add_text_frame(
             texts.append(frame_split)
         texts.append(content)
     texts.append(frame_bottom)
-    text = join_filter_text(texts, "\n")
+    text = join_filter_text(texts, '\n')
 
     return text
 
@@ -403,7 +403,7 @@ def to_json(
     # Get parameter.
     if compact:
         indent = None
-        separators = (",", ":")
+        separators = (',', ':')
     else:
         indent = 4
         separators = None
@@ -447,7 +447,7 @@ def to_text(
 
         ## Replace tab.
         case str():
-            text = data.replace("\t", "    ")
+            text = data.replace('\t', '    ')
 
         ## Format contents.
         case list() | tuple() | dict() | set():

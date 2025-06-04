@@ -32,14 +32,14 @@ from .rtype import RNull
 
 
 __all__ = (
-    "throw",
-    "warn",
-    "catch_exc",
-    "check_least_one",
-    "check_most_one",
-    "check_file_found",
-    "check_file_exist",
-    "check_response_code"
+    'throw',
+    'warn',
+    'catch_exc',
+    'check_least_one',
+    'check_most_one',
+    'check_file_found',
+    'check_file_exist',
+    'check_response_code'
 )
 
 
@@ -67,9 +67,9 @@ def throw(
         text = exception.__doc__.strip()
     if (
         text is None
-        or text == ""
+        or text == ''
     ):
-        text = "use error"
+        text = 'use error'
     else:
         text = text[0].lower() + text[1:]
 
@@ -110,20 +110,20 @@ def throw(
         ### Join.
         if names == ():
             values_len = len(values)
-            text_value = ", ".join(values)
+            text_value = ', '.join(values)
             if values_len == 1:
-                text_value = "value is " + text_value
+                text_value = 'value is ' + text_value
             else:
-                text_value = "values is (%s)" % text_value
+                text_value = 'values is (%s)' % text_value
         else:
             names_values = zip(names, values)
-            text_value = ", ".join(
+            text_value = ', '.join(
                 [
-                    "parameter '%s' is %s" % (name, value)
+                    'parameter "%s" is %s' % (name, value)
                     for name, value in names_values
                 ]
             )
-        text += " %s." % text_value
+        text += ' %s.' % text_value
 
     # Throw exception.
     exception = exception(text)
@@ -147,7 +147,7 @@ def warn(
 
     # Handle parameter.
     if infos == ():
-        infos = "Warning!"
+        infos = 'Warning!'
     elif len(infos) == 1:
         if infos[0].__class__ == str:
             infos = infos[0]
@@ -193,7 +193,7 @@ def catch_exc(
         from .rstdout import echo
 
         ## Execute.
-        echo(exc_report, title=title, frame="half")
+        echo(exc_report, title=title, frame='half')
 
     return exc_report, exc_type, exc_instance, exc_traceback
 
@@ -218,10 +218,10 @@ def check_least_one(*values: Any) -> None:
     if vars_name is not None:
         vars_name_de_dup = list(set(vars_name))
         vars_name_de_dup.sort(key=vars_name.index)
-        vars_name_str = " " + " and ".join([f"'{var_name}'" for var_name in vars_name_de_dup])
+        vars_name_str = ' ' + ' and '.join([f'"{var_name}"' for var_name in vars_name_de_dup])
     else:
-        vars_name_str = ""
-    raise TypeError(f"at least one of parameters{vars_name_str} is not None")
+        vars_name_str = ''
+    raise TypeError(f'at least one of parameters{vars_name_str} is not None')
 
 
 def check_most_one(*values: Any) -> None:
@@ -246,10 +246,10 @@ def check_most_one(*values: Any) -> None:
         if vars_name is not None:
             vars_name_de_dup = list(set(vars_name))
             vars_name_de_dup.sort(key=vars_name.index)
-            vars_name_str = " " + " and ".join([f"'{var_name}'" for var_name in vars_name_de_dup])
+            vars_name_str = ' ' + ' and '.join([f'"{var_name}"' for var_name in vars_name_de_dup])
         else:
-            vars_name_str = ""
-        raise TypeError(f"at most one of parameters{vars_name_str} is not None")
+            vars_name_str = ''
+        raise TypeError(f'at most one of parameters{vars_name_str} is not None')
 
 
 def check_file_found(path: str) -> None:
@@ -312,7 +312,7 @@ def check_response_code(
             result = code // 100 == 2
         case int():
             result = code == range_
-        case _ if hasattr(range_, "__contains__"):
+        case _ if hasattr(range_, '__contains__'):
             result = code in range_
         case _:
             throw(TypeError, range_)

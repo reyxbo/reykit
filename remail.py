@@ -22,7 +22,7 @@ from .ros import FileBytes, get_file_bytes
 
 
 __all__ = (
-    "REmail",
+    'REmail',
 )
 
 
@@ -74,8 +74,8 @@ class REmail(object):
         """
 
         # Get.
-        domain_name = email.split("@")[-1]
-        host = "smtp." + domain_name
+        domain_name = email.split('@')[-1]
+        host = 'smtp.' + domain_name
         port = 25
 
         return host, port
@@ -126,9 +126,9 @@ class REmail(object):
 
         # Handle parameter.
         if show_to.__class__ == list:
-            show_to = ",".join(show_to)
+            show_to = ','.join(show_to)
         if show_cc.__class__ == list:
-            show_cc = ",".join(show_cc)
+            show_cc = ','.join(show_cc)
 
         # Instance.
         mimes = MIMEMultipart()
@@ -137,7 +137,7 @@ class REmail(object):
 
         ## Title.
         if title is not None:
-            mimes["subject"] = title
+            mimes['subject'] = title
         
         ## Text.
         if text is not None:
@@ -147,20 +147,20 @@ class REmail(object):
         ## Attachment.
         for file_name, file_bytes in attachment.items():
             mime_file = MIMEApplication(file_bytes)
-            mime_file.add_header("Content-Disposition", "attachment", filename=file_name)
+            mime_file.add_header('Content-Disposition', 'attachment', filename=file_name)
             mimes.attach(mime_file)
 
         ## Show from.
         if show_from is not None:
-            mimes["from"] = show_from
+            mimes['from'] = show_from
 
         ## Show to.
         if show_to is not None:
-            mimes["to"] = show_to
+            mimes['to'] = show_to
 
         ## Show cc.
         if show_cc is not None:
-            mimes["cc"] = show_cc
+            mimes['cc'] = show_cc
 
         # Create.
         email = mimes.as_string()
@@ -220,14 +220,14 @@ class REmail(object):
 
         ## To.
         if to.__class__ == str:
-            to = to.split(",")
+            to = to.split(',')
 
         ## Cc.
         match cc:
             case None:
                 cc = []
             case str():
-                cc = cc.split(",")
+                cc = cc.split(',')
 
         ## Show from.
         show_from = show_from or self.username
@@ -235,12 +235,12 @@ class REmail(object):
         ## Show to.
         show_to = show_to or to
         if show_to.__class__ == str:
-            show_to = show_to.split(",")
+            show_to = show_to.split(',')
 
         ## Show cc.
         show_cc = show_cc or cc
         if show_cc.__class__ == str:
-            show_cc = show_cc.split(",")
+            show_cc = show_cc.split(',')
 
         ## Attachment.
         for file_name, file_source in attachment.items():

@@ -40,8 +40,8 @@ from .rwrap import wrap_thread
 
 
 __all__ = (
-    "RLog",
-    "RRecord"
+    'RLog',
+    'RRecord'
 )
 
 
@@ -59,12 +59,12 @@ class RLog(object):
 
     # Default value.
     default_format = (
-        "%(format_time)s | "
-        "%(format_levelname)s | "
-        "%(format_path)s | "
-        "%(format_message)s"
+        '%(format_time)s | '
+        '%(format_levelname)s | '
+        '%(format_path)s | '
+        '%(format_message)s'
     )
-    default_format_date = "%Y-%m-%d %H:%M:%S"
+    default_format_date = '%Y-%m-%d %H:%M:%S'
     default_format_width = 100
 
     # Whether print colour.
@@ -80,7 +80,7 @@ class RLog(object):
 
     def __init__(
         self,
-        name: str = "Log"
+        name: str = 'Log'
     ) -> None:
         """
         Build `log` instance.
@@ -111,29 +111,29 @@ class RLog(object):
         """
 
         # Get parameter.
-        stack_params = get_stack_param("full", 12)
+        stack_params = get_stack_param('full', 12)
         stack_param = stack_params[-1]
 
         # Compatible.
 
-        ## Compatible "__call__".
+        ## Compatible '__call__'.
         if (
-            stack_param["filename"] == path_rlog
-            and stack_param["name"] in ("debug", "info", "warning", "error", "critical")
+            stack_param['filename'] == path_rlog
+            and stack_param['name'] in ('debug', 'info', 'warning', 'error', 'critical')
         ):
             stack_param = stack_params[-2]
 
-        ## Compatible "print".
+        ## Compatible 'print'.
         if (
-            stack_param["filename"] == path_rlog
-            and stack_param["name"] == "preprocess"
+            stack_param['filename'] == path_rlog
+            and stack_param['name'] == 'preprocess'
         ):
             stack_param = stack_params[-3]
 
-        ## Compatible "echo".
+        ## Compatible 'echo'.
         if (
-            stack_param["filename"] == path_echo
-            and stack_param["name"] == "echo"
+            stack_param['filename'] == path_echo
+            and stack_param['name'] == 'echo'
         ):
             stack_param = stack_params[-4]
 
@@ -154,26 +154,26 @@ class RLog(object):
         record : Log record instance.
         """
 
-        # Format "format_time".
-        if "%(format_time)s" in format_:
+        # Format 'format_time'.
+        if '%(format_time)s' in format_:
             datetime = now()
             datetime_str = time_to(datetime, True)
             record.format_time = datetime_str[:-3]
 
-        # Format "format_levelname".
-        if "%(format_levelname)s" in format_:
+        # Format 'format_levelname'.
+        if '%(format_levelname)s' in format_:
             record.format_levelname = record.levelname.ljust(8)
 
-        # Format "format_path".
-        if "%(format_path)s" in format_:
+        # Format 'format_path'.
+        if '%(format_path)s' in format_:
             message_stack = self._get_message_stack()
-            record.format_path = "%s:%s" % (
-                message_stack["filename"],
-                message_stack["lineno"]
+            record.format_path = '%s:%s' % (
+                message_stack['filename'],
+                message_stack['lineno']
             )
 
-        # Format "format_message".
-        if "%(format_message)s" in format_:
+        # Format 'format_message'.
+        if '%(format_message)s' in format_:
             record.format_message = record.getMessage()
 
 
@@ -195,15 +195,15 @@ class RLog(object):
 
         # Set parameters.
         color_code_dict = {
-            10: "\033[1;34m",
-            20: "\033[1;37m",
-            30: "\033[1;33m",
-            40: "\033[1;31m",
-            50: "\033[1;37;41m"
+            10: '\033[1;34m',
+            20: '\033[1;37m',
+            30: '\033[1;33m',
+            40: '\033[1;31m',
+            50: '\033[1;37;41m'
         }
 
         # Get.
-        color_code = color_code_dict.get(level, "")
+        color_code = color_code_dict.get(level, '')
 
         return color_code
 
@@ -228,32 +228,33 @@ class RLog(object):
         if not self.print_colour: return
 
         ## Added.
-        result = search(r"\033\[[\d;]+?m", format_)
+        pattern = '\033\\[[\\d;]+?m'
+        result = search(pattern, format_)
         if result is not None: return
 
-        # "format_time".
-        if "%(format_time)s" in format_:
-            record.format_time = "\033[32m%s\033[0m" % record.format_time
+        # 'format_time'.
+        if '%(format_time)s' in format_:
+            record.format_time = '\033[32m%s\033[0m' % record.format_time
 
-        # "format_levelname".
-        if "%(format_levelname)s" in format_:
+        # 'format_levelname'.
+        if '%(format_levelname)s' in format_:
             level_color_code = self.get_level_color_ansi(record.levelno)
-            record.format_levelname = "%s%s\033[0m" % (
+            record.format_levelname = '%s%s\033[0m' % (
                 level_color_code,
                 record.format_levelname
             )
 
-        # "format_path".
-        if "%(format_path)s" in format_:
-            record.format_path = "\033[36m%s\033[0m" % record.format_path
+        # 'format_path'.
+        if '%(format_path)s' in format_:
+            record.format_path = '\033[36m%s\033[0m' % record.format_path
 
-        # "format_message".
+        # 'format_message'.
         if (
-            "%(format_message)s" in format_
-            and search(r"\033\[[\d;]+?m", record.format_message) is None
+            '%(format_message)s' in format_
+            and search('\033\\[[\\d;]+?m', record.format_message) is None
         ):
             level_color_code = self.get_level_color_ansi(record.levelno)
-            record.format_message = "%s%s\033[0m" % (
+            record.format_message = '%s%s\033[0m' % (
                 level_color_code,
                 record.format_message
             )
@@ -273,16 +274,16 @@ class RLog(object):
         record : Log record instance.
         """
 
-        # Format "format_message".
-        if "%(format_message)s" in format_:
-            pattern = r"\033\[[\d;]+?m"
+        # Format 'format_message'.
+        if '%(format_message)s' in format_:
+            pattern = '\033\\[[\\d;]+?m'
             record.format_message = sub(pattern, record.format_message)
 
 
     def get_default_filter_method(
         self,
         format_: str,
-        mode : Optional[Literal["print", "file"]] = None
+        mode : Optional[Literal['print', 'file']] = None
     ) -> Callable[[LogRecord], Literal[True]]:
         """
         Get default filter method of handler.
@@ -323,11 +324,11 @@ class RLog(object):
             match mode:
 
                 # Format print.
-                case "print":
+                case 'print':
                     self._supply_format_print(format_, record)
 
                 # Format file.
-                case "file":
+                case 'file':
                     self._supply_format_file(format_, record)
 
             return True
@@ -415,8 +416,8 @@ class RLog(object):
         """
 
         # Get parameter.
-        format_ = get_first_notnull(format_, self.default_format, default="exception")
-        filter_ = filter_ or self.get_default_filter_method(format_, "print")
+        format_ = get_first_notnull(format_, self.default_format, default='exception')
+        filter_ = filter_ or self.get_default_filter_method(format_, 'print')
 
         # Create handler.
         handler = StreamHandler()
@@ -448,7 +449,7 @@ class RLog(object):
         self,
         path: Optional[str] = None,
         mb: None = None,
-        time: Union[float, Literal["m", "w0", "w1", "w2", "w3", "w4", "w5", "w6"]] = None,
+        time: Union[float, Literal['m', 'w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6']] = None,
         level: int = DEBUG,
         format_: Optional[str] = None,
         filter_: Optional[Callable[[LogRecord], bool]] = None
@@ -470,7 +471,7 @@ class RLog(object):
         self,
         path: Optional[str] = None,
         mb: float = None,
-        time: Union[float, Literal["m", "w0", "w1", "w2", "w3", "w4", "w5", "w6"]] = None,
+        time: Union[float, Literal['m', 'w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6']] = None,
         level: int = DEBUG,
         format_: Optional[str] = None,
         filter_: Optional[Callable[[LogRecord], bool]] = None
@@ -480,7 +481,7 @@ class RLog(object):
         self,
         path: Optional[str] = None,
         mb: Optional[float] = None,
-        time: Optional[Union[float, Literal["m", "w0", "w1", "w2", "w3", "w4", "w5", "w6"]]] = None,
+        time: Optional[Union[float, Literal['m', 'w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6']]] = None,
         level: int = DEBUG,
         format_: Optional[str] = None,
         filter_: Optional[Callable[[LogRecord], bool]] = None
@@ -519,9 +520,9 @@ class RLog(object):
         """
 
         # Get parameter.
-        format_ = get_first_notnull(format_, self.default_format, default="exception")
+        format_ = get_first_notnull(format_, self.default_format, default='exception')
         path = path or self.name
-        filter_ = filter_ or self.get_default_filter_method(format_, "file")
+        filter_ = filter_ or self.get_default_filter_method(format_, 'file')
 
         # Create handler.
 
@@ -530,7 +531,7 @@ class RLog(object):
             mb is not None
             and time is not None
         ):
-            raise AssertionError("parameter 'mb' and 'time' cannot be used together")
+            raise AssertionError('parameter "mb" and "time" cannot be used together')
 
         ## By size split.
         elif mb is not None:
@@ -542,7 +543,7 @@ class RLog(object):
             byte = int(mb * 1024 * 1024)
             handler = ConcurrentRotatingFileHandler(
                 path,
-                "a",
+                'a',
                 byte,
                 1_0000_0000,
                 delay=True
@@ -557,23 +558,23 @@ class RLog(object):
                     second = int(time * 60 * 60)
                     handler = ConcurrentTimedRotatingFileHandler(
                         path,
-                        "S",
+                        'S',
                         second,
                         1_0000_0000,
                         delay=True
                     )
 
                 ### Everyday midnight.
-                case "m":
+                case 'm':
                     handler = ConcurrentTimedRotatingFileHandler(
                         path,
-                        "MIDNIGHT",
+                        'MIDNIGHT',
                         backupCount=1_0000_0000,
                         delay=True
                     )
 
                 ### Weekly midnight
-                case "w0" | "w1" | "w2" | "w3" | "w4" | "w5" | "w6":
+                case 'w0' | 'w1' | 'w2' | 'w3' | 'w4' | 'w5' | 'w6':
                     handler = ConcurrentTimedRotatingFileHandler(
                         path,
                         time,
@@ -589,7 +590,7 @@ class RLog(object):
         else:
             handler = ConcurrentRotatingFileHandler(
                 path,
-                "a",
+                'a',
                 delay=True
             )
 
@@ -734,7 +735,7 @@ class RLog(object):
             """
 
             # Log.
-            if __s not in ("\n", " ", "[0m"):
+            if __s not in ('\n', ' ', '[0m'):
                 self(__s, level=self.INFO, catch=False)
 
             # Print.
@@ -807,21 +808,21 @@ class RLog(object):
                 level = self.ERROR
 
         ## Messages.
-        messages = "\n".join(
+        messages = '\n'.join(
             [
                 to_text(message, self.default_format_width)
                 for message in messages
             ]
         )
-        if "\n" in messages:
-            messages = "\n" + messages
+        if '\n' in messages:
+            messages = '\n' + messages
 
         ### Exception.
         if (
             catch
             and exc_type is not None
         ):
-            messages = "%s\n%s" % (
+            messages = '%s\n%s' % (
                 messages,
                 exc_report
             )
@@ -967,7 +968,7 @@ class RRecord(object):
 
     def __init__(
         self,
-        path: Optional[str] = "_rrecord"
+        path: Optional[str] = '_rrecord'
     ) -> None:
         """
         Build `record` instance.
@@ -1009,9 +1010,9 @@ class RRecord(object):
             if value.__class__ != str:
                 value = str(value)
             if rfile:
-                value += ":"
+                value += ':'
             else:
-                value = ":%s:" % value
+                value = ':%s:' % value
 
             ## Record.
             rfile(value, True)
@@ -1044,7 +1045,7 @@ class RRecord(object):
             ## Convert.
             if value.__class__ != str:
                 value = str(value)
-            value = ":%s:" % value
+            value = ':%s:' % value
 
             ## Judge.
             judge = value in rfile

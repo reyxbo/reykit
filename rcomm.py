@@ -25,15 +25,15 @@ from .rregex import search
 
 
 __all__ = (
-    "join_url",
-    "split_url",
-    "join_cookie",
-    "split_cookie",
-    "get_content_type",
-    "request",
-    "download",
-    "get_file_stream_time",
-    "listen_socket"
+    'join_url',
+    'split_url',
+    'join_cookie',
+    'split_cookie',
+    'get_content_type',
+    'request',
+    'download',
+    'get_file_stream_time',
+    'listen_socket'
 )
 
 
@@ -52,18 +52,18 @@ def join_url(url: str, params: Dict) -> str:
     """
 
     # Join parameter.
-    params_str = "&".join(
+    params_str = '&'.join(
         [
-            f"{key}={urllib_quote(value)}"
+            f'{key}={urllib_quote(value)}'
             for key, value in params.items()
         ]
     )
 
     # Join URL.
-    if "?" not in url:
-        url += "?"
-    elif url[-1] != "?":
-        url += "&"
+    if '?' not in url:
+        url += '?'
+    elif url[-1] != '?':
+        url += '&'
     url += params_str
 
     return url
@@ -85,14 +85,14 @@ def split_url(url: str) -> Tuple[str, Dict[str, str]]:
     # Split URL.
     split_result = urllib_urlsplit(url)
     params_str = split_result.query
-    url = split_result.scheme + "://" + split_result.netloc + split_result.path
+    url = split_result.scheme + '://' + split_result.netloc + split_result.path
 
     # Split parameter.
     params = {
         key: urllib_unquote(value)
         for key, value in map(
-            lambda item: item.split("=", 1),
-            params_str.split("&")
+            lambda item: item.split('=', 1),
+            params_str.split('&')
         )
     }
 
@@ -113,9 +113,9 @@ def join_cookie(params: Dict[str, str]) -> str:
     """
 
     # Join.
-    cookie = "; ".join(
+    cookie = '; '.join(
         [
-            f"{key}={value}"
+            f'{key}={value}'
             for key, value in params.items()
         ]
     )
@@ -140,8 +140,8 @@ def split_cookie(cookie: str) -> Dict[str, str]:
     params = {
         key: value
         for key, value in map(
-            lambda item: item.split("=", 1),
-            cookie.split("; ")
+            lambda item: item.split('=', 1),
+            cookie.split('; ')
         )
     }
 
@@ -192,7 +192,7 @@ def request(
     proxies: Dict[str, str] = {},
     stream: bool = False,
     verify: bool = False,
-    method: Optional[Literal["get", "post", "put", "patch", "delete", "options", "head"]] = None,
+    method: Optional[Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head']] = None,
     check: Union[bool, int, Iterable[int]] = False
 ) -> Response:
     """
@@ -249,19 +249,19 @@ def request(
     # Handle parameter.
     if method is None:
         if data is None and json is None and files is None:
-            method = "get"
+            method = 'get'
         else:
-            method = "post"
+            method = 'post'
     if files is None:
         if data.__class__ == str:
             rfile = RFile(data)
             data = rfile.bytes
-            if "Content-Disposition" not in headers:
+            if 'Content-Disposition' not in headers:
                 file_name = rfile.name_suffix
-                headers["Content-Disposition"] = f"attachment; filename={file_name}"
+                headers['Content-Disposition'] = f'attachment; filename={file_name}'
         if data.__class__ == bytes:
-            if "Content-Type" not in headers:
-                headers["Content-Type"] = get_content_type(data)
+            if 'Content-Type' not in headers:
+                headers['Content-Type'] = get_content_type(data)
     else:
         for key, value in files.items():
             if value.__class__ == tuple:
@@ -271,20 +271,20 @@ def request(
             if item_data.__class__ == str:
                 rfile = RFile(item_data)
                 data = rfile.bytes
-                item_headers.setdefault("filename", rfile.name_suffix)
+                item_headers.setdefault('filename', rfile.name_suffix)
             if item_data.__class__ == bytes:
-                if "Content-Type" not in item_headers:
-                    item_headers["Content-Type"] = get_content_type(item_data)
+                if 'Content-Type' not in item_headers:
+                    item_headers['Content-Type'] = get_content_type(item_data)
             files[key] = (
-                item_headers.get("filename", key),
+                item_headers.get('filename', key),
                 item_data,
-                item_headers.get("Content-Type"),
+                item_headers.get('Content-Type'),
                 item_headers
             )
     if not verify:
         filterwarnings(
-            "ignore",
-            "Unverified HTTPS request is being made to host"
+            'ignore',
+            'Unverified HTTPS request is being made to host'
         )
 
     # Request.
@@ -303,11 +303,11 @@ def request(
     )
 
     # Set encod type.
-    if response.encoding == "ISO-8859-1":
-        pattern = r"<meta [^>]*charset=([\w-]+)[^>]*>"
+    if response.encoding == 'ISO-8859-1':
+        pattern = r'<meta [^>]*charset=([\w-]+)[^>]*>'
         charset = search(pattern, response.text)
         if charset is None:
-            charset = "utf-8"
+            charset = 'utf-8'
         response.encoding = charset
 
     # Check code.
@@ -342,10 +342,10 @@ def download(url: str, path: Optional[str] = None) -> str:
 
     # Judge file type and path.
     if path is None:
-        Content_disposition = response.headers.get("Content-Disposition", "")
-        if "filename" in Content_disposition:
+        Content_disposition = response.headers.get('Content-Disposition', '')
+        if 'filename' in Content_disposition:
             file_name = search(
-                r"filename=['\"]?([^\s'\"]+)",
+                'filename=[\'"]?([^\\s\'"]+)',
                 Content_disposition
             )
         else:
@@ -353,9 +353,9 @@ def download(url: str, path: Optional[str] = None) -> str:
         if file_name is None:
             file_type_obj = get_content_type(content)
             if file_type_obj is not None:
-                file_name = "download." + file_type_obj.EXTENSION
+                file_name = 'download.' + file_type_obj.EXTENSION
         if file_name is None:
-            file_name = "download"
+            file_name = 'download'
         path = os_abspath(file_name)
 
     # Save.

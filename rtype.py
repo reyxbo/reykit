@@ -10,9 +10,9 @@
 
 
 __all__ = (
-    "RError",
-    "RActiveError",
-    "RNull"
+    'RError',
+    'RActiveError',
+    'RNull'
 )
 
 
@@ -29,4 +29,4 @@ class RActiveError(RError):
 
 
 class RNull():
-    "Rey `null` type."
+    'Rey `null` type.'

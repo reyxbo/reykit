@@ -20,14 +20,14 @@ from .rtext import to_text, add_text_frame
 
 
 __all__ = (
-    "beautify_text",
-    "echo",
-    "rinput",
-    "stop_print",
-    "start_print",
-    "modify_print",
-    "reset_print",
-    "add_print_position"
+    'beautify_text',
+    'echo',
+    'rinput',
+    'stop_print',
+    'start_print',
+    'modify_print',
+    'reset_print',
+    'add_print_position'
 )
 
 
@@ -39,7 +39,7 @@ _stoped: bool = False
 _modified: bool = False
 
 # IO.
-_io_null: TextIOWrapper = open(os_devnull, "w")
+_io_null: TextIOWrapper = open(os_devnull, 'w')
 _io_stdout: TextIOWrapper = sys.stdout
 _io_stdout_write: Callable[[str], int] = sys.stdout.write
 
@@ -54,7 +54,7 @@ def beautify_text(
     data: Tuple[Any],
     title: Union[bool, str] = True,
     width: Optional[int] = None,
-    frame: Optional[Literal["full", "half", "top", "half_plain", "top_plain"]] = "full"
+    frame: Optional[Literal['full', 'half', 'top', 'half_plain', 'top_plain']] = 'full'
 ) -> str:
     """
     Beautify data to text.
@@ -93,26 +93,26 @@ def beautify_text(
     if title is True:
         titles = get_name(data, 3)
         if titles is not None:
-            titles = [title if not title.startswith("`") else "" for title in titles]
-            if set(titles) != {""}:
-                title = " │ ".join(titles)
+            titles = [title if not title.startswith('`') else '' for title in titles]
+            if set(titles) != {''}:
+                title = ' │ '.join(titles)
     if title.__class__ != str:
         title = None
 
     ## Width.
     global default_width
-    width = get_first_notnull(width, default_width, default="exception")
+    width = get_first_notnull(width, default_width, default='exception')
 
     ## Frame.
     global is_frame_plain
     if is_frame_plain:
         match frame:
-            case "full":
-                frame = "half_plain"
-            case "half":
-                frame = "half_plain"
-            case "top":
-                frame = "top_plain"
+            case 'full':
+                frame = 'half_plain'
+            case 'half':
+                frame = 'half_plain'
+            case 'top':
+                frame = 'top_plain'
 
     # To text.
     text_list = [
@@ -130,7 +130,7 @@ def echo(
     *data: Any,
     title: Union[bool, str] = True,
     width: Optional[int] = None,
-    frame: Optional[Literal["full", "half", "top", "half_plain", "top_plain"]] = "full"
+    frame: Optional[Literal['full', 'half', 'top', 'half_plain', 'top_plain']] = 'full'
 ) -> str:
     """
     Beautify data to text, and print.
@@ -176,7 +176,7 @@ def rinput(
     *data: Any,
     title: Union[bool, str] = True,
     width: Optional[int] = None,
-    frame: Optional[Literal["full", "half", "top", "half_plain", "top_plain"]] = "full",
+    frame: Optional[Literal['full', 'half', 'top', 'half_plain', 'top_plain']] = 'full',
     extra: Optional[str] = None
 ) -> str:
     """
@@ -340,23 +340,23 @@ def add_print_position() -> None:
         """
 
         # Break.
-        if __s in ("\n", " ", "[0m"): return __s
+        if __s in ('\n', ' ', '[0m'): return __s
 
         # Get parameter.
-        stack_params = get_stack_param("full", 3)
+        stack_params = get_stack_param('full', 3)
         stack_floor = stack_params[-1]
 
-        ## Compatible "echo".
+        ## Compatible 'echo'.
         if (
-            stack_floor["filename"] == path_echo
-            and stack_floor["name"] == "echo"
+            stack_floor['filename'] == path_echo
+            and stack_floor['name'] == 'echo'
         ):
             stack_floor = stack_params[-2]
 
         # Add.
         __s = 'File "%s", line %s\n%s' % (
-            stack_floor["filename"],
-            stack_floor["lineno"],
+            stack_floor['filename'],
+            stack_floor['lineno'],
             __s
         )
 

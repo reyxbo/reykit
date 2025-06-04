@@ -30,12 +30,12 @@ from .rwrap import wrap_thread
 
 
 __all__ = (
-    "async_run",
-    "async_request",
-    "RThreadLock",
-    "RAsyncLock",
-    "RThreadPool",
-    "RAsyncPool"
+    'async_run',
+    'async_request',
+    'RThreadLock',
+    'RAsyncLock',
+    'RThreadPool',
+    'RAsyncPool'
 )
 
 
@@ -83,7 +83,7 @@ async def async_request(
     headers: Dict[str, str] = {},
     timeout: Optional[float] = None,
     proxy: Optional[str] = None,
-    method: Optional[Literal["get", "post", "put", "patch", "delete", "options", "head"]] = None,
+    method: Optional[Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head']] = None,
     check: Union[bool, int, Iterable[int]] = False,
     handler: Optional[Union[str, Tuple[str], Callable[[ClientResponse], Union[Coroutine, Any]]]] = None
 ) -> Any:
@@ -146,9 +146,9 @@ async def async_request(
     # Handle parameter.
     if method is None:
         if data is None and json is None:
-            method = "get"
+            method = 'get'
         else:
-            method = "post"
+            method = 'post'
 
     # Session.
     async with ClientSession() as session:
@@ -179,13 +179,13 @@ async def async_request(
                 ## Auto.
                 case None:
                     match response.content_type:
-                        case "application/json":
+                        case 'application/json':
                             result = await response.json()
-                        case "text/plain; charset=utf-8":
+                        case 'text/plain; charset=utf-8':
 
                             # Set encode type.
-                            if response.get_encoding() == "ISO-8859-1":
-                                encoding = "utf-8"
+                            if response.get_encoding() == 'ISO-8859-1':
+                                encoding = 'utf-8'
                             else:
                                 encoding = None
 

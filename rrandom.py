@@ -20,11 +20,11 @@ from .rnumber import digits
 
 
 __all__ = (
-    "randn",
-    "randb",
-    "randi",
-    "randchar",
-    "randsort"
+    'randn',
+    'randb',
+    'randi',
+    'randchar',
+    'randsort'
 )
 
 
@@ -76,7 +76,7 @@ def randn(*thresholds: float, precision: Optional[int] = None) -> Union[int, flo
             threshold_low = thresholds[0]
             threshold_high = thresholds[1]
         case _:
-            raise ValueError("number of parameter 'thresholds' must is 0 or 1 or 2")
+            raise ValueError('number of parameter "thresholds" must is 0 or 1 or 2')
     if precision is None:
         threshold_low_desimal_digits = digits(threshold_low)[1]
         threshold_high_desimal_digits = digits(threshold_high)[1]
@@ -231,7 +231,7 @@ def randchar(
 
     # Generate.
     char_list = randi(char_range, length, False)
-    chars = "".join(char_list)
+    chars = ''.join(char_list)
 
     return chars
 

@@ -23,14 +23,14 @@ from .rdata import unique
 
 
 __all__ = (
-    "search",
-    "findall",
-    "sub",
-    "split",
-    "search_batch",
-    "findall_batch",
-    "sub_batch",
-    "split_batch"
+    'search',
+    'findall',
+    'sub',
+    'split',
+    'search_batch',
+    'findall_batch',
+    'sub_batch',
+    'split_batch'
 )
 
 
@@ -65,6 +65,8 @@ def search(
             result = obj_re[0]
         elif len(result) == 1:
             result = obj_re[1]
+
+        return result
 
 
 def findall(
@@ -115,7 +117,7 @@ def sub(
 
     # Handle parameter.
     if replace is None:
-        replace = ""
+        replace = ''
     if count is None:
         count = 0
 
@@ -282,7 +284,7 @@ def split_batch(text: str, *patterns: str) -> str:
         string
         for pattern in patterns
         for string in split(pattern, text)
-        if string != ""
+        if string != ''
     ]
 
     # De duplicate.

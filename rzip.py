@@ -19,9 +19,9 @@ from .ros import RFile, RFolder
 
 
 __all__ = (
-    "compress",
-    "decompress",
-    "zip"
+    'compress',
+    'decompress',
+    'zip'
 )
 
 
@@ -46,9 +46,9 @@ def compress(
     # Get parameter.
     build_dir = RFolder(build_dir).path
     if overwrite:
-        mode = "w"
+        mode = 'w'
     else:
-        mode = "x"
+        mode = 'x'
     is_file = os_isfile(obj_path)
     if is_file:
         rfile = RFile(obj_path)
@@ -56,7 +56,7 @@ def compress(
     else:
         rfolder = RFolder(obj_path)
         obj_name = rfolder.name
-    build_name = obj_name + ".zip"
+    build_name = obj_name + '.zip'
     build_path = os_join(build_dir, build_name)
 
     # Compress.
@@ -104,7 +104,7 @@ def decompress(
     # Check object whether can be decompress.
     is_support = is_zipfile(obj_path)
     if not is_support:
-        raise AssertionError("file format that cannot be decompressed")
+        raise AssertionError('file format that cannot be decompressed')
 
     # Handle parameter.
     build_dir = build_dir or os_getcwd()

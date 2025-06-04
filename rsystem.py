@@ -42,62 +42,62 @@ from .rexception import throw
 
 
 __all__ = (
-    "add_env_path",
-    "reset_env_path",
-    "del_modules",
-    "dos_command",
-    "dos_command_var",
-    "block",
-    "is_iterable",
-    "is_table",
-    "is_number_str",
-    "get_first_notnull",
-    "get_name",
-    "get_stack_text",
-    "get_stack_param",
-    "get_arg_info",
-    "get_computer_info",
-    "get_network_table",
-    "get_process_table",
-    "search_process",
-    "kill_process",
-    "stop_process",
-    "start_process",
-    "get_idle_port"
+    'add_env_path',
+    'reset_env_path',
+    'del_modules',
+    'dos_command',
+    'dos_command_var',
+    'block',
+    'is_iterable',
+    'is_table',
+    'is_number_str',
+    'get_first_notnull',
+    'get_name',
+    'get_stack_text',
+    'get_stack_param',
+    'get_arg_info',
+    'get_computer_info',
+    'get_network_table',
+    'get_process_table',
+    'search_process',
+    'kill_process',
+    'stop_process',
+    'start_process',
+    'get_idle_port'
 )
 
 
-LoginUsers = TypedDict("LoginUsers", {"time": datetime, "name": str, "host": str})
+LoginUsers = TypedDict('LoginUsers', {'time': datetime, 'name': str, 'host': str})
 ComputerInfo = TypedDict(
-    "ComputerInfo",
+    'ComputerInfo',
     {
-        "boot_time": float,
-        "cpu_count": int,
-        "cpu_frequency": int,
-        "cpu_percent": float,
-        "memory_total": float,
-        "memory_percent": float,
-        "disk_total": float,
-        "disk_percent": float,
-        "process_count": int,
-        "network_count": int,
-        "login_users":LoginUsers
+        'boot_time': float,
+        'cpu_count': int,
+        'cpu_frequency': int,
+        'cpu_percent': float,
+        'memory_total': float,
+        'memory_percent': float,
+        'disk_total': float,
+        'disk_percent': float,
+        'process_count': int,
+        'network_count': int,
+        'login_users':LoginUsers
     }
 )
 NetWorkInfo = TypedDict(
-    "NetWorkTable",
+    'NetWorkTable',
     {
-        "family": Optional[str],
-        "socket": Optional[str],
-        "local_ip": str,
-        "local_port": int,
-        "remote_ip": Optional[str],
-        "remote_port": Optional[int],
-        "status": Optional[str],
-        "pid": Optional[int]
+        'family': Optional[str],
+        'socket': Optional[str],
+        'local_ip': str,
+        'local_port': int,
+        'remote_ip': Optional[str],
+        'remote_port': Optional[int],
+        'status': Optional[str],
+        'pid': Optional[int]
     }
 )
-ProcessInfo = TypedDict("ProcessInfo", {"create_time": datetime, "id": int, "name": str, "ports": Optional[List[int]]})
+ProcessInfo = TypedDict('ProcessInfo', {'create_time': datetime, 'id': int, 'name': str, 'ports': Optional[List[int]]})
 
 
 # Added environment path.
@@ -166,7 +166,7 @@ def del_modules(path: str) -> List[str]:
 
         ## Filter non file module.
         if (
-            not hasattr(module, "__file__")
+            not hasattr(module, '__file__')
             or module.__file__ is None
         ):
             continue
@@ -191,7 +191,7 @@ def dos_command(command: Union[str, Iterable[str]]) -> str:
     command : DOS command.
         - `str` : Use this command.
         - `Iterable[str]` : Join strings with space as command.
-            When space in the string, automatic add quotation mark (e.g., ['echo', 'a b'] -> 'echo "a b"').
+            When space in the string, automatic add quotation mark (e.g., ['echo', 'a b'] -> 'echo 'a b'').
 
     Returns
     -------
@@ -203,13 +203,13 @@ def dos_command(command: Union[str, Iterable[str]]) -> str:
 
     # Check.
     error_bytes: bytes = popen.stderr.read()
-    if error_bytes != b"":
-        error = error_bytes.decode("GBK")
+    if error_bytes != b'':
+        error = error_bytes.decode('GBK')
         throw(value=error)
 
     # Standard output.
     output_bytes: bytes = popen.stdout.read()
-    output = output_bytes.decode("GBK")
+    output = output_bytes.decode('GBK')
 
     return output
 
@@ -243,7 +243,7 @@ def dos_command_var(*vars: Any) -> List[Any]:
     vars_info = tuple(zip(vars_name, vars))
 
     # Set DOS command.
-    usage = "input arguments to variables"
+    usage = 'input arguments to variables'
     parser = ArgumentParser(usage=usage)
     for name, value in vars_info:
         if value is None:
@@ -256,19 +256,19 @@ def dos_command_var(*vars: Any) -> List[Any]:
         ## Position argument.
         parser.add_argument(
             name,
-            nargs="?",
+            nargs='?',
             type=var_type,
             help=var_help
         )
 
         ## Keyword argument.
-        kw_name = "--" + name
+        kw_name = '--' + name
         parser.add_argument(
             kw_name,
-            nargs="*",
+            nargs='*',
             type=var_type,
             help=var_help,
-            metavar="value",
+            metavar='value',
             dest=kw_name
         )
 
@@ -276,7 +276,7 @@ def dos_command_var(*vars: Any) -> List[Any]:
     namespace = parser.parse_args()
     values = []
     for name, value in vars_info:
-        kw_name = "--" + name
+        kw_name = '--' + name
 
         ## Position argument.
         dos_value = getattr(namespace, name)
@@ -307,7 +307,7 @@ def block() -> None:
     """
 
     # Start.
-    print("Start blocking.")
+    print('Start blocking.')
     while True:
         try:
             time_sleep(1)
@@ -315,12 +315,12 @@ def block() -> None:
 
             # Confirm.
             try:
-                print("Double press interrupt to end blocking.")
+                print('Double press interrupt to end blocking.')
                 time_sleep(1)
 
             # End.
             except KeyboardInterrupt:
-                print("End blocking.")
+                print('End blocking.')
                 break
 
             except:
@@ -349,7 +349,7 @@ def is_iterable(
         return False
 
     # Judge.
-    if hasattr(obj, "__iter__"):
+    if hasattr(obj, '__iter__'):
         return True
     else:
         return False
@@ -382,7 +382,7 @@ def is_table(
     ## Check fields of table.
     if check_fields:
         keys_strs = [
-            ":".join([str(key) for key in element.keys()])
+            ':'.join([str(key) for key in element.keys()])
             for element in obj
         ]
         keys_strs_only = set(keys_strs)
@@ -418,7 +418,7 @@ def is_number_str(
 
 def get_first_notnull(
     *values: Any,
-    default: Union[None, Any, Literal["exception"]] = None,
+    default: Union[None, Any, Literal['exception']] = None,
     nulls: Tuple = (None,)) -> Any:
     """
     Get the first value that is not null.
@@ -443,15 +443,15 @@ def get_first_notnull(
             return value
 
     # Throw exception.
-    if default == "exception":
+    if default == 'exception':
         vars_name = get_name(values)
         if vars_name is not None:
             vars_name_de_dup = list(set(vars_name))
             vars_name_de_dup.sort(key=vars_name.index)
-            vars_name_str = " " + " and ".join([f"'{var_name}'" for var_name in vars_name_de_dup])
+            vars_name_str = ' ' + ' and '.join([f'"{var_name}"' for var_name in vars_name_de_dup])
         else:
-            vars_name_str = ""
-        raise ValueError(f"at least one of parameters{vars_name_str} is not None")
+            vars_name_str = ''
+        raise ValueError(f'at least one of parameters{vars_name_str} is not None')
 
     return default
 
@@ -480,12 +480,12 @@ def get_name(obj: Any, frame: int = 2) -> Optional[Union[str, Tuple[str, ...]]]:
     """
 
     # Get name using built in method.
-    if hasattr(obj, "__name__"):
+    if hasattr(obj, '__name__'):
         name = obj.__name__
         return name
 
     # Get name using module method.
-    name = "obj"
+    name = 'obj'
     for frame_ in range(1, frame + 1):
         if name.__class__ != str:
             return
@@ -501,7 +501,7 @@ def get_name(obj: Any, frame: int = 2) -> Optional[Union[str, Tuple[str, ...]]]:
     return name
 
 
-def get_stack_text(format_: Literal["plain", "full"] = "plain", limit: int = 2) -> str:
+def get_stack_text(format_: Literal['plain', 'full'] = 'plain', limit: int = 2) -> str:
     """
     Get code stack text.
 
@@ -521,7 +521,7 @@ def get_stack_text(format_: Literal["plain", "full"] = "plain", limit: int = 2) 
     match format_:
 
         # Plain.
-        case "plain":
+        case 'plain':
             limit += 1
             stacks = format_stack(limit=limit)
 
@@ -531,11 +531,11 @@ def get_stack_text(format_: Literal["plain", "full"] = "plain", limit: int = 2) 
 
             ## Convert.
             text = stacks[0]
-            index_end = text.find(", in ")
+            index_end = text.find(', in ')
             text = text[2:index_end]
 
         # Full.
-        case "full":
+        case 'full':
             stacks = format_stack()
             index_limit = len(stacks) - limit
             stacks = stacks[:index_limit]
@@ -546,10 +546,10 @@ def get_stack_text(format_: Literal["plain", "full"] = "plain", limit: int = 2) 
 
             ## Convert.
             stacks = [
-                stack[2:].replace("\n  ", "\n", 1)
+                stack[2:].replace('\n  ', '\n', 1)
                 for stack in stacks
             ]
-            text = "".join(stacks)
+            text = ''.join(stacks)
             text = text[:-1]
 
         # Throw exception.
@@ -560,12 +560,12 @@ def get_stack_text(format_: Literal["plain", "full"] = "plain", limit: int = 2) 
 
 
 @overload
-def get_stack_param(format_: Literal["floor"] = "floor", limit: int = 2) -> Dict: ...
+def get_stack_param(format_: Literal['floor'] = 'floor', limit: int = 2) -> Dict: ...
 
 @overload
-def get_stack_param(format_: Literal["full"] = "floor", limit: int = 2) -> List[Dict]: ...
+def get_stack_param(format_: Literal['full'] = 'floor', limit: int = 2) -> List[Dict]: ...
 
-def get_stack_param(format_: Literal["floor", "full"] = "floor", limit: int = 2) -> Union[Dict, List[Dict]]:
+def get_stack_param(format_: Literal['floor', 'full'] = 'floor', limit: int = 2) -> Union[Dict, List[Dict]]:
     """
     Get code stack parameters.
 
@@ -595,23 +595,23 @@ def get_stack_param(format_: Literal["floor", "full"] = "floor", limit: int = 2)
     match format_:
 
         ## Floor.
-        case "floor":
+        case 'floor':
             stack = stacks[-1]
             params = {
-                "filename": stack.filename,
-                "lineno": stack.lineno,
-                "name": stack.name,
-                "line": stack.line
+                'filename': stack.filename,
+                'lineno': stack.lineno,
+                'name': stack.name,
+                'line': stack.line
             }
 
         ## Full.
-        case "full":
+        case 'full':
             params = [
                 {
-                    "filename": stack.filename,
-                    "lineno": stack.lineno,
-                    "name": stack.name,
-                    "line": stack.line
+                    'filename': stack.filename,
+                    'lineno': stack.lineno,
+                    'name': stack.name,
+                    'line': stack.line
                 }
                 for stack in stacks
             ]
@@ -621,7 +621,7 @@ def get_stack_param(format_: Literal["floor", "full"] = "floor", limit: int = 2)
 
 def get_arg_info(func: Callable) -> List[
     Dict[
-        Literal["name", "type", "annotation", "default"],
+        Literal['name', 'type', 'annotation', 'default'],
         Optional[str]
     ]
 ]:
@@ -652,22 +652,22 @@ def get_arg_info(func: Callable) -> List[
     # Get information.
     info = [
         {
-            "name": name,
-            "type": (
-                "position_or_keyword"
+            'name': name,
+            'type': (
+                'position_or_keyword'
                 if parameter.kind == _ParameterKind.POSITIONAL_OR_KEYWORD
-                else "var_position"
+                else 'var_position'
                 if parameter.kind == _ParameterKind.VAR_POSITIONAL
-                else "var_keyword"
+                else 'var_keyword'
                 if parameter.kind == _ParameterKind.VAR_KEYWORD
-                else "only_position"
+                else 'only_position'
                 if parameter.kind == _ParameterKind.POSITIONAL_ONLY
-                else "only_keyword"
+                else 'only_keyword'
                 if parameter.kind == _ParameterKind.KEYWORD_ONLY
                 else None
             ),
-            "annotation": parameter.annotation,
-            "default": parameter.default
+            'annotation': parameter.annotation,
+            'default': parameter.default
         }
         for name, parameter in signature.parameters.items()
     ]
@@ -708,21 +708,21 @@ def get_computer_info() -> ComputerInfo:
 
     ## Boot time.
     boot_time = psutil_boot_time()
-    info["boot_time"] = datetime.fromtimestamp(
+    info['boot_time'] = datetime.fromtimestamp(
         boot_time
     ).strftime(
-        "%Y-%m-%d %H:%M:%S"
+        '%Y-%m-%d %H:%M:%S'
     )
 
     ## CPU.
-    info["cpu_count"] = psutil_cpu_count()
-    info["cpu_frequency"] = int(psutil_cpu_freq().current)
-    info["cpu_percent"] = round(psutil_cpu_percent(), 1)
+    info['cpu_count'] = psutil_cpu_count()
+    info['cpu_frequency'] = int(psutil_cpu_freq().current)
+    info['cpu_percent'] = round(psutil_cpu_percent(), 1)
 
     ## Memory.
     memory_info = psutil_virtual_memory()
-    info["memory_total"] = round(memory_info.total / 1024 / 1024 / 1024, 1)
-    info["memory_percent"] = round(memory_info.percent, 1)
+    info['memory_total'] = round(memory_info.total / 1024 / 1024 / 1024, 1)
+    info['memory_percent'] = round(memory_info.percent, 1)
 
     ## Disk.
     disk_total = []
@@ -737,33 +737,33 @@ def get_computer_info() -> ComputerInfo:
         disk_used.append(partition_usage_info.used)
     disk_total = sum(disk_total)
     disk_used = sum(disk_used)
-    info["disk_total"] = round(disk_total / 1024 / 1024 / 1024, 1)
-    info["disk_percent"] = round(disk_used / disk_total * 100, 1)
+    info['disk_total'] = round(disk_total / 1024 / 1024 / 1024, 1)
+    info['disk_percent'] = round(disk_used / disk_total * 100, 1)
 
     ## Process.
     pids = psutil_pids()
-    info["process_count"] = len(pids)
+    info['process_count'] = len(pids)
 
     ## Network.
     net_info = psutil_net_connections()
-    info["network_count"] = len(net_info)
+    info['network_count'] = len(net_info)
 
     ## User.
     users_info = psutil_users()
-    info["login_users"] = [
+    info['login_users'] = [
         {
-            "time": datetime.fromtimestamp(
+            'time': datetime.fromtimestamp(
                 user_info.started
             ).strftime(
-                "%Y-%m-%d %H:%M:%S"
+                '%Y-%m-%d %H:%M:%S'
             ),
-            "name": user_info.name,
-            "host": user_info.host
+            'name': user_info.name,
+            'host': user_info.host
         }
         for user_info in users_info
     ]
-    sort_func = lambda row: row["time"]
-    info["login_users"].sort(key=sort_func, reverse=True)
+    sort_func = lambda row: row['time']
+    info['login_users'].sort(key=sort_func, reverse=True)
 
     return info
 
@@ -778,49 +778,49 @@ def get_network_table() -> List[NetWorkInfo]:
     """
 
     # Get.
-    connections = psutil_net_connections("all")
+    connections = psutil_net_connections('all')
     table = [
         {
-            "family": (
-                "IPv4"
-                if connection.family.name == "AF_INET"
-                else "IPv6"
-                if connection.family.name == "AF_INET6"
+            'family': (
+                'IPv4'
+                if connection.family.name == 'AF_INET'
+                else 'IPv6'
+                if connection.family.name == 'AF_INET6'
                 else None
             ),
-            "socket": (
-                "TCP"
-                if connection.type.name == "SOCK_STREAM"
-                else "UDP"
-                if connection.type.name == "SOCK_DGRAM"
+            'socket': (
+                'TCP'
+                if connection.type.name == 'SOCK_STREAM'
+                else 'UDP'
+                if connection.type.name == 'SOCK_DGRAM'
                 else None
             ),
-            "local_ip": connection.laddr.ip,
-            "local_port": connection.laddr.port,
-            "remote_ip": (
+            'local_ip': connection.laddr.ip,
+            'local_port': connection.laddr.port,
+            'remote_ip': (
                 None
                 if connection.raddr == ()
                 else connection.raddr.ip
             ),
-            "remote_port": (
+            'remote_port': (
                 None
                 if connection.raddr == ()
                 else connection.raddr.port
             ),
-            "status": (
+            'status': (
                 None
-                if connection.status == "NONE"
+                if connection.status == 'NONE'
                 else connection.status.lower()
             ),
-            "pid": connection.pid
+            'pid': connection.pid
         }
         for connection in connections
     ]
 
     # Sort.
-    sort_func = lambda row: row["local_port"]
+    sort_func = lambda row: row['local_port']
     table.sort(key=sort_func)
-    sort_func = lambda row: row["local_ip"]
+    sort_func = lambda row: row['local_ip']
     table.sort(key=sort_func)
 
     return table
@@ -841,27 +841,27 @@ def get_process_table() -> List[ProcessInfo]:
     for process in process_iter:
         info = {}
         with process.oneshot():
-            info["create_time"] = datetime.fromtimestamp(
+            info['create_time'] = datetime.fromtimestamp(
                 process.create_time()
             ).strftime(
-                "%Y-%m-%d %H:%M:%S"
+                '%Y-%m-%d %H:%M:%S'
             )
-            info["id"] = process.pid
-            info["name"] = process.name()
+            info['id'] = process.pid
+            info['name'] = process.name()
             connections = process.connections()
             if connections == []:
-                info["ports"] = None
+                info['ports'] = None
             else:
-                info["ports"] = [
+                info['ports'] = [
                     connection.laddr.port
                     for connection in connections
                 ]
             table.append(info)
 
     # Sort.
-    sort_func = lambda row: row["id"]
+    sort_func = lambda row: row['id']
     table.sort(key=sort_func)
-    sort_func = lambda row: row["create_time"]
+    sort_func = lambda row: row['create_time']
     table.sort(key=sort_func)
 
     return table
@@ -932,21 +932,21 @@ def search_process(
     ## Name.
     for info in table:
         if (
-            info["name"] in names
-            and psutil_pid_exists(info["id"])
+            info['name'] in names
+            and psutil_pid_exists(info['id'])
         ):
-            process = Process(info["id"])
+            process = Process(info['id'])
             processes.append(process)
 
     ## Port.
     for info in table:
         for port in ports:
             if (
-                info["ports"] is not None
-                and port in info["ports"]
-                and psutil_pid_exists(info["id"])
+                info['ports'] is not None
+                and port in info['ports']
+                and psutil_pid_exists(info['id'])
             ):
-                process = Process(info["id"])
+                process = Process(info['id'])
                 processes.append(process)
                 break
 
@@ -1075,7 +1075,7 @@ def get_idle_port(min: int = 49152) -> int:
     # Get parameter.
     network_table = get_network_table()
     ports = [
-        info["local_port"]
+        info['local_port']
         for info in network_table
     ]
 

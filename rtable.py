@@ -20,21 +20,21 @@ from .rtime import time_to
 
 
 __all__ = (
-    "to_table",
-    "to_dict",
-    "to_list",
-    "to_df",
-    "to_json",
-    "to_text",
-    "to_sql",
-    "to_html",
-    "to_csv",
-    "to_excel"
+    'to_table',
+    'to_dict',
+    'to_list',
+    'to_df',
+    'to_json',
+    'to_text',
+    'to_sql',
+    'to_html',
+    'to_csv',
+    'to_excel'
 )
 
 
 type Table = Union[List[Dict], Dict, CursorResult, DataFrame]
-SheetSet = TypedDict("SheetsSet", {"name": str, "index": int, "fields": Union[str, List[str]]})
+SheetSet = TypedDict('SheetsSet', {'name': str, 'index': int, 'fields': Union[str, List[str]]})
 
 
 def to_table(
@@ -343,23 +343,23 @@ def to_sql(
         [
             repr(time_to(value, raising=False))
             if value is not None
-            else "NULL"
+            else 'NULL'
             for value in row
         ]
         for row in data
     ]
     sql_rows = [
-        "SELECT " + ",".join(row_values)
+        'SELECT ' + ','.join(row_values)
         for row_values in sql_rows_values
     ]
-    sql_row_first = "SELECT " + ",".join(
+    sql_row_first = 'SELECT ' + ','.join(
         [
-            f"{value} AS `{key}`"
+            f'{value} AS `{key}`'
             for key, value in list(zip(fields, sql_rows_values[0]))
         ]
     )
     sql_rows[0] = sql_row_first
-    data_sql = " UNION ALL ".join(sql_rows)
+    data_sql = ' UNION ALL '.join(sql_rows)
 
     return data_sql
 
@@ -387,14 +387,14 @@ def to_html(
     data_df = to_df(data, fields)
 
     # Convert.
-    data_html = data_df.to_html(col_space=50, index=False, justify="center")
+    data_html = data_df.to_html(col_space=50, index=False, justify='center')
 
     return data_html
 
 
 def to_csv(
     data: Union[Table, Iterable[Iterable]],
-    path: str = "data.csv",
+    path: str = 'data.csv',
     fields: Optional[Iterable] = None
 ) -> str:
     """
@@ -423,14 +423,14 @@ def to_csv(
         header = True
 
     # Save file.
-    data_df.to_csv(rfile.path, header=header, index=False, mode="a")
+    data_df.to_csv(rfile.path, header=header, index=False, mode='a')
 
     return rfile.path
 
 
 def to_excel(
     data: Union[Table, Iterable[Iterable]],
-    path: str = "data.xlsx",
+    path: str = 'data.xlsx',
     group_field: Optional[str] = None,
     sheets_set: Dict[Union[str, int], SheetSet] = {}
 ) -> str:
@@ -474,7 +474,7 @@ def to_excel(
 
     # Generate sheets.
     if group_field is None:
-        data_group = (("Sheet1", data),)
+        data_group = (('Sheet1', data),)
     else:
         data_group = data.groupby(group_field)
     sheets_table_before = []
@@ -490,12 +490,12 @@ def to_excel(
         else:
             sheets_table_after.append((sheet_name, sheet_df))
             continue
-        if "name" in sheet_set:
-            sheet_name = sheet_set["name"]
-        if "fields" in sheet_set:
-            sheet_df = sheet_df[sheet_set["fields"]]
-        if "index" in sheet_set:
-            sheets_table_before.append((sheet_set["index"], (sheet_name, sheet_df)))
+        if 'name' in sheet_set:
+            sheet_name = sheet_set['name']
+        if 'fields' in sheet_set:
+            sheet_df = sheet_df[sheet_set['fields']]
+        if 'index' in sheet_set:
+            sheets_table_before.append((sheet_set['index'], (sheet_name, sheet_df)))
         else:
             sheets_table_after.append((sheet_name, sheet_df))
     sort_func = lambda item: item[0]

@@ -95,45 +95,42 @@ async def async_request(
     url : Request URL.
     params : Request URL add parameters.
     data : Request body data. Conflict with parameter `json`.
-        - `Dict` : Convert to `key=value&...` format bytes.
+        - `Dict`, Convert to `key=value&...`: format bytes.
             Automatic set `Content-Type` to `application/x-www-form-urlencoded`.
-        - `Dict and a certain value is 'bytes' type` : Key is parameter name and file name, value is file data.
+        - `Dict and a certain value is 'bytes' type`: Key is parameter name and file name, value is file data.
             Automatic set `Content-Type` to `multipart/form-data`.
-        - `str` : File path to read file bytes data.
+        - `str`: File path to read file bytes data.
             Automatic set `Content-Type` to file media type, and `filename` to file name.
-        - `bytes` : File bytes data.
+        - `bytes`: File bytes data.
             Automatic set `Content-Type` to file media type.
-
     json : Request body data, convert to `JSON` format. Conflict with parameter `data`.
         Automatic set `Content-Type` to `application/json`.
-
     headers : Request header data.
     timeout : Request maximun waiting time.
     proxy : Proxy URL.
     method : Request method.
-        - `None` : Automatic judge.
-            * When parameter `data` or `json` not has value, then request method is `get`.
-            * When parameter `data` or `json` has value, then request method is `post`.
-        - `Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head']` : Use this request method.
-
+        - `None`: Automatic judge.
+            When parameter `data` or `json` not has value, then request method is `get`.
+            When parameter `data` or `json` has value, then request method is `post`.
+        - `Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head']`: Use this request method.
     check : Check response code, and throw exception.
         - `Literal[False]`: Not check.
         - `Literal[True]`: Check if is between 200 and 299.
-        - `int` : Check if is this value.
-        - `Iterable` : Check if is in sequence.
+        - `int`: Check if is this value.
+        - `Iterable`: Check if is in sequence.
 
-    handler: Response handler.
-        - `None` : Automatic handle.
-            * `Response 'Content-Type' is 'application/json'` : Use `ClientResponse.json` method.
-            * `Response 'Content-Type' is 'text/plain; charset=utf-8'` : Use `ClientResponse.text` method.
-            * `Other` : Use `ClientResponse.read` method.
-        - `str` : Get this attribute.
-            * `Callable` : Execute this method. When return `Coroutine`, then use `await` syntax execute `Coroutine`.
-            * `Any` : Return this value.
-        - `Tuple[str]` : Get these attribute.
-            * `Callable` : Execute this method. When return `Coroutine`, then use `await` syntax execute `Coroutine`.
-            * `Any` : Return this value.
-        - `Callable` : Execute this method. When return `Coroutine`, then use `await` syntax execute `Coroutine`.
+    handler : Response handler.
+        - `None`: Automatic handle.
+            `Response 'Content-Type' is 'application/json'`: Use `ClientResponse.json` method.
+            `Response 'Content-Type' is 'text/plain; charset=utf-8'`: Use `ClientResponse.text` method.
+            `Other`: Use `ClientResponse.read` method.
+        - `str`: Get this attribute.
+            `Callable`: Execute this method. When return `Coroutine`, then use `await` syntax execute `Coroutine`.
+            `Any`: Return this value.
+        - `Tuple[str]`: Get these attribute.
+            `Callable`: Execute this method. When return `Coroutine`, then use `await` syntax execute `Coroutine`.
+            `Any`: Return this value.
+        - `Callable`, Execute this method. When return `Coroutine`, then use `await`: syntax execute `Coroutine`.
 
     Returns
     -------
@@ -262,8 +259,8 @@ class RThreadLock():
         Parameters
         ----------
         timeout : Maximum wait seconds.
-            - `None` : Not limit.
-            - `float` : Use this value.
+            - `None`: Not limit.
+            - `float`: Use this value.
 
         Returns
         -------
@@ -337,8 +334,8 @@ class RAsyncLock():
         Parameters
         ----------
         timeout : Maximum wait seconds.
-            - `None` : Not limit.
-            - `float` : Use this value.
+            - `None`: Not limit.
+            - `float`: Use this value.
 
         Returns
         -------
@@ -385,9 +382,8 @@ class RThreadPool(object):
         task : Thread task.
         args : Task default position arguments.
         _max_workers : Maximum number of threads.
-            - `None` : Number of CPU + 4, 32 maximum.
-            - `int` : Use this value, no maximum limit.
-
+            - `None`: Number of CPU + 4, 32 maximum.
+            - `int`: Use this value, no maximum limit.
         kwargs : Task default keyword arguments.
         """
 
@@ -509,8 +505,8 @@ class RThreadPool(object):
         Parameters
         ----------
         timeout : Call generator maximum waiting seconds, timeout throw exception.
-            - `None` : Infinite.
-            - `float` : Set this seconds.
+            - `None`: Infinite.
+            - `float`: Set this seconds.
 
         Returns
         -------

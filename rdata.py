@@ -218,8 +218,8 @@ def in_arrs(ojb: Any, *arrs: Iterable, mode: Literal['or', 'and'] = 'or') -> boo
     obj : One object.
     arrs : Multiple arrays.
     mode : Judge mode.
-        - `Literal['or']` : Judge whether the in a certain array.
-        - `Literal['and']` : Judge whether the in all arrays.
+        - `Literal['or']`: Judge whether the in a certain array.
+        - `Literal['and']`: Judge whether the in all arrays.
 
     Returns
     -------
@@ -255,8 +255,8 @@ def objs_in(arr: Iterable, *objs: Any, mode: Literal['or', 'and'] = 'or') -> boo
     arr : One array.
     objs : Multiple objects.
     mode : Judge mode.
-        - `Literal['or']` : Judge whether contain a certain object.
-        - `Literal['and']` : Judge whether contain all objects.
+        - `Literal['or']`: Judge whether contain a certain object.
+        - `Literal['and']`: Judge whether contain all objects.
 
     Returns
     -------

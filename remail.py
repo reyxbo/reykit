@@ -116,9 +116,8 @@ class REmail(object):
         title : Email title.
         text : Email text.
         attachment : Email attachments dictionary.
-            - `Key` : File name.
-            - `Value` : File bytes data.
-
+            - `Key`: File name.
+            - `Value`: File bytes data.
         show_from : Show from email address.
         show_to : Show to email addresses list.
         show_cc : Show carbon copy email addresses list.
@@ -185,35 +184,30 @@ class REmail(object):
         Parameters
         ----------
         to : To email addresses.
-            - `str` : Email address, multiple comma interval.
-            - `List[str]` : Email addresses list.
-
+            - `str`: Email address, multiple comma interval.
+            - `List[str]`: Email addresses list.
         title : Email title.
         text : Email text.
         attachment : Email attachments dictionary.
-            - `Key` : File name.
-            - `Value` : File bytes data source.
-                * `bytes` : File bytes data.
-                * `str` : File path.
-                * `BufferedIOBase` : File bytes IO.
-
+            - `Key`: File name.
+            - `Value`: File bytes data source.
+                `bytes`: File bytes data.
+                `str`: File path.
+                `BufferedIOBase`: File bytes IO.
         cc : Carbon copy email addresses.
-            - `str` : Email address, multiple comma interval.
-            - `List[str]` : Email addresses list.
-
+            - `str`: Email address, multiple comma interval.
+            - `List[str]`: Email addresses list.
         show_from : Show from email address.
-            - `None` : Use attribute `self.username`.
-            - `str` : Email address.
-
+            - `None`: Use attribute `self.username`.
+            - `str`: Email address.
         show_to : Show to email addresses.
-            - `None` : Use parameter `to`.
-            - `str` : Email address, multiple comma interval.
-            - `List[str]` : Email addresses list.
-
+            - `None`: Use parameter `to`.
+            - `str`: Email address, multiple comma interval.
+            - `List[str]`: Email addresses list.
         show_cc : Show carbon copy email addresses.
-            - `None` : Use parameter `cc`.
-            - `str` : Email address, multiple comma interval.
-            - `List[str]` : Email addresses list.
+            - `None`: Use parameter `cc`.
+            - `str`: Email address, multiple comma interval.
+            - `List[str]`: Email addresses list.
         """
 
         # Handle parameter.

@@ -182,9 +182,9 @@ def get_file_str(file: FileStr) -> str:
     Parameters
     ----------
     file : File source.
-        - `'str' and path` : Return this string data.
-        - `'str' and not path` : As a file path read string data.
-        - `TextIOBase` : Read string data.
+        - `'str' and path`: Return this string data.
+        - `'str' and not path`: As a file path read string data.
+        - `TextIOBase`: Read string data.
 
     Returns
     -------
@@ -230,9 +230,9 @@ def get_file_bytes(file: FileBytes) -> bytes:
     Parameters
     ----------
     file : File source.
-        - `bytes` : Return this bytes data.
-        - `str` : As a file path read bytes data.
-        - `BufferedIOBase` : Read bytes data.
+        - `bytes`: Return this bytes data.
+        - `str`: As a file path read bytes data.
+        - `BufferedIOBase`: Read bytes data.
 
     Returns
     -------
@@ -307,8 +307,8 @@ class RFile(object):
         Parameters
         ----------
         type_ : File data type.
-            - `Literal['bytes']` : Return file bytes data.
-            - `Literal['str']` : Return file string data.
+            - `Literal['bytes']`: Return file bytes data.
+            - `Literal['str']`: Return file string data.
 
         Returns
         -------
@@ -342,10 +342,9 @@ class RFile(object):
         Parameters
         ----------
         data : Write data.
-            - `str` : File text.
-            - `bytes` : File bytes data.
-            - `Any` : To JSON format or string.
-
+            - `str`: File text.
+            - `bytes`: File bytes data.
+            - `Any`: To JSON format or string.
         append : Whether append data, otherwise overwrite data.
         """
 
@@ -729,8 +728,8 @@ class RFolder(object):
         Parameters
         ----------
         path : Folder path.
-            - `None` : Work folder path.
-            - `str` : Use this folder path.
+            - `None`: Work folder path.
+            - `str`: Use this folder path.
         """
 
         # Set attribute.
@@ -750,10 +749,9 @@ class RFolder(object):
         Parameters
         ----------
         target : Target data.
-            - `Literal['all']` : Return file and folder path.
-            - `Literal['file']` : Return file path.
-            - `Literal['folder']` : Return folder path.
-
+            - `Literal['all']`: Return file and folder path.
+            - `Literal['file']`: Return file path.
+            - `Literal['folder']`: Return folder path.
         recursion : Is recursion directory.
 
         Returns
@@ -1407,10 +1405,9 @@ class RTempFolder(object):
         Parameters
         ----------
         target : Target data.
-            - `Literal['all']` : Return file and folder path.
-            - `Literal['file']` : Return file path.
-            - `Literal['folder']` : Return folder path.
-
+            - `Literal['all']`: Return file and folder path.
+            - `Literal['file']`: Return file path.
+            - `Literal['folder']`: Return folder path.
         recursion : Is recursion directory.
 
         Returns
@@ -1719,7 +1716,7 @@ def doc_to_docx(
     ----------
     path : DOC file path.
     save_path : DOCX sve file path.
-        - `None` : DOC file Directory.
+        - `None`: DOC file Directory.
 
     Returns
     -------

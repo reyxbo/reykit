@@ -50,7 +50,7 @@ def encode_qrcode(text: str, path: Optional[str] = None) -> bytes:
     ----------
     text : Text.
     path : File save path.
-        - `None` : Not save.
+        - `None`: Not save.
 
     Returns
     -------
@@ -122,17 +122,14 @@ def compress_image(
     Parameters
     ----------
     input_image : Input source image data.
-        - `str` : Source image read file path.
-        - `bytes` : Source image bytes data.
-
+        - `str`: Source image read file path.
+        - `bytes`: Source image bytes data.
     output_image : Output compressed image data.
-        - `None` : Return compressed image bytes data.
-        - `str` : Compressed image file save path, no return.
-
+        - `None`: Return compressed image bytes data.
+        - `str`: Compressed image file save path, no return.
     target_size : Compressed target size.
-        - `value < 1` : Not more than this size ratio.
-        - `value > 1` : Not more than this value, unit is KB.
-
+        - `value < 1`: Not more than this size ratio.
+        - `value > 1`: Not more than this value, unit is KB.
     rate : Compressed iteration rate of quality and resolution.
     reduce : If target size is not completed, whether reduce image resolution for compression.
     max_quality : Iteration start image quality rate.
@@ -197,8 +194,8 @@ def to_pimage(image: Union[str, bytes]) -> RImage:
     Parameters
     ----------
     image : Image source data.
-        - `str` : Image file path.
-        - `bytes` : Image bytes data.
+        - `str`: Image file path.
+        - `bytes`: Image bytes data.
 
     Returns
     -------
@@ -228,13 +225,11 @@ def generate_captcha_image(
     Parameters
     ----------
     text : Text, contains digits and Uppercase letters and lowercase letters.
-        - `None` : Random five characters.
-        - `int` : Given length Random characters.
-        - `str` : Given characters.
-
+        - `None`: Random five characters.
+        - `int`: Given length Random characters.
+        - `str`: Given characters.
     path : File save path.
-        - `None` : Not save.
-
+        - `None`: Not save.
     kwargs : `ImageCaptcha` Parameters.
 
     Returns

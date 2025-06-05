@@ -51,10 +51,9 @@ def randn(*thresholds: float, precision: Optional[int] = None) -> Union[int, flo
         - When `length is 0`, then low and high thresholds is `0` and `10`.
         - When `length is 1`, then low and high thresholds is `0` and `thresholds[0]`.
         - When `length is 2`, then low and high thresholds is `thresholds[0]` and `thresholds[1]`.
-
     precision : Precision of random range, that is maximum decimal digits of return value.
-        - `None` : Set to Maximum decimal digits of element of parameter `thresholds`.
-        - `int` : Set to this value.
+        - `None`: Set to Maximum decimal digits of element of parameter `thresholds`.
+        - `int`: Set to this value.
 
     Returns
     -------
@@ -106,8 +105,8 @@ def randb(pr: float = 0.5) -> bool:
     Parameters
     ----------
     pr : Probability setting.
-        - `∈(0, 1)` : Random probability, formula is `randn(1, int(1 / pr * 100)) <= 100`.
-        - `∈(1, +∞)` : Random range, formula is `randn(1, ceil(pr)) == 1`.
+        - `∈(0, 1)`: Random probability, formula is `randn(1, int(1 / pr * 100)) <= 100`.
+        - `∈(1, +∞)`: Random range, formula is `randn(1, ceil(pr)) == 1`.
 
     Returns
     -------
@@ -157,8 +156,8 @@ def randi(
     ----------
     data : Sequence data.
     multi : Whether index multiple data elements.
-        - `None` : Return a value.
-        - `int` : Return multiple values.
+        - `None`: Return a value.
+        - `int`: Return multiple values.
     unique : Whether index unique, non value constraint.
 
     Returns

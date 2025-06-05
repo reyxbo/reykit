@@ -48,8 +48,8 @@ def to_table(
     ----------
     data : Table format data.
     fields : Table fields.
-        - `None` : Infer.
-        - `Iterable` : Use values in Iterable.
+        - `None`: Infer.
+        - `Iterable`: Use values in Iterable.
 
     Returns
     -------
@@ -116,13 +116,12 @@ def to_dict(
     ----------
     data : Table format data.
     key_field : Key field of dictionary.
-        - `int` : Subscript index.
-        - `str` : Name index.
-
+        - `int`: Subscript index.
+        - `str`: Name index.
     val_field : Value field of dictionary.
-        - `None` : All fields except key.
-        - `int` : Subscript index.
-        - `str` : Name index.
+        - `None`: All fields except key.
+        - `int`: Subscript index.
+        - `str`: Name index.
 
     Returns
     -------
@@ -177,8 +176,8 @@ def to_list(
     ----------
     data : Table format data.
     field : Field of value.
-        - `int` : Subscript index.
-        - `str` : Name index.
+        - `int`: Subscript index.
+        - `str`: Name index.
 
     Returns
     -------
@@ -217,8 +216,8 @@ def to_df(
     ----------
     data : Table format data.
     fields : Table fields.
-        - `None` : Infer.
-        - `Iterable` : Use values in Iterable.
+        - `None`: Infer.
+        - `Iterable`: Use values in Iterable.
 
     Returns
     -------
@@ -262,9 +261,8 @@ def to_json(
     ----------
     data : Table format data.
     fields : Table fields.
-        - `None` : Infer.
-        - `Iterable` : Use values in Iterable.
-
+        - `None`: Infer.
+        - `Iterable`: Use values in Iterable.
     compact : Whether compact content.
 
     Returns
@@ -293,9 +291,8 @@ def to_text(
     ----------
     data : Table format data.
     fields : Table fields.
-        - `None` : Infer.
-        - `Iterable` : Use values in Iterable.
-
+        - `None`: Infer.
+        - `Iterable`: Use values in Iterable.
     width : Format width.
 
     Returns
@@ -323,8 +320,8 @@ def to_sql(
     ----------
     data : Table format data.
     fields : Table fields.
-        - `None` : Infer.
-        - `Iterable` : Use values in Iterable.
+        - `None`: Infer.
+        - `Iterable`: Use values in Iterable.
 
     Returns
     -------
@@ -375,8 +372,8 @@ def to_html(
     ----------
     data : Table format data.
     fields : Table fields.
-        - `None` : Infer.
-        - `Iterable` : Use values in Iterable.
+        - `None`: Infer.
+        - `Iterable`: Use values in Iterable.
 
     Returns
     -------
@@ -406,8 +403,8 @@ def to_csv(
     data : Table format data.
     path : File save path.
     fields : Table fields.
-        - `None` : Infer.
-        - `Iterable` : Use values in Iterable.
+        - `None`: Infer.
+        - `Iterable`: Use values in Iterable.
 
     Returns
     -------

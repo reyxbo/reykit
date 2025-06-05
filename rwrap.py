@@ -95,9 +95,8 @@ def wrap_frame(decorator: Callable) -> Callable:
         func : Function.
         args : Position arguments of function.
         _execute : Whether execute function, otherwise decorate function.
-            - `None` : When parameter `args` or `kwargs` have values, then True, otherwise False.
-            - `bool` : Use this value.
-
+            - `None`, When parameter `args` or `kwargs`: have values, then True, otherwise False.
+            - `bool`: Use this value.
         kwargs : Keyword arguments of function.
 
         Returns
@@ -332,9 +331,8 @@ def wrap_retry(
     func : Function to be decorated.
     args : Position arguments of decorated function.
     _report : Print report title.
-        - `None` : Not print.
-        - `str` : Print and use this title.
-
+        - `None`: Not print.
+        - `str`: Print and use this title.
     _exception : Catch exception types.
     _try_total : Retry total.
     _try_count : Retry count.

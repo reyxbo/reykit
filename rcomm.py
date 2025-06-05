@@ -203,43 +203,39 @@ def request(
     url : Request URL.
     params : Request URL add parameters.
     data : Request body data.
-        - `Dict` : Convert to `key=value&...` format bytes.
+        - `Dict`, Convert to `key=value&...`: format bytes.
             Automatic set `Content-Type` to `application/x-www-form-urlencoded`.
-        - `str` : File path to read file bytes data.
+        - `str`: File path to read file bytes data.
             Automatic set `Content-Type` to file media type, and `filename` to file name.
-        - `bytes` : File bytes data.
+        - `bytes`: File bytes data.
             Automatic set `Content-Type` to file media type.
-
     json : Request body data, convert to `JSON` format.
         Automatic set `Content-Type` to `application/json`.
     files : Request body data, convert to `multi form` format.
         Automatic set `Content-Type` to `multipart/form-data`.
-        - `Dict[str, str]` : Parameter name and File path to read file bytes data.
+        - `Dict[str, str]`: Parameter name and File path to read file bytes data.
             Automatic set `Content-Type` to file media type, and `filename` to file name.
-        - `Dict[str, bytes]` : Parameter name and file bytes data.
-        - `Dict[str, Tuple[str, dict]` : Parameter name and File path to read file bytes data and other parameters.
+        - `Dict[str, bytes]`: Parameter name and file bytes data.
+        - `Dict[str, Tuple[str, dict]`: Parameter name and File path to read file bytes data and other parameters.
             Automatic set `Content-Type` to file media type, and `filename` to file name.
-        - `Dict[str, Tuple[bytes, dict]` : Parameter name and file bytes data and other parameters.
-
+        - `Dict[str, Tuple[bytes, dict]`: Parameter name and file bytes data and other parameters.
     headers : Request header data.
     timeout : Request maximun waiting time.
     proxies : Proxy IP setup.
-        - `None` : No setup.
-        - `Dict[str, str]` : Name and use IP of each protocol.
-
+        - `None`: No setup.
+        - `Dict[str, str]`: Name and use IP of each protocol.
     stream : Whether use stream request.
     verify : Whether verify certificate.
     method : Request method.
-        - `None` : Automatic judge.
-            * When parameter `data` or `json` or `files` not has value, then request method is `get`.
-            * When parameter `data` or `json` or `files` has value, then request method is `post`.
-        - `Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head']` : Use this request method.
-
+        - `None`: Automatic judge.
+            When parameter `data` or `json` or `files` not has value, then request method is `get`.
+            When parameter `data` or `json` or `files` has value, then request method is `post`.
+        - `Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head']`: Use this request method.
     check : Check response code, and throw exception.
         - `Literal[False]`: Not check.
         - `Literal[True]`: Check if is between 200 and 299.
-        - `int` : Check if is this value.
-        - `Iterable` : Check if is in sequence.
+        - `int`: Check if is this value.
+        - `Iterable`: Check if is in sequence.
 
     Returns
     -------
@@ -329,7 +325,7 @@ def download(url: str, path: Optional[str] = None) -> str:
     ----------
     url : Download URL.
     path : Save path.
-        - `None` : File name is `download` and automatic judge file type.
+        - `None`, File name is `download`: and automatic judge file type.
 
     Returns
     -------
@@ -375,10 +371,9 @@ def get_file_stream_time(
     Parameters
     ----------
     file : File data.
-        - `str` : File path.
-        - `bytes` : File bytes data.
-        - `int` : File bytes size.
-
+        - `str`: File path.
+        - `bytes`: File bytes data.
+        - `int`: File bytes size.
     bandwidth : Bandwidth, unit Mpbs.
 
     Returns

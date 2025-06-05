@@ -106,8 +106,7 @@ def sub(
     pattern : Regular pattern, `period match any character`.
     text : Match text.
     replace : Replace text or handle function.
-        - `None` : Delete match part.
-
+        - `None`: Delete match part.
     count : Replace maximum count.
 
     Returns
@@ -245,9 +244,9 @@ def sub_batch(text: str, *patterns: Union[str, Tuple[str, Union[str, Callable[[R
     ----------
     text : Match text.
     patterns : Regular pattern and replace text, `period match any character`.
-        - `str` : Regular pattern, delete match part.
-        - `Tuple[str, str]` : Regular pattern and replace text.
-        - `Tuple[str, Callable[[RMatch], str]]` : Regular pattern and replace handle function.
+        - `str`: Regular pattern, delete match part.
+        - `Tuple[str, str]`: Regular pattern and replace text.
+        - `Tuple[str, Callable[[RMatch], str]]`: Regular pattern and replace handle function.
 
     Returns
     -------

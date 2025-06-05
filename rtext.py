@@ -171,9 +171,9 @@ def fill_width(text: str, char: str, width: int, align: Literal['left', 'right',
     char : Fill character.
     width : Fill width.
     align : Align orientation.
-        - `Literal[`left`]` : Fill right, align left.
-        - `Literal[`right`]` : Fill left, align right.
-        - `Literal[`center`]` : Fill both sides, align center.
+        - `Literal[`left`]`: Fill right, align left.
+        - `Literal[`right`]`: Fill left, align right.
+        - `Literal[`center`]`: Fill both sides, align center.
 
     Returns
     -------
@@ -253,9 +253,8 @@ def join_filter_text(data: Iterable, char: str = ',', filter_: Tuple = (None, ''
     Parameters
     ----------
     data : Data.
-        - `Element is 'str'` : Join.
-        - `Element is 'Any'` : Convert to string and join.
-
+        - `Element is 'str'`: Join.
+        - `Element is 'Any'`: Convert to string and join.
     char : Join character.
     filter_ : Filter elements.
 
@@ -290,17 +289,16 @@ def add_text_frame(
     ----------
     texts : Texts.
     title : Frame title.
-        - `Union[None, Literal['']]` : No title.
-        - `str` : Use this value as the title.
-
+        - `Union[None, Literal['']]`: No title.
+        - `str`: Use this value as the title.
     width : Frame width.
     frame : Frame type.
-        - `Literal[`full`]` : Add beautiful four side frame and limit length.
-            * When throw `exception`, then frame is `half` type.
-        - `Literal[`half`]` : Add beautiful top and bottom side frame.
-        - `Literal[`top`]` : Add beautiful top side frame.
-        - `Literal[`half_plain`]` : Add plain top and bottom side frame.
-        - `Literal[`top_plain`]` : Add plain top side frame.
+        - `Literal[`full`]`: Add beautiful four side frame and limit length.
+            When throw `exception`, then frame is `half` type.
+        - `Literal[`half`]`: Add beautiful top and bottom side frame.
+        - `Literal[`top`]`: Add beautiful top side frame.
+        - `Literal[`half_plain`]`: Add plain top and bottom side frame.
+        - `Literal[`top_plain`]`: Add plain top side frame.
 
     Returns
     -------

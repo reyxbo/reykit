@@ -90,13 +90,13 @@ def now(
     Parameters
     ----------
     format_ : Format type.
-        - `Literal['datetime']` : Return datetime object of datetime package.
-        - `Literal['date']` : Return date object of datetime package.
-        - `Literal['time']` : Return time object of datetime package.
-        - `Literal['datetime_str']` : Return string in format `'%Y-%m-%d %H:%M:%S'`.
-        - `Literal['date_str']` : Return string in format `'%Y-%m-%d'`.
-        - `Literal['time_str']` : Return string in foramt `'%H:%M:%S'`.
-        - `Literal['timestamp']` : Return time stamp in milliseconds.
+        - `Literal['datetime']`: Return datetime object of datetime package.
+        - `Literal['date']`: Return date object of datetime package.
+        - `Literal['time']`: Return time object of datetime package.
+        - `Literal['datetime_str']`: Return string in format `'%Y-%m-%d %H:%M:%S'`.
+        - `Literal['date_str']`: Return string in format `'%Y-%m-%d'`.
+        - `Literal['time_str']`: Return string in foramt `'%H:%M:%S'`.
+        - `Literal['timestamp']`: Return time stamp in milliseconds.
 
     Returns
     -------
@@ -163,11 +163,10 @@ def time_to(
     Parameters
     ----------
     obj : Time object.
-        - `datetime` : Text format is `'%Y-%m-%d %H:%M:%S'`.
-        - `date` : Text format is `'%Y-%m-%d'`.
-        - `time` : Text format is `'%H:%M:%S'`.
-        - `struct_time` : Text format is `'%Y-%m-%d %H:%M:%S'`.
-
+        - `datetime`: Text format is `'%Y-%m-%d %H:%M:%S'`.
+        - `date`: Text format is `'%Y-%m-%d'`.
+        - `time`: Text format is `'%H:%M:%S'`.
+        - `struct_time`: Text format is `'%Y-%m-%d %H:%M:%S'`.
     decimal : Whether with decimal, precision to microseconds.
     raising : When parameter `obj` value error, whether throw exception, otherwise return original value.
 
@@ -426,8 +425,8 @@ def sleep(
         - When `length is 2`, then low and high thresholds is `thresholds[0]` and `thresholds[1]`.
     
     precision : Precision of random range, that is maximum decimal digits of sleep seconds.
-        - `None` : Set to Maximum decimal digits of element of parameter `thresholds`.
-        - `int` : Set to this value.
+        - `None`: Set to Maximum decimal digits of element of parameter `thresholds`.
+        - `int`: Set to this value.
     
     Returns
     -------
@@ -464,9 +463,8 @@ def wait(
     args : Position arguments of decorated function.
     _interval : Interval seconds.
     _timeout : Timeout seconds, timeout throw exception.
-        - `None` : Infinite time.
-        - `float` : Use this time.
-
+        - `None`: Infinite time.
+        - `float`: Use this time.
     kwargs : Keyword arguments of decorated function.
 
     Returns
@@ -568,8 +566,8 @@ class RTimeMark():
         Parameters
         ----------
         title : Print title.
-            - `None` : Not print.
-            - `str` : Print and use this title.
+            - `None`: Not print.
+            - `str`: Print and use this title.
 
         Returns
         -------

@@ -189,8 +189,8 @@ def dos_command(command: Union[str, Iterable[str]]) -> str:
     Parameters
     ----------
     command : DOS command.
-        - `str` : Use this command.
-        - `Iterable[str]` : Join strings with space as command.
+        - `str`: Use this command.
+        - `Iterable[str]`: Join strings with space as command.
             When space in the string, automatic add quotation mark (e.g., ['echo', 'a b'] -> 'echo 'a b'').
 
     Returns
@@ -427,9 +427,8 @@ def get_first_notnull(
     ----------
     values : Check values.
     default : When all are null, then return this is value, or throw exception.
-        - `Any` : Return this is value.
-        - `Literal['exception']` : Throw `exception`.
-
+        - `Any`: Return this is value.
+        - `Literal['exception']`: Throw `exception`.
     nulls : Range of null values.
 
     Returns
@@ -469,9 +468,8 @@ def get_name(obj: Any, frame: int = 2) -> Optional[Union[str, Tuple[str, ...]]]:
     Parameters
     ----------
     obj : Object.
-        - `Tuple` : Variable length position parameter of previous layer.
-        - `Any` : Parameter of any layer.
-
+        - `Tuple`: Variable length position parameter of previous layer.
+        - `Any`: Parameter of any layer.
     frame : Number of code to upper level.
 
     Returns
@@ -508,9 +506,8 @@ def get_stack_text(format_: Literal['plain', 'full'] = 'plain', limit: int = 2) 
     Parameters
     ----------
     format_ : Stack text format.
-        - `Literal['plain']` : Floor stack position.
-        - `Literal['full']` : Full stack information.
-
+        - `Literal['plain']`: Floor stack position.
+        - `Literal['full']`: Full stack information.
     limit : Stack limit level.
 
     Returns
@@ -572,9 +569,8 @@ def get_stack_param(format_: Literal['floor', 'full'] = 'floor', limit: int = 2)
     Parameters
     ----------
     format_ : Stack parameters format.
-        - `Literal['floor']` : Floor stack parameters.
-        - `Literal['full']` : Full stack parameters.
-
+        - `Literal['floor']`: Floor stack parameters.
+        - `Literal['full']`: Full stack parameters.
     limit : Stack limit level.
 
     Returns
@@ -635,15 +631,15 @@ def get_arg_info(func: Callable) -> List[
     Returns
     -------
     Arguments information.
-        - `Value of key 'name'` : Argument name.
-        - `Value of key 'type'` : Argument bind type.
-            * `Literal['position_or_keyword']` : Is positional argument or keyword argument.
-            * `Literal['var_position']` : Is variable length positional argument.
-            * `Literal['var_keyword']` : Is variable length keyword argument.
-            * `Literal['only_position']` : Is positional only argument.
-            * `Literal['only_keyword']` : Is keyword only argument.
-        - `Value of key 'annotation'` : Argument annotation.
-        - `Value of key 'default'` : Argument default value.
+        - `Value of key 'name'`: Argument name.
+        - `Value of key 'type'`: Argument bind type.
+            `Literal['position_or_keyword']`: Is positional argument or keyword argument.
+            `Literal['var_position']`: Is variable length positional argument.
+            `Literal['var_keyword']`: Is variable length keyword argument.
+            `Literal['only_position']`: Is positional only argument.
+            `Literal['only_keyword']`: Is keyword only argument.
+        - `Value of key 'annotation'`: Argument annotation.
+        - `Value of key 'default'`: Argument default value.
     """
 
     # Get signature.
@@ -688,17 +684,17 @@ def get_computer_info() -> ComputerInfo:
     Returns
     -------
     Computer information dictionary.
-        - `Key 'boot_time'` : Computer boot time.
-        - `Key 'cpu_count'` : Computer logical CPU count.
-        - `Key 'cpu_frequency'` : Computer current CPU frequency.
-        - `Key 'cpu_percent'` : Computer CPU usage percent.
-        - `Key 'memory_total'` : Computer memory total gigabyte.
-        - `Key 'memory_percent'` : Computer memory usage percent.
-        - `Key 'disk_total'` : Computer disk total gigabyte.
-        - `Key 'disk_percent'` : Computer disk usage percent.
-        - `Key 'process_count'` : Computer process count.
-        - `Key 'network_count'` : Computer network count.
-        - `Key 'login_users'` : Computer login users information.
+        - `Key 'boot_time'`: Computer boot time.
+        - `Key 'cpu_count'`: Computer logical CPU count.
+        - `Key 'cpu_frequency'`: Computer current CPU frequency.
+        - `Key 'cpu_percent'`: Computer CPU usage percent.
+        - `Key 'memory_total'`: Computer memory total gigabyte.
+        - `Key 'memory_percent'`: Computer memory usage percent.
+        - `Key 'disk_total'`: Computer disk total gigabyte.
+        - `Key 'disk_percent'`: Computer disk usage percent.
+        - `Key 'process_count'`: Computer process count.
+        - `Key 'network_count'`: Computer network count.
+        - `Key 'login_users'`: Computer login users information.
     """
 
     # Set parameter.

@@ -292,9 +292,9 @@ class RLog(object):
         ----------
         format_ : Record format.
         mode : Handler mode.
-            - `None` : Standard filter method.
-            - `Literal['print'] : Print handler filter method.
-            - `Literal['file'] : File handler filter method.
+            - `None`: Standard filter method.
+            - `Literal['print']`: Print handler filter method.
+            - `Literal['file']`: File handler filter method.
 
         Returns
         -------
@@ -399,16 +399,15 @@ class RLog(object):
         ----------
         level : Handler level.
         format_ : Record format.
-            - `None` : Use attribute `default_format`.
-            - `str` : Use this value. 
-                * `Contain 'format_time'` : Date and time and millisecond, print output with color.
-                * `Contain 'format_levelname'` : Level name and fixed width, print output with color.
-                * `Contain 'format_path'` : Record code path, print output with color.
-                * `Contain 'format_message'` : message content, file output delete ANSI code, print outputwith color.
-
+            - `None`: Use attribute `default_format`.
+            - `str`: Use this value. 
+                `Contain 'format_time'`: Date and time and millisecond, print output with color.
+                `Contain 'format_levelname'`: Level name and fixed width, print output with color.
+                `Contain 'format_path'`: Record code path, print output with color.
+                `Contain 'format_message'`: message content, file output delete ANSI code, print outputwith color.
         filter_ : Filter method. The parameter is the `LogRecord` instance, return is `bool`.
-            - `None` : Use default filter method.
-            - `Callable` : Use this method.
+            - `None`: Use default filter method.
+            - `Callable`: Use this method.
 
         Returns
         -------
@@ -492,27 +491,24 @@ class RLog(object):
         Parameters
         ----------
         path : File path.
-            - `None` : Use attribute `self.name`.
-            - `str` : Use this value.
-
+            - `None`: Use attribute `self.name`.
+            - `str`: Use this value.
         mb : File split condition, max megabyte. Conflict with parameter `time`. Cannot be less than 1, prevent infinite split file.
         time : File split condition, interval time. Conflict with parameter `mb`.
-            - `float` : Interval hours.
-            - `Literal['m']` : Everyday midnight.
-            - `Literal['w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6']` : Weekly midnight, 'w0' is monday, 'w6' is sunday, and so on.
-
+            - `float`: Interval hours.
+            - `Literal['m']`: Everyday midnight.
+            - `Literal['w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6']`: Weekly midnight, 'w0' is monday, 'w6' is sunday, and so on.
         level : Handler level.
         format_ : Record format.
-            - `None` : Use attribute `default_format`.
-            - `str` : Use this value.
-                * `Contain 'format_time'` : Date and time and millisecond, print output with color.
-                * `Contain 'format_levelname'` : Level name and fixed width, print output with color.
-                * `Contain 'format_path'` : Record code path, print output with color.
-                * `Contain 'format_message'` : message content, file output delete ANSI code, print outputwith color.
-
+            - `None`: Use attribute `default_format`.
+            - `str`: Use this value.
+                `Contain 'format_time'`: Date and time and millisecond, print output with color.
+                `Contain 'format_levelname'`: Level name and fixed width, print output with color.
+                `Contain 'format_path'`: Record code path, print output with color.
+                `Contain 'format_message'`: message content, file output delete ANSI code, print outputwith color.
         filter_ : Filter method. The parameter is the `LogRecord` instance, return is `bool`.
-            - `None` : Use default filter method.
-            - `Callable` : Use this method.
+            - `None`: Use default filter method.
+            - `Callable`: Use this method.
 
         Returns
         -------
@@ -619,9 +615,8 @@ class RLog(object):
         Parameters
         ----------
         queue : Queue instance.
-            - `None` : Create queue and use.
-            - `Queue` : Use this queue.
-
+            - `None`: Create queue and use.
+            - `Queue`: Use this queue.
         level : Handler level.
         filter_ : Filter method. The parameter is the `LogRecord` instance, return is `bool`.
 
@@ -779,11 +774,10 @@ class RLog(object):
         ----------
         messages : Record content.
         level : Record level.
-            - `None` : Automatic judge.
-                * `in 'except' syntax` : Use 'ERROR' level.
-                * `Other` : Use 'INFO' level.
-            - `int` : Use this value.
-
+            - `None`: Automatic judge.
+                `in 'except' syntax`: Use 'ERROR' level.
+                `Other`: Use 'INFO' level.
+            - `int`: Use this value.
         catch : Whether catch and append exception stack.
         params : Record Format parameters.
         """
@@ -976,8 +970,8 @@ class RRecord(object):
         Parameters
         ----------
         path : File path.
-            - `None` : Record to variable.
-            - `path` : Record to file.
+            - `None`: Record to variable.
+            - `path`: Record to file.
         """
 
         # Set attribute.

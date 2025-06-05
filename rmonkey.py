@@ -88,8 +88,8 @@ def monkey_patch_sqlalchemy_result_more_fetch():
         Parameters
         ----------
         limit : Limit row.
-            - `>0` : Limit first few row.
-            - `<0` : Limit last few row.
+            - `>0`: Limit first few row.
+            - `<0`: Limit last few row.
         """
 
         # Handle parameter.

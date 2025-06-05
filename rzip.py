@@ -37,9 +37,8 @@ def compress(
     ----------
     obj_path : File or folder path.
     build_dir : Build directory.
-        - `None` : Work directory.
-        - `str` : Use this value.
-
+        - `None`: Work directory.
+        - `str`: Use this value.
     overwrite : Whether to overwrite.
     """
 
@@ -93,12 +92,11 @@ def decompress(
     ----------
     obj_path : Compressed object path.
     build_dir : Build directory.
-        - `None` : Work directory.
-        - `str` : Use this value.
-
+        - `None`: Work directory.
+        - `str`: Use this value.
     passwrod : Unzip Password.
-        - `None` : No Unzip Password.
-        - `str` : Use this value.
+        - `None`: No Unzip Password.
+        - `str`: Use this value.
     """
 
     # Check object whether can be decompress.
@@ -125,8 +123,8 @@ def zip(
     ----------
     obj_path : File or folder or compressed object path.
     output_path : Build directory.
-        - `None` : Work directory.
-        - `str` : Use this value.
+        - `None`: Work directory.
+        - `str`: Use this value.
     """
 
     # Judge compress or decompress.

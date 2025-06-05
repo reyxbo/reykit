@@ -63,24 +63,22 @@ def beautify_text(
     ----------
     data : Text data.
     title : Text title.
-        - `Literal[True]` : Automatic get data variable name.
-        - `Literal[False]` : No title.
-        - `str` : Use this value as the title.
-
+        - `Literal[True]`: Automatic get data variable name.
+        - `Literal[False]`: No title.
+        - `str`: Use this value as the title.
     width : Text width.
-        - `None` : Use attribute `default_width`.
-        - `int` : Use this value.
-
+        - `None`: Use attribute `default_width`.
+        - `int`: Use this value.
     frame : Text frame type.
-        - `Literal[`full`]` : Add beautiful four side frame and limit length.
-            * When attribute `is_frame_plain` is True, then frame is `half_plain` type.
-            * When throw `exception`, then frame is `half` type.
-        - `Literal[`half`]` : Add beautiful top and bottom side frame.
-            * When attribute `is_frame_plain` is True, then frame is `half_plain` type.
-        - `Literal[`top`]` : Add beautiful top side frame.
-            * When attribute `is_frame_plain` is True, then frame is `top_plain` type.
-        - `Literal[`half_plain`]` : Add plain top and bottom side frame.
-        - `Literal[`top_plain`]` : Add plain top side frame.
+        - `Literal[`full`]`: Add beautiful four side frame and limit length.
+            When attribute `is_frame_plain` is True, then frame is `half_plain` type.
+            When throw `exception`, then frame is `half` type.
+        - `Literal[`half`]`: Add beautiful top and bottom side frame.
+            When attribute `is_frame_plain` is True, then frame is `half_plain` type.
+        - `Literal[`top`]`: Add beautiful top side frame.
+            When attribute `is_frame_plain` is True, then frame is `top_plain` type.
+        - `Literal[`half_plain`]`: Add plain top and bottom side frame.
+        - `Literal[`top_plain`]`: Add plain top side frame.
 
     Returns
     -------
@@ -139,24 +137,22 @@ def echo(
     ----------
     data : Text data.
     title : Text title.
-        - `Literal[True]` : Automatic get data variable name.
-        - `Literal[False]` : No title.
-        - `str` : Use this value as the title.
-
+        - `Literal[True]`: Automatic get data variable name.
+        - `Literal[False]`: No title.
+        - `str`: Use this value as the title.
     width : Text width.
-        - `None` : Use attribute `default_width`.
-        - `int` : Use this value.
-
+        - `None`: Use attribute `default_width`.
+        - `int`: Use this value.
     frame : Text frame type.
-        - `Literal[`full`]` : Add beautiful four side frame and limit length.
-            * When attribute `is_frame_plain` is True, then frame is `half_plain` type.
-            * When throw `exception`, then frame is `half` type.
-        - `Literal[`half`]` : Add beautiful top and bottom side frame.
-            * When attribute `is_frame_plain` is True, then frame is `half_plain` type.
-        - `Literal[`top`]` : Add beautiful top side frame.
-            * When attribute `is_frame_plain` is True, then frame is `top_plain` type.
-        - `Literal[`half_plain`]` : Add plain top and bottom side frame.
-        - `Literal[`top_plain`]` : Add plain top side frame.
+        - `Literal[`full`]`: Add beautiful four side frame and limit length.
+            When attribute `is_frame_plain` is True, then frame is `half_plain` type.
+            When throw `exception`, then frame is `half` type.
+        - `Literal[`half`]`: Add beautiful top and bottom side frame.
+            When attribute `is_frame_plain` is True, then frame is `half_plain` type.
+        - `Literal[`top`]`: Add beautiful top side frame.
+            When attribute `is_frame_plain` is True, then frame is `top_plain` type.
+        - `Literal[`half_plain`]`: Add plain top and bottom side frame.
+        - `Literal[`top_plain`]`: Add plain top side frame.
 
     Returns
     -------
@@ -186,25 +182,22 @@ def rinput(
     ----------
     data : Text data.
     title : Text title.
-        - `Literal[True]` : Automatic get data variable name.
-        - `Literal[False]` : No title.
-        - `str` : Use this value as the title.
-
+        - `Literal[True]`: Automatic get data variable name.
+        - `Literal[False]`: No title.
+        - `str`: Use this value as the title.
     width : Text width.
-        - `None` : Use attribute `default_width`.
-        - `int` : Use this value.
-
+        - `None`: Use attribute `default_width`.
+        - `int`: Use this value.
     frame : Text frame type.
-        - `Literal[`full`]` : Add beautiful four side frame and limit length.
-            * When attribute `is_frame_plain` is True, then frame is `half_plain` type.
-            * When throw `exception`, then frame is `half` type.
-        - `Literal[`half`]` : Add beautiful top and bottom side frame.
-            * When attribute `is_frame_plain` is True, then frame is `half_plain` type.
-        - `Literal[`top`]` : Add beautiful top side frame.
-            * When attribute `is_frame_plain` is True, then frame is `top_plain` type.
-        - `Literal[`half_plain`]` : Add plain top and bottom side frame.
-        - `Literal[`top_plain`]` : Add plain top side frame.
-
+        - `Literal[`full`]`: Add beautiful four side frame and limit length.
+            When attribute `is_frame_plain` is True, then frame is `half_plain` type.
+            When throw `exception`, then frame is `half` type.
+        - `Literal[`half`]`: Add beautiful top and bottom side frame.
+            When attribute `is_frame_plain` is True, then frame is `half_plain` type.
+        - `Literal[`top`]`: Add beautiful top side frame.
+            When attribute `is_frame_plain` is True, then frame is `top_plain` type.
+        - `Literal[`half_plain`]`: Add plain top and bottom side frame.
+        - `Literal[`top_plain`]`: Add plain top side frame.
     extra : Extra print text at the end.
 
     Returns
@@ -263,8 +256,8 @@ def modify_print(preprocess: Callable[[str], Optional[str]]) -> None:
     Parameters
     ----------
     preprocess : Preprocess function.
-        - `Callable[[str], str]` : Input old text, output new text, will trigger printing.
-        - `Callable[[str], None]` : Input old text, no output, will not trigger printing.
+        - `Callable[[str], str]`: Input old text, output new text, will trigger printing.
+        - `Callable[[str], None]`: Input old text, no output, will not trigger printing.
     """
 
 

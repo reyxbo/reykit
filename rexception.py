@@ -169,16 +169,16 @@ def catch_exc(
     Parameters
     ----------
     title : Print title.
-        - `None` : Not print.
-        - `str` : Print and use this title.
+        - `None`: Not print.
+        - `str`: Print and use this title.
 
     Returns
     -------
     Exception data.
-        - `str` : Exception report text.
-        - `Type[BaseException]` : Exception type.
-        - `BaseException` : Exception instance.
-        - `TracebackType` : Exception traceback instance.
+        - `str`: Exception report text.
+        - `Type[BaseException]`: Exception type.
+        - `BaseException`: Exception instance.
+        - `TracebackType`: Exception traceback instance.
     """
 
     # Get parameter.
@@ -298,8 +298,8 @@ def check_response_code(
     code : Response code.
     range_ : Pass the code range.
         - `None`: Check if is between 200 and 299.
-        - `int` : Check if is this value.
-        - `Iterable` : Check if is in sequence.
+        - `int`: Check if is this value.
+        - `Iterable`: Check if is in sequence.
 
     Returns
     -------

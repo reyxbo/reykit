@@ -75,7 +75,9 @@ def to_table(
                 dict(zip(
                     fields,
                     [
-                        None if isnull(value) else value
+                        None
+                        if (value.__class__ != list and isnull(value))
+                        else value
                         for value in row
                     ]
                 ))

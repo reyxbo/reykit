@@ -10,9 +10,8 @@
 
 
 from __future__ import annotations
-from typing import Any, List, Union, Literal, Optional, NoReturn, overload
+from typing import Any, List, Dict, Union, Literal, Optional, NoReturn, overload
 from io import TextIOBase, BufferedIOBase
-from json import JSONDecodeError
 from os import (
     walk as os_walk,
     listdir as os_listdir,
@@ -36,7 +35,9 @@ from os.path import (
     splitext as os_splitext,
     splitdrive as os_splitdrive
 )
-from shutil import copy
+from shutil import copy as shutil_copy
+from json import JSONDecodeError
+from tomllib import loads as tomllib_loads
 from hashlib import md5 as hashlib_md5
 from tempfile import TemporaryFile, TemporaryDirectory
 from docx import Document as docx_document
@@ -60,6 +61,7 @@ __all__ = (
     'find_relpath',
     'get_file_str',
     'get_file_bytes',
+    'read_toml',
     'RFile',
     'RFolder',
     'RTempFile',
@@ -263,6 +265,37 @@ def get_file_bytes(file: FileBytes) -> bytes:
     return file_bytes
 
 
+def read_toml(path: Union[str, RFile]) -> Dict[str, Any]:
+    """
+    Read and parse TOML file.
+
+    Parameters
+    ----------
+    path : File path or RFile object.
+
+    Returns
+    -------
+    Parameter dictionary.
+    """
+
+    # Read.
+    match path:
+
+        ## File path.
+        case str():
+            rfile = RFile(path)
+            text = rfile.str
+
+        ## RFile object.
+        case RFile():
+            text = rfile.str
+
+    # Parse.
+    params = tomllib_loads(text)
+
+    return params
+
+
 class RFile(object):
     """
     Rey's `file` type.
@@ -383,7 +416,7 @@ class RFile(object):
         """
 
         # Copy.
-        copy(
+        shutil_copy(
             self.path,
             path
         )
@@ -616,6 +649,22 @@ class RFile(object):
         file_md5 = get_md5(self.path)
 
         return file_md5
+
+
+    @property
+    def toml(self) -> Dict[str, Any]:
+        """
+        Read and parse TOML file.
+
+        Returns
+        -------
+        Parameter dictionary.
+        """
+
+        # Read and parse.
+        params = read_toml(self.path)
+
+        return params
 
 
     def __bool__(self) -> bool:

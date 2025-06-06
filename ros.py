@@ -268,6 +268,7 @@ def get_file_bytes(file: FileBytes) -> bytes:
 def read_toml(path: Union[str, RFile]) -> Dict[str, Any]:
     """
     Read and parse TOML file.
+    Treat nan as a None or null value.
 
     Parameters
     ----------
@@ -291,7 +292,11 @@ def read_toml(path: Union[str, RFile]) -> Dict[str, Any]:
             text = rfile.str
 
     # Parse.
-    params = tomllib_loads(text)
+
+    ## Handle nan.
+    parse_float = lambda float_str: None if float_str == "nan" else float_str
+
+    params = tomllib_loads(text, parse_float=parse_float)
 
     return params
 
@@ -655,6 +660,7 @@ class RFile(object):
     def toml(self) -> Dict[str, Any]:
         """
         Read and parse TOML file.
+        Treat nan as a None or null value.
 
         Returns
         -------

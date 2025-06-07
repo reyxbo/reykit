@@ -9,7 +9,8 @@
 """
 
 
-from typing import Any, List, Union, Optional, Literal, Sequence, overload
+from typing import Union, Optional, Literal, overload
+from collections.abc import Sequence
 from string import digits as string_digits, ascii_letters as string_ascii_letters, punctuation as string_punctuation
 from math import ceil as math_ceil
 from secrets import randbelow as secrets_randbelow
@@ -142,13 +143,13 @@ def randi(
     data: Sequence,
     multi: int = None,
     unique: bool = True
-) -> List[Element]: ...
+) -> list[Element]: ...
 
 def randi(
     data: Sequence,
     multi: Optional[int] = None,
     unique: bool = True
-) -> Union[Element, List[Element]]:
+) -> Union[Element, list[Element]]:
     """
     Random index data element.
 
@@ -235,7 +236,7 @@ def randchar(
     return chars
 
 
-def randsort(data: Sequence[Element]) -> List[Element]:
+def randsort(data: Sequence[Element]) -> list[Element]:
     """
     Random sorting data.
 

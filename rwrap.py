@@ -9,7 +9,8 @@
 """
 
 
-from typing import Any, List, Tuple, Dict, Callable, Optional, Union, Literal, overload
+from typing import Any, Optional, Union, Literal, overload
+from collections.abc import Callable
 from io import IOBase, StringIO
 from inspect import getdoc
 from functools import wraps as functools_wraps
@@ -158,7 +159,7 @@ def wrap_runtime(func: Callable,
     *args: Any,
     _return_report: Literal[True] = False,
     **kwargs: Any
-) -> Tuple[Any, str]: ...
+) -> tuple[Any, str]: ...
 
 @wrap_frame
 def wrap_runtime(
@@ -166,7 +167,7 @@ def wrap_runtime(
     *args: Any,
     _return_report: bool = False,
     **kwargs: Any
-) -> Union[Any, Tuple[Any, str]]:
+) -> Union[Any, tuple[Any, str]]:
     """
     Decorator, print or return runtime report of the function.
 
@@ -259,7 +260,7 @@ def wrap_thread(
 def wrap_exc(
     func: Callable,
     *args: Any,
-    _exception: Union[BaseException, Tuple[BaseException, ...]] = BaseException,
+    _exception: Union[BaseException, tuple[BaseException, ...]] = BaseException,
     _handler: Optional[Callable] = None,
     **kwargs: Any
 ) -> Optional[Any]: ...
@@ -268,7 +269,7 @@ def wrap_exc(
 def wrap_exc(
     func: Callable,
     *args: Any,
-    _exception: Union[BaseException, Tuple[BaseException, ...]] = BaseException,
+    _exception: Union[BaseException, tuple[BaseException, ...]] = BaseException,
     _handler: Optional[Callable] = None,
     **kwargs: Any
 ) -> Optional[Any]:
@@ -307,7 +308,7 @@ def wrap_retry(
     func: Callable,
     *args: Any,
     _report: Optional[str] = None,
-    _exception: Union[BaseException, Tuple[BaseException, ...]] = BaseException,
+    _exception: Union[BaseException, tuple[BaseException, ...]] = BaseException,
     _try_total: int = 1,
     _try_count: int = 0,
     **kwargs: Any
@@ -318,7 +319,7 @@ def wrap_retry(
     func: Callable,
     *args: Any,
     _report: Optional[str] = None,
-    _exception: Union[BaseException, Tuple[BaseException, ...]] = BaseException,
+    _exception: Union[BaseException, tuple[BaseException, ...]] = BaseException,
     _try_total: int = 1,
     _try_count: int = 0,
     **kwargs: Any
@@ -502,7 +503,7 @@ def wrap_dos_command(
 
 
 # Cache decorator data.
-wrap_cache_data: Dict[Callable, List[Tuple[Any, Any, Any]]] = {}
+wrap_cache_data: dict[Callable, list[tuple[Any, Any, Any]]] = {}
 
 
 @overload
@@ -568,7 +569,7 @@ def wrap_cache(
 def wrap_redirect_stdout(
     func: Callable,
     *args: Any,
-    _redirect: Optional[Union[List, IOBase]] = None,
+    _redirect: Optional[Union[list, IOBase]] = None,
     **kwargs: Any
 ) -> Any: ...
 
@@ -576,7 +577,7 @@ def wrap_redirect_stdout(
 def wrap_redirect_stdout(
     func: Callable,
     *args: Any,
-    _redirect: Optional[Union[List, IOBase]] = None,
+    _redirect: Optional[Union[list, IOBase]] = None,
     **kwargs: Any
 ) -> Any:
     """

@@ -9,7 +9,8 @@
 """
 
 
-from typing import Any, List, Tuple, Dict, Callable, Literal, Union, Optional
+from typing import Any, Literal, Union, Optional
+from collections.abc import Callable
 from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -103,7 +104,7 @@ class RSchedule(object):
         self.scheduler.resume()
 
 
-    def tasks(self) -> List[Job]:
+    def tasks(self) -> list[Job]:
         """
         Return to task list.
 
@@ -122,8 +123,8 @@ class RSchedule(object):
         self,
         func: Callable,
         trigger: Literal['date', 'interval', 'cron'] = 'date',
-        args: Optional[Tuple] = None,
-        kwargs: Optional[Dict] = None,
+        args: Optional[tuple] = None,
+        kwargs: Optional[dict] = None,
         **trigger_kwargs: Any
     ) -> Job:
         """
@@ -158,8 +159,8 @@ class RSchedule(object):
         self,
         task: Union[Job, str],
         trigger: Optional[Literal['date', 'interval', 'cron']] = None,
-        args: Optional[Tuple] = None,
-        kwargs: Optional[Dict] = None,
+        args: Optional[tuple] = None,
+        kwargs: Optional[dict] = None,
         **trigger_kwargs: Any
     ) -> None:
         """

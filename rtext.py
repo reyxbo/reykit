@@ -9,9 +9,9 @@
 """
 
 
-from typing import Any, List, Tuple, Literal, Iterable, Optional
+from typing import Any, Literal, Optional
+from collections.abc import Iterable
 from decimal import Decimal
-from string import digits as string_digits, ascii_letters as string_ascii_letters, punctuation as string_punctuation
 from pprint import pformat as pprint_pformat
 from json import dumps as json_dumps
 
@@ -36,7 +36,7 @@ __all__ = (
 monkey_patch_pprint_modify_width_judgment()
 
 
-def split_text(text: str, man_len: int, by_width: bool = False) -> List[str]:
+def split_text(text: str, man_len: int, by_width: bool = False) -> list[str]:
     """
     Split text by max length or not greater than display width.
 
@@ -220,7 +220,7 @@ def join_data_text(data: Iterable) -> str:
 
     # Join.
 
-    ## Dict type.
+    ## dict type.
     if data.__class__ == dict:
         texts = []
         for key, value in data.items():
@@ -246,7 +246,7 @@ def join_data_text(data: Iterable) -> str:
     return text
 
 
-def join_filter_text(data: Iterable, char: str = ',', filter_: Tuple = (None, '')) -> str:
+def join_filter_text(data: Iterable, char: str = ',', filter_: tuple = (None, '')) -> str:
     """
     Join and filter text.
 

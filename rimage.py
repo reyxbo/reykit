@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, List, Union, Optional
+from typing import Any, Union, Optional
 from io import BytesIO
 from qrcode import make as qrcode_make
 from qrcode.image.pil import PilImage
@@ -73,7 +73,7 @@ def encode_qrcode(text: str, path: Optional[str] = None) -> bytes:
     return file_bytes
 
 
-def decode_qrcode(image: Union[str, bytes]) -> List[str]:
+def decode_qrcode(image: Union[str, bytes]) -> list[str]:
     """
     Decoding QR code or bar code image.
 

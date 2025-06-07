@@ -9,7 +9,7 @@
 """
 
 
-from typing import List, Tuple, Dict, Optional, Union
+from typing import Optional, Union
 from io import BufferedIOBase
 from smtplib import SMTP
 from email.mime.multipart import MIMEMultipart
@@ -60,7 +60,7 @@ class REmail(object):
     def get_server_address(
         self,
         email: str
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         """
         Get server address of email.
 
@@ -103,10 +103,10 @@ class REmail(object):
         self,
         title: Optional[str],
         text: Optional[str],
-        attachment: Dict[str, bytes],
+        attachment: dict[str, bytes],
         show_from: Optional[str],
-        show_to: Optional[List[str]],
-        show_cc: Optional[List[str]]
+        show_to: Optional[list[str]],
+        show_cc: Optional[list[str]]
     ) -> str:
         """
         create email content.
@@ -169,14 +169,14 @@ class REmail(object):
 
     def send_email(
         self,
-        to: Union[str, List[str]],
+        to: Union[str, list[str]],
         title: Optional[str] = None,
         text: Optional[str] = None,
-        attachment: Dict[str, FileBytes] = {},
-        cc: Optional[Union[str, List[str]]] = None,
+        attachment: dict[str, FileBytes] = {},
+        cc: Optional[Union[str, list[str]]] = None,
         show_from: Optional[str] = None,
-        show_to: Optional[Union[str, List[str]]] = None,
-        show_cc: Optional[Union[str, List[str]]] = None
+        show_to: Optional[Union[str, list[str]]] = None,
+        show_cc: Optional[Union[str, list[str]]] = None
     ) -> None:
         """
         Send email.
@@ -185,7 +185,7 @@ class REmail(object):
         ----------
         to : To email addresses.
             - `str`: Email address, multiple comma interval.
-            - `List[str]`: Email addresses list.
+            - `list[str]`: Email addresses list.
         title : Email title.
         text : Email text.
         attachment : Email attachments dictionary.
@@ -196,18 +196,18 @@ class REmail(object):
                 `BufferedIOBase`: File bytes IO.
         cc : Carbon copy email addresses.
             - `str`: Email address, multiple comma interval.
-            - `List[str]`: Email addresses list.
+            - `list[str]`: Email addresses list.
         show_from : Show from email address.
             - `None`: Use attribute `self.username`.
             - `str`: Email address.
         show_to : Show to email addresses.
             - `None`: Use parameter `to`.
             - `str`: Email address, multiple comma interval.
-            - `List[str]`: Email addresses list.
+            - `list[str]`: Email addresses list.
         show_cc : Show carbon copy email addresses.
             - `None`: Use parameter `cc`.
             - `str`: Email address, multiple comma interval.
-            - `List[str]`: Email addresses list.
+            - `list[str]`: Email addresses list.
         """
 
         # Handle parameter.

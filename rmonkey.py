@@ -49,7 +49,7 @@ def monkey_patch_sqlalchemy_result_more_fetch():
     from .rtime import time_to
 
 
-    # Fetch result as table in 'List[Dict]' format.
+    # Fetch result as table in 'list[dict]' format.
     CursorResult.fetch_table = to_table
 
     # Fetch result as dictionary.
@@ -207,7 +207,7 @@ def monkey_patch_sqlalchemy_row_index_field():
     """
 
 
-    from typing import Any, Tuple, Union, overload
+    from typing import Any, Union, overload
     from sqlalchemy.engine.row import Row
 
 
@@ -216,9 +216,9 @@ def monkey_patch_sqlalchemy_row_index_field():
     def __getitem__(self, index: Union[str, int]) -> Any: ...
 
     @overload
-    def __getitem__(self, index: slice) -> Tuple: ...
+    def __getitem__(self, index: slice) -> tuple: ...
 
-    def __getitem__(self, index: Union[str, int, slice]) -> Union[Any, Tuple]:
+    def __getitem__(self, index: Union[str, int, slice]) -> Union[Any, tuple]:
         """
         Index row value.
 

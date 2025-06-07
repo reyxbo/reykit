@@ -9,7 +9,8 @@
 """
 
 
-from typing import Any, Dict, TypedDict, Literal, Callable, Optional, Union, overload, NoReturn
+from typing import Any, TypedDict, Literal, Optional, Union, overload, NoReturn
+from collections.abc import Callable
 from pandas import (
     DataFrame,
     Timestamp as pd_timestamp,
@@ -518,7 +519,7 @@ class RTimeMark():
         """
 
         # Record table.
-        self.record: Dict[int, RecordData] = {}
+        self.record: dict[int, RecordData] = {}
 
 
     def mark(self, note: Optional[str] = None) -> int:

@@ -9,7 +9,8 @@
 """
 
 
-from typing import Any, List, Dict, TypedDict, Tuple, Iterable, Literal, Optional, Sequence, Callable, Union, Type, overload
+from typing import Any, TypedDict, Literal, Optional, Union, overload
+from collections.abc import Callable, Iterable, Sequence
 from inspect import signature as inspect_signature, _ParameterKind, _empty
 from sys import path as sys_path, modules as sys_modules
 from os import getpid as os_getpid
@@ -97,14 +98,14 @@ NetWorkInfo = TypedDict(
         'pid': Optional[int]
     }
 )
-ProcessInfo = TypedDict('ProcessInfo', {'create_time': datetime, 'id': int, 'name': str, 'ports': Optional[List[int]]})
+ProcessInfo = TypedDict('ProcessInfo', {'create_time': datetime, 'id': int, 'name': str, 'ports': Optional[list[int]]})
 
 
 # Added environment path.
-_add_env_paths: List[str] = []
+_add_env_paths: list[str] = []
 
 
-def add_env_path(path: str) -> List[str]:
+def add_env_path(path: str) -> list[str]:
     """
     Add environment variable path.
 
@@ -140,7 +141,7 @@ def reset_env_path() -> None:
     _add_env_paths = []
 
 
-def del_modules(path: str) -> List[str]:
+def del_modules(path: str) -> list[str]:
     """
     Delete record of modules import dictionary.
 
@@ -214,7 +215,7 @@ def dos_command(command: Union[str, Iterable[str]]) -> str:
     return output
 
 
-def dos_command_var(*vars: Any) -> List[Any]:
+def dos_command_var(*vars: Any) -> list[Any]:
     """
     Use DOS command to input arguments to variables.
     Use DOS command `python file --help` to view help information.
@@ -329,7 +330,7 @@ def block() -> None:
 
 def is_iterable(
     obj: Any,
-    exclude_types: Iterable[Type] = [str, bytes]
+    exclude_types: Iterable[type] = [str, bytes]
 ) -> bool:
     """
     Judge whether it is iterable.
@@ -360,12 +361,12 @@ def is_table(
     check_fields: bool = True
 ) -> bool:
     """
-    Judge whether it is `List[Dict]` table format and keys and keys sort of the Dict are the same.
+    Judge whether it is `list[dict]` table format and keys and keys sort of the dict are the same.
 
     Parameters
     ----------
     obj : Judge object.
-    check_fields : Do you want to check the keys and keys sort of the Dict are the same.
+    check_fields : Do you want to check the keys and keys sort of the dict are the same.
 
     Returns
     -------
@@ -419,7 +420,7 @@ def is_number_str(
 def get_first_notnull(
     *values: Any,
     default: Union[None, Any, Literal['exception']] = None,
-    nulls: Tuple = (None,)) -> Any:
+    nulls: tuple = (None,)) -> Any:
     """
     Get the first value that is not null.
 
@@ -456,19 +457,19 @@ def get_first_notnull(
 
 
 @overload
-def get_name(obj: Tuple, frame: int = 2) -> Optional[Tuple[str, ...]]: ...
+def get_name(obj: tuple, frame: int = 2) -> Optional[tuple[str, ...]]: ...
 
 @overload
 def get_name(obj: Any, frame: int = 2) -> Optional[str]: ...
 
-def get_name(obj: Any, frame: int = 2) -> Optional[Union[str, Tuple[str, ...]]]:
+def get_name(obj: Any, frame: int = 2) -> Optional[Union[str, tuple[str, ...]]]:
     """
     Get name of object or variable.
 
     Parameters
     ----------
     obj : Object.
-        - `Tuple`: Variable length position parameter of previous layer.
+        - `tuple`: Variable length position parameter of previous layer.
         - `Any`: Parameter of any layer.
     frame : Number of code to upper level.
 
@@ -557,12 +558,12 @@ def get_stack_text(format_: Literal['plain', 'full'] = 'plain', limit: int = 2) 
 
 
 @overload
-def get_stack_param(format_: Literal['floor'] = 'floor', limit: int = 2) -> Dict: ...
+def get_stack_param(format_: Literal['floor'] = 'floor', limit: int = 2) -> dict: ...
 
 @overload
-def get_stack_param(format_: Literal['full'] = 'floor', limit: int = 2) -> List[Dict]: ...
+def get_stack_param(format_: Literal['full'] = 'floor', limit: int = 2) -> list[dict]: ...
 
-def get_stack_param(format_: Literal['floor', 'full'] = 'floor', limit: int = 2) -> Union[Dict, List[Dict]]:
+def get_stack_param(format_: Literal['floor', 'full'] = 'floor', limit: int = 2) -> Union[dict, list[dict]]:
     """
     Get code stack parameters.
 
@@ -615,8 +616,8 @@ def get_stack_param(format_: Literal['floor', 'full'] = 'floor', limit: int = 2)
     return params
 
 
-def get_arg_info(func: Callable) -> List[
-    Dict[
+def get_arg_info(func: Callable) -> list[
+    dict[
         Literal['name', 'type', 'annotation', 'default'],
         Optional[str]
     ]
@@ -764,7 +765,7 @@ def get_computer_info() -> ComputerInfo:
     return info
 
 
-def get_network_table() -> List[NetWorkInfo]:
+def get_network_table() -> list[NetWorkInfo]:
     """
     Get network information table.
 
@@ -822,7 +823,7 @@ def get_network_table() -> List[NetWorkInfo]:
     return table
 
 
-def get_process_table() -> List[ProcessInfo]:
+def get_process_table() -> list[ProcessInfo]:
     """
     Get process information table.
 
@@ -867,7 +868,7 @@ def search_process(
     id_: Optional[Union[int, Sequence[int]]] = None,
     name: Optional[Union[str, Sequence[str]]] = None,
     port: Optional[Union[str, int, Sequence[Union[str, int]]]] = None,
-) -> List[Process]:
+) -> list[Process]:
     """
     Search process by ID or name or port.
 
@@ -953,7 +954,7 @@ def kill_process(
     id_: Optional[Union[int, Sequence[int]]] = None,
     name: Optional[Union[str, Sequence[str]]] = None,
     port: Optional[Union[str, int, Sequence[Union[str, int]]]] = None,
-) -> List[Process]:
+) -> list[Process]:
     """
     Search and kill process by ID or name or port.
 
@@ -991,7 +992,7 @@ def stop_process(
     id_: Optional[Union[int, Sequence[int]]] = None,
     name: Optional[Union[str, Sequence[str]]] = None,
     port: Optional[Union[str, int, Sequence[Union[str, int]]]] = None,
-) -> List[Process]:
+) -> list[Process]:
     """
     Search and stop process by ID or name or port.
 
@@ -1029,7 +1030,7 @@ def start_process(
     id_: Optional[Union[int, Sequence[int]]] = None,
     name: Optional[Union[str, Sequence[str]]] = None,
     port: Optional[Union[str, int, Sequence[Union[str, int]]]] = None,
-) -> List[Process]:
+) -> list[Process]:
     """
     Search and start process by ID or name or port.
 

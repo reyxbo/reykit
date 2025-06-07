@@ -9,7 +9,8 @@
 """
 
 
-from typing import List, Tuple, Callable, Optional, Union, Literal, overload
+from typing import Optional, Union, Literal, overload
+from collections.abc import Callable
 from re import (
     search as re_search,
     sub as re_sub,
@@ -37,7 +38,7 @@ __all__ = (
 def search(
     pattern: str,
     text: str
-) -> Optional[Union[str, Tuple[Optional[str], ...]]]:
+) -> Optional[Union[str, tuple[Optional[str], ...]]]:
     """
     Regular search text.
 
@@ -72,7 +73,7 @@ def search(
 def findall(
     pattern: str,
     text: str,
-) -> Union[List[str], List[Tuple[str, ...]]]:
+) -> Union[list[str], list[tuple[str, ...]]]:
     """
     Regular find all text.
 
@@ -130,7 +131,7 @@ def split(
     pattern: str,
     text: str,
     count: Optional[int] = None
-) -> List[str]:
+) -> list[str]:
     """
     Regular split text.
 
@@ -160,22 +161,22 @@ def search_batch(
     text: str,
     *patterns: str,
     first: Literal[True] = True
-) -> Optional[Union[str, Tuple[Optional[str], ...]]]: ...
+) -> Optional[Union[str, tuple[Optional[str], ...]]]: ...
 
 @overload
 def search_batch(
     text: str,
     *patterns: str,
     first: Literal[False] = True
-) -> List[Optional[Union[str, Tuple[Optional[str], ...]]]]: ...
+) -> list[Optional[Union[str, tuple[Optional[str], ...]]]]: ...
 
 def search_batch(
     text: str,
     *patterns: str,
     first: bool = True
 ) -> Union[
-    Optional[Union[str, Tuple[Optional[str], ...]]],
-    List[Optional[Union[str, Tuple[Optional[str], ...]]]]
+    Optional[Union[str, tuple[Optional[str], ...]]],
+    list[Optional[Union[str, tuple[Optional[str], ...]]]]
 ]:
     """
     Batch regular search text.
@@ -236,7 +237,7 @@ def findall_batch(text: str, *patterns: str) -> str:
     return texts
 
 
-def sub_batch(text: str, *patterns: Union[str, Tuple[str, Union[str, Callable[[RMatch], str]]]]) -> str:
+def sub_batch(text: str, *patterns: Union[str, tuple[str, Union[str, Callable[[RMatch], str]]]]) -> str:
     """
     Batch regular replace text.
 
@@ -245,8 +246,8 @@ def sub_batch(text: str, *patterns: Union[str, Tuple[str, Union[str, Callable[[R
     text : Match text.
     patterns : Regular pattern and replace text, `period match any character`.
         - `str`: Regular pattern, delete match part.
-        - `Tuple[str, str]`: Regular pattern and replace text.
-        - `Tuple[str, Callable[[RMatch], str]]`: Regular pattern and replace handle function.
+        - `tuple[str, str]`: Regular pattern and replace text.
+        - `tuple[str, Callable[[RMatch], str]]`: Regular pattern and replace handle function.
 
     Returns
     -------

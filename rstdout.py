@@ -9,7 +9,8 @@
 """
 
 
-from typing import Any, Tuple, Literal, Optional, Callable, Union, Final
+from typing import Any, Literal, Optional, Union, Final
+from collections.abc import Callable
 import sys
 from io import TextIOWrapper
 from os import devnull as os_devnull
@@ -51,7 +52,7 @@ default_width: int = 100
 
 
 def beautify_text(
-    data: Tuple[Any],
+    data: tuple[Any],
     title: Union[bool, str] = True,
     width: Optional[int] = None,
     frame: Optional[Literal['full', 'half', 'top', 'half_plain', 'top_plain']] = 'full'

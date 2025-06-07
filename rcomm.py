@@ -9,7 +9,8 @@
 """
 
 
-from typing import Any, Tuple, Dict, Literal, Iterable, Callable, Optional, Union
+from typing import Any, Literal, Optional, Union
+from collections.abc import Callable, Iterable
 from warnings import filterwarnings
 from os.path import abspath as os_abspath, isfile as os_isfile
 from socket import socket as  Socket
@@ -37,7 +38,7 @@ __all__ = (
 )
 
 
-def join_url(url: str, params: Dict) -> str:
+def join_url(url: str, params: dict) -> str:
     """
     Join URL and parameters.
 
@@ -69,7 +70,7 @@ def join_url(url: str, params: Dict) -> str:
     return url
 
 
-def split_url(url: str) -> Tuple[str, Dict[str, str]]:
+def split_url(url: str) -> tuple[str, dict[str, str]]:
     """
     Split URL and parameters.
 
@@ -99,7 +100,7 @@ def split_url(url: str) -> Tuple[str, Dict[str, str]]:
     return url, params
 
 
-def join_cookie(params: Dict[str, str]) -> str:
+def join_cookie(params: dict[str, str]) -> str:
     """
     Join parameters of Cookie.
 
@@ -123,7 +124,7 @@ def join_cookie(params: Dict[str, str]) -> str:
     return cookie
 
 
-def split_cookie(cookie: str) -> Dict[str, str]:
+def split_cookie(cookie: str) -> dict[str, str]:
     """
     Split parameters of Cookie.
 
@@ -183,13 +184,13 @@ def get_content_type(file: Union[str, bytes]) -> Optional[str]:
 
 def request(
     url: str,
-    params: Optional[Dict] = None,
-    data: Optional[Union[Dict, str, bytes]] = None,
-    json: Optional[Dict] = None,
-    files: Optional[Dict[str, Union[str, bytes, Tuple[Union[str, bytes], dict]]]] = None,
-    headers: Dict[str, str] = {},
+    params: Optional[dict] = None,
+    data: Optional[Union[dict, str, bytes]] = None,
+    json: Optional[dict] = None,
+    files: Optional[dict[str, Union[str, bytes, tuple[Union[str, bytes], dict]]]] = None,
+    headers: dict[str, str] = {},
     timeout: Optional[float] = None,
-    proxies: Dict[str, str] = {},
+    proxies: dict[str, str] = {},
     stream: bool = False,
     verify: bool = False,
     method: Optional[Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head']] = None,
@@ -203,7 +204,7 @@ def request(
     url : Request URL.
     params : Request URL add parameters.
     data : Request body data.
-        - `Dict`, Convert to `key=value&...`: format bytes.
+        - `dict`, Convert to `key=value&...`: format bytes.
             Automatic set `Content-Type` to `application/x-www-form-urlencoded`.
         - `str`: File path to read file bytes data.
             Automatic set `Content-Type` to file media type, and `filename` to file name.
@@ -213,17 +214,17 @@ def request(
         Automatic set `Content-Type` to `application/json`.
     files : Request body data, convert to `multi form` format.
         Automatic set `Content-Type` to `multipart/form-data`.
-        - `Dict[str, str]`: Parameter name and File path to read file bytes data.
+        - `dict[str, str]`: Parameter name and File path to read file bytes data.
             Automatic set `Content-Type` to file media type, and `filename` to file name.
-        - `Dict[str, bytes]`: Parameter name and file bytes data.
-        - `Dict[str, Tuple[str, dict]`: Parameter name and File path to read file bytes data and other parameters.
+        - `dict[str, bytes]`: Parameter name and file bytes data.
+        - `dict[str, tuple[str, dict]`: Parameter name and File path to read file bytes data and other parameters.
             Automatic set `Content-Type` to file media type, and `filename` to file name.
-        - `Dict[str, Tuple[bytes, dict]`: Parameter name and file bytes data and other parameters.
+        - `dict[str, tuple[bytes, dict]`: Parameter name and file bytes data and other parameters.
     headers : Request header data.
     timeout : Request maximun waiting time.
     proxies : Proxy IP setup.
         - `None`: No setup.
-        - `Dict[str, str]`: Name and use IP of each protocol.
+        - `dict[str, str]`: Name and use IP of each protocol.
     stream : Whether use stream request.
     verify : Whether verify certificate.
     method : Request method.

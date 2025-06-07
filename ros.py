@@ -10,7 +10,7 @@
 
 
 from __future__ import annotations
-from typing import Any, List, Dict, Union, Literal, Optional, NoReturn, overload
+from typing import Any, Union, Literal, Optional, NoReturn, overload
 from io import TextIOBase, BufferedIOBase
 from os import (
     walk as os_walk,
@@ -265,7 +265,7 @@ def get_file_bytes(file: FileBytes) -> bytes:
     return file_bytes
 
 
-def read_toml(path: Union[str, RFile]) -> Dict[str, Any]:
+def read_toml(path: Union[str, RFile]) -> dict[str, Any]:
     """
     Read and parse TOML file.
     Treat nan as a None or null value.
@@ -657,7 +657,7 @@ class RFile(object):
 
 
     @property
-    def toml(self) -> Dict[str, Any]:
+    def toml(self) -> dict[str, Any]:
         """
         Read and parse TOML file.
         Treat nan as a None or null value.
@@ -797,7 +797,7 @@ class RFolder(object):
         self,
         target: Literal['all', 'file', 'folder'] = 'all',
         recursion: bool = False
-    ) -> List:
+    ) -> list:
         """
         Get the path of files and folders in the folder path.
 
@@ -881,7 +881,7 @@ class RFolder(object):
         pattern: str,
         recursion: bool = False,
         all_ : Literal[True] = False
-    ) -> List[str]: ...
+    ) -> list[str]: ...
 
     def search(
         self,
@@ -1453,7 +1453,7 @@ class RTempFolder(object):
         self,
         target: Literal['all', 'file', 'folder'] = 'all',
         recursion: bool = False
-    ) -> List:
+    ) -> list:
         """
         Get the path of files and folders in the folder path.
 
@@ -1537,7 +1537,7 @@ class RTempFolder(object):
         pattern: str,
         recursion: bool = False,
         all_ : Literal[True] = False
-    ) -> List[str]: ...
+    ) -> list[str]: ...
 
     def search(
         self,

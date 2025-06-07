@@ -20,8 +20,9 @@
 """
 
 
-from typing import Any, Tuple, Iterable, Optional, Union, NoReturn, Type
+from typing import Any, Optional, Union, NoReturn
 from types import TracebackType
+from collections.abc import Iterable
 from sys import exc_info as sys_exc_info
 from os.path import exists as os_exists
 from traceback import format_exc
@@ -44,7 +45,7 @@ __all__ = (
 
 
 def throw(
-    exception: Type[BaseException] = AssertionError,
+    exception: type[BaseException] = AssertionError,
     value: Any = RNull,
     *values: Any,
     frame: int = 2
@@ -132,7 +133,7 @@ def throw(
 
 def warn(
     *infos: Any,
-    exception: Type[BaseException] = UserWarning,
+    exception: type[BaseException] = UserWarning,
     stacklevel: int = 3
 ) -> None:
     """
@@ -162,7 +163,7 @@ def warn(
 
 def catch_exc(
     title: Optional[str] = None
-) -> Tuple[str, Type[BaseException], BaseException, TracebackType]:
+) -> tuple[str, type[BaseException], BaseException, TracebackType]:
     """
     Catch exception information and print, must used in `except` syntax.
 
@@ -176,7 +177,7 @@ def catch_exc(
     -------
     Exception data.
         - `str`: Exception report text.
-        - `Type[BaseException]`: Exception type.
+        - `type[BaseException]`: Exception type.
         - `BaseException`: Exception instance.
         - `TracebackType`: Exception traceback instance.
     """

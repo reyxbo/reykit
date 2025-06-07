@@ -10,7 +10,8 @@
 
 
 from __future__ import annotations
-from typing import Any, Tuple, Dict, Optional, Union, Literal, Final, Callable, NoReturn, overload, override
+from typing import Any, Optional, Union, Literal, Final, NoReturn, overload, override
+from collections.abc import Callable
 from queue import Queue
 from os.path import abspath as os_abspath
 from logging import (
@@ -101,7 +102,7 @@ class RLog(object):
         self.logger.setLevel(self.DEBUG)
 
 
-    def _get_message_stack(self) -> Dict:
+    def _get_message_stack(self) -> dict:
         """
         Get message stack parameters.
 
@@ -608,7 +609,7 @@ class RLog(object):
         queue: Optional[Queue] = None,
         level: int = DEBUG,
         filter_: Optional[Callable[[LogRecord], bool]] = None
-    ) -> Tuple[QueueHandler, Queue[LogRecord]]:
+    ) -> tuple[QueueHandler, Queue[LogRecord]]:
         """
         Add queue output record handler.
 

@@ -10,7 +10,8 @@
 
 
 from __future__ import annotations
-from typing import Any, List, Tuple, Dict, Optional, Literal, Iterable, Callable, Generator, Coroutine, Union, Type
+from typing import Any, Optional, Literal, Union
+from collections.abc import Callable, Iterable, Generator, Coroutine
 from threading import RLock as TRLock, get_ident as threading_get_ident
 from concurrent.futures import ThreadPoolExecutor, Future as CFuture, as_completed as concurrent_as_completed
 from asyncio import (
@@ -39,7 +40,7 @@ __all__ = (
 )
 
 
-def async_run(*coroutines: Coroutine) -> List:
+def async_run(*coroutines: Coroutine) -> list:
     """
     Asynchronous run `Coroutine` instances.
 
@@ -77,15 +78,15 @@ def async_run(*coroutines: Coroutine) -> List:
 
 async def async_request(
     url: str,
-    params: Optional[Dict] = None,
-    data: Optional[Union[Dict, str, bytes]] = None,
-    json: Optional[Dict] = None,
-    headers: Dict[str, str] = {},
+    params: Optional[dict] = None,
+    data: Optional[Union[dict, str, bytes]] = None,
+    json: Optional[dict] = None,
+    headers: dict[str, str] = {},
     timeout: Optional[float] = None,
     proxy: Optional[str] = None,
     method: Optional[Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head']] = None,
     check: Union[bool, int, Iterable[int]] = False,
-    handler: Optional[Union[str, Tuple[str], Callable[[ClientResponse], Union[Coroutine, Any]]]] = None
+    handler: Optional[Union[str, tuple[str], Callable[[ClientResponse], Union[Coroutine, Any]]]] = None
 ) -> Any:
     """
     Get asynchronous `Coroutine` instance of send request.
@@ -95,9 +96,9 @@ async def async_request(
     url : Request URL.
     params : Request URL add parameters.
     data : Request body data. Conflict with parameter `json`.
-        - `Dict`, Convert to `key=value&...`: format bytes.
+        - `dict`, Convert to `key=value&...`: format bytes.
             Automatic set `Content-Type` to `application/x-www-form-urlencoded`.
-        - `Dict and a certain value is 'bytes' type`: Key is parameter name and file name, value is file data.
+        - `dict and a certain value is 'bytes' type`: Key is parameter name and file name, value is file data.
             Automatic set `Content-Type` to `multipart/form-data`.
         - `str`: File path to read file bytes data.
             Automatic set `Content-Type` to file media type, and `filename` to file name.
@@ -127,7 +128,7 @@ async def async_request(
         - `str`: Get this attribute.
             `Callable`: Execute this method. When return `Coroutine`, then use `await` syntax execute `Coroutine`.
             `Any`: Return this value.
-        - `Tuple[str]`: Get these attribute.
+        - `tuple[str]`: Get these attribute.
             `Callable`: Execute this method. When return `Coroutine`, then use `await` syntax execute `Coroutine`.
             `Any`: Return this value.
         - `Callable`, Execute this method. When return `Coroutine`, then use `await`: syntax execute `Coroutine`.
@@ -395,7 +396,7 @@ class RThreadPool(object):
             _max_workers,
             task.__name__
         )
-        self.futures: List[CFuture] = []
+        self.futures: list[CFuture] = []
 
 
     def one(
@@ -441,9 +442,9 @@ class RThreadPool(object):
 
     def batch(
         self,
-        *args: Tuple,
-        **kwargs: Tuple
-    ) -> List[CFuture]:
+        *args: tuple,
+        **kwargs: tuple
+    ) -> list[CFuture]:
         """
         Add and start a batch of tasks to the thread pool.
         parameters sequence will combine one by one, and discard excess parameters.
@@ -528,7 +529,7 @@ class RThreadPool(object):
     def repeat(
         self,
         number: int
-    ) -> List[CFuture]:
+    ) -> list[CFuture]:
         """
         Add and start a batch of tasks to the thread pool, and only with default parameters.
 
@@ -620,7 +621,7 @@ class RAsyncPool(object):
         self.args = args
         self.kwargs = kwargs
         self.exc_handler = _exc_handler
-        self.queue_input: AQueue[Tuple[Tuple, Dict]] = AQueue()
+        self.queue_input: AQueue[tuple[tuple, dict]] = AQueue()
         self.queue_output = AQueue()
         self.queue_count = 0
 
@@ -719,8 +720,8 @@ class RAsyncPool(object):
 
     def batch(
         self,
-        *args: Tuple,
-        **kwargs: Tuple
+        *args: tuple,
+        **kwargs: tuple
     ) -> None:
         """
         Add and start a batch of tasks to the pool.
@@ -766,7 +767,7 @@ class RAsyncPool(object):
     def repeat(
         self,
         number: int
-    ) -> List[CFuture]:
+    ) -> list[CFuture]:
         """
         Add and start a batch of tasks to the pool, and only with default parameters.
 

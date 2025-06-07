@@ -9,7 +9,8 @@
 """
 
 
-from typing import Any, List, Dict, TypedDict, Iterable, Optional, Union, overload
+from typing import Any, TypedDict, Optional, Union, overload
+from collections.abc import Iterable
 from os.path import abspath as os_abspath
 from pandas import DataFrame, ExcelWriter, isnull
 from sqlalchemy.engine.cursor import CursorResult
@@ -33,16 +34,16 @@ __all__ = (
 )
 
 
-type Table = Union[List[Dict], Dict, CursorResult, DataFrame]
-SheetSet = TypedDict('SheetsSet', {'name': str, 'index': int, 'fields': Union[str, List[str]]})
+type Table = Union[list[dict], dict, CursorResult, DataFrame]
+SheetSet = TypedDict('SheetsSet', {'name': str, 'index': int, 'fields': Union[str, list[str]]})
 
 
 def to_table(
     data: Union[Table, Iterable[Iterable]],
     fields: Optional[Iterable] = None
-) -> List[Dict]:
+) -> list[dict]:
     """
-    Convert data to table in `List[Dict]` format, keys and keys sort of the dictionary are the same.
+    Convert data to table in `list[dict]` format, keys and keys sort of the dictionary are the same.
 
     Parameters
     ----------
@@ -53,7 +54,7 @@ def to_table(
 
     Returns
     -------
-    Table in `List[Dict]` format.
+    Table in `list[dict]` format.
     """
 
     # Convert.
@@ -97,20 +98,20 @@ def to_dict(
     data: Union[Table, Iterable[Iterable]],
     key_field: Union[int, str] = 0,
     val_field: None = None
-) -> Dict[Any, Dict]: ...
+) -> dict[Any, dict]: ...
 
 @overload
 def to_dict(
     data: Union[Table, Iterable[Iterable]],
     key_field: Union[int, str] = 0,
     val_field: Union[int, str] = None
-) -> Dict: ...
+) -> dict: ...
 
 def to_dict(
     data: Union[Table, Iterable[Iterable]],
     key_field: Union[int, str] = 0,
     val_field: Optional[Union[int, str]] = None
-) -> Union[Dict[Any, Dict], Dict]:
+) -> Union[dict[Any, dict], dict]:
     """
     Convert data as dictionary.
 
@@ -170,7 +171,7 @@ def to_dict(
 def to_list(
     data: Union[Table, Iterable[Iterable]],
     field: Union[int, str] = 0,
-) -> List:
+) -> list:
     """
     Convert data as list.
 
@@ -431,7 +432,7 @@ def to_excel(
     data: Union[Table, Iterable[Iterable]],
     path: str = 'data.xlsx',
     group_field: Optional[str] = None,
-    sheets_set: Dict[Union[str, int], SheetSet] = {}
+    sheets_set: dict[Union[str, int], SheetSet] = {}
 ) -> str:
     """
     Convert data to save Excel format file and return sheet name and sheet data.

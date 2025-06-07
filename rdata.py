@@ -9,7 +9,8 @@
 """
 
 
-from typing import Any, List, Tuple, Dict, TypedDict, Iterable, Optional, Literal, NoReturn, Callable, Generator, TypeVar, overload
+from typing import Any, TypedDict, Optional, Literal, NoReturn, TypeVar, overload
+from collections.abc import Callable, Iterable, Generator
 
 from .rexception import check_least_one, check_most_one
 from .rsystem import is_iterable
@@ -33,7 +34,7 @@ Element = TypeVar('Element')
 def count(
     data: Iterable,
     ascend: bool = False
-) -> List[CountResult]:
+) -> list[CountResult]:
     """
     Group count data element value.
 
@@ -88,7 +89,7 @@ def count(
     return result
 
 
-def flatten(data: Any, *, _flattern_data: Optional[List] = None) -> List:
+def flatten(data: Any, *, _flattern_data: Optional[list] = None) -> list:
     """
     Flatten data.
 
@@ -137,9 +138,9 @@ def split(data: Iterable[Element], share: None = None, bin_size: None = None) ->
 def split(data: Iterable[Element], share: int = None, bin_size: int = None) -> NoReturn: ...
 
 @overload
-def split(data: Iterable[Element], share: Optional[int] = None, bin_size: Optional[int] = None) -> List[List[Element]]: ...
+def split(data: Iterable[Element], share: Optional[int] = None, bin_size: Optional[int] = None) -> list[list[Element]]: ...
 
-def split(data: Iterable[Element], share: Optional[int] = None, bin_size: Optional[int] = None) -> List[List[Element]]:
+def split(data: Iterable[Element], share: Optional[int] = None, bin_size: Optional[int] = None) -> list[list[Element]]:
     """
     Split data into multiple data.
 
@@ -187,7 +188,7 @@ def split(data: Iterable[Element], share: Optional[int] = None, bin_size: Option
     return _data
 
 
-def unique(data: Iterable[Element]) -> List[Element]:
+def unique(data: Iterable[Element]) -> list[Element]:
     """
     De duplication of data.
 
@@ -309,7 +310,7 @@ class RGenerator(object):
         self.func = func
         self.args = args
         self.kwargs = kwargs
-        self.params: List[Tuple[Tuple, Dict]] = []
+        self.params: list[tuple[tuple, dict]] = []
         self.generator = self._generator()
 
 

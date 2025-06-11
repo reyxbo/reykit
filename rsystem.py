@@ -38,6 +38,7 @@ from argparse import ArgumentParser
 from time import sleep as time_sleep
 from datetime import datetime
 from varname import VarnameRetrievingError, argname
+from webbrowser import open as webbrowser_open
 
 from .rexception import throw
 
@@ -64,7 +65,8 @@ __all__ = (
     'kill_process',
     'stop_process',
     'start_process',
-    'get_idle_port'
+    'get_idle_port',
+    'open_browser'
 )
 
 
@@ -1152,3 +1154,22 @@ def memory_write(
 
     # Read.
     pymem.write_int(memory_address, value)
+
+
+def open_browser(url: str) -> bool:
+    """
+    Open browser and URL.
+
+    Parameters
+    ----------
+    url : URL.
+
+    Returns
+    -------
+    Is it successful.
+    """
+
+    # Open.
+    succeeded = webbrowser_open(url)
+
+    return succeeded

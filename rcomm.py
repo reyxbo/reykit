@@ -19,6 +19,7 @@ from requests.api import request as requests_request
 from requests.models import Response
 from mimetypes import guess_type
 from filetype import guess as filetype_guess
+from webbrowser import open as webbrowser_open
 
 from .rexception import throw, check_response_code
 from .ros import RFile
@@ -34,7 +35,8 @@ __all__ = (
     'request',
     'download',
     'get_file_stream_time',
-    'listen_socket'
+    'listen_socket',
+    'open_browser'
 )
 
 
@@ -429,3 +431,22 @@ def listen_socket(
         socket_conn, _ = socket.accept()
         data = socket_conn.recv(rece_size)
         handler(data)
+
+
+def open_browser(url: str) -> bool:
+    """
+    Open browser and URL.
+
+    Parameters
+    ----------
+    url : URL.
+
+    Returns
+    -------
+    Is it successful.
+    """
+
+    # Open.
+    succeeded = webbrowser_open(url)
+
+    return succeeded

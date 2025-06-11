@@ -590,13 +590,13 @@ class RTimeMark():
 
         ## No record.
         if record_len == 0:
-            row = dict.fromkeys(('timestamp', 'datetime', 'timedelta', 'note'))
+            row: RecordData = dict.fromkeys(('timestamp', 'datetime', 'timedelta', 'note'))
             data = [row]
             indexes = [0]
 
         ## Add total row.
         if record_len > 2:
-            row = dict.fromkeys(('timestamp', 'datetime', 'timedelta', 'note'))
+            row: RecordData = dict.fromkeys(('timestamp', 'datetime', 'timedelta', 'note'))
             max_index = record_len - 1
             total_timedelta = self.record[max_index]['datetime'] - self.record[0]['datetime']
             row['timedelta'] = total_timedelta

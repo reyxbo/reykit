@@ -1105,14 +1105,13 @@ def memory_read(
 
     # Get DLL address.
     pymem = Pymem(process)
-    dll_address = None
     for module in pymem.list_modules():
         if module.name == dll:
             dll_address: int = module.lpBaseOfDll
             break
 
-    ## Check.
-    if dll_address is None:
+    ## Throw exception.
+    else:
         throw(value=dll_address)
 
     # Get memory address.

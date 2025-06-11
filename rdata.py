@@ -59,15 +59,13 @@ def count(
 
     # Count.
     for element in data:
-        value_list_exist = False
         for index, value in enumerate(value_list):
             element_str = str(element)
             value_str = str(value)
             if element_str == value_str:
-                value_list_exist = True
                 count_list[index] += 1
                 break
-        if not value_list_exist:
+        else:
             value_list.append(element)
             count_list.append(1)
 

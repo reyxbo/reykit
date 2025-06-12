@@ -242,7 +242,7 @@ class RThreadLock():
 
     def __init__(self) -> None:
         """
-        Build `thread lock` instance.
+        Build `thread lock` attributes.
         """
 
         # Set attribute.
@@ -318,7 +318,7 @@ class RAsyncLock():
 
     def __init__(self) -> None:
         """
-        Build `asynchronous lock` instance.
+        Build `asynchronous lock` attributes.
         """
 
         # Set attribute.
@@ -376,7 +376,7 @@ class RThreadPool(object):
         **kwargs: Any
     ) -> None:
         """
-        Build `thread pool` instance.
+        Build `thread pool` attributes.
 
         Parameters
         ----------
@@ -605,7 +605,7 @@ class RAsyncPool(object):
         **kwargs: Any
     ) -> None:
         """
-        Build `asynchronous pool` instance.
+        Build `asynchronous pool` attributes.
 
         Parameters
         ----------

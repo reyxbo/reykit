@@ -41,9 +41,11 @@ from varname import VarnameRetrievingError, argname
 from webbrowser import open as webbrowser_open
 
 from .rexception import throw
+from .rtype import RConfigMeta
 
 
 __all__ = (
+    'RConfigSystem',
     'add_env_path',
     'reset_env_path',
     'del_modules',
@@ -103,8 +105,13 @@ NetWorkInfo = TypedDict(
 ProcessInfo = TypedDict('ProcessInfo', {'create_time': datetime, 'id': int, 'name': str, 'ports': Optional[list[int]]})
 
 
-# Added environment path.
-_add_env_paths: list[str] = []
+class RConfigSystem(object, metaclass=RConfigMeta):
+    """
+    Rey's `config system` type.
+    """
+
+    # Added environment path.
+    _add_env_paths: list[str] = []
 
 
 def add_env_path(path: str) -> list[str]:
@@ -124,8 +131,7 @@ def add_env_path(path: str) -> list[str]:
     abs_path = os_abspath(path)
 
     # Add.
-    global _add_env_paths
-    _add_env_paths.append(abs_path)
+    RConfigSystem._add_env_paths.append(abs_path)
     sys_path.append(abs_path)
 
     return sys_path
@@ -137,10 +143,9 @@ def reset_env_path() -> None:
     """
 
     # Delete.
-    global _add_env_paths
-    for path in _add_env_paths:
+    for path in RConfigSystem._add_env_paths:
         sys_path.remove(path)
-    _add_env_paths = []
+    RConfigSystem._add_env_paths = []
 
 
 def del_modules(path: str) -> list[str]:

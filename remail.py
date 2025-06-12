@@ -38,7 +38,7 @@ class REmail(object):
         password: str
     ) -> None:
         """
-        Build `email` instance.
+        Build `email` attributes.
 
         Parameters
         ----------

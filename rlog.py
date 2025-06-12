@@ -33,21 +33,28 @@ from concurrent_log_handler import ConcurrentRotatingFileHandler, ConcurrentTime
 from .rexception import throw, catch_exc
 from .ros import RFile
 from .rregex import search, sub
-from .rstdout import modify_print, reset_print, path_echo
+from .rstdout import RConfigStdout, modify_print, reset_print
 from .rsystem import get_first_notnull, get_stack_param
 from .rtext import to_text
 from .rtime import now, time_to
+from .rtype import RConfigMeta
 from .rwrap import wrap_thread
 
 
 __all__ = (
+    'RConfigLog',
     'RLog',
     'RRecord'
 )
 
 
-# Module path.
-path_rlog = os_abspath(__file__)
+class RConfigLog(object, metaclass=RConfigMeta):
+    """
+    Rey's `config log` type.
+    """
+
+    # Module path.
+    path_rlog: Final[str] = os_abspath(__file__)
 
 
 class RLog(object):
@@ -84,7 +91,7 @@ class RLog(object):
         name: str = 'Log'
     ) -> None:
         """
-        Build `log` instance.
+        Build `log` attributes.
 
         Parameters
         ----------
@@ -119,21 +126,21 @@ class RLog(object):
 
         ## Compatible '__call__'.
         if (
-            stack_param['filename'] == path_rlog
+            stack_param['filename'] == RConfigLog.path_rlog
             and stack_param['name'] in ('debug', 'info', 'warning', 'error', 'critical')
         ):
             stack_param = stack_params[-2]
 
         ## Compatible 'print'.
         if (
-            stack_param['filename'] == path_rlog
+            stack_param['filename'] == RConfigLog.path_rlog
             and stack_param['name'] == 'preprocess'
         ):
             stack_param = stack_params[-3]
 
         ## Compatible 'echo'.
         if (
-            stack_param['filename'] == path_echo
+            stack_param['filename'] == RConfigStdout._path_rstdout
             and stack_param['name'] == 'echo'
         ):
             stack_param = stack_params[-4]
@@ -966,7 +973,7 @@ class RRecord(object):
         path: Optional[str] = '_rrecord'
     ) -> None:
         """
-        Build `record` instance.
+        Build `record` attributes.
 
         Parameters
         ----------

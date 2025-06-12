@@ -295,7 +295,7 @@ class RGenerator(object):
         **kwargs: Any
     ) -> None:
         """
-        Build `generator` instance.
+        Build `generator` attributes.
 
         Parameters
         ----------

@@ -28,11 +28,12 @@ from os.path import exists as os_exists
 from traceback import format_exc
 from warnings import warn as warnings_warn
 
-
 from .rtype import RNull
 
 
 __all__ = (
+    'RError',
+    'RActiveError',
     'throw',
     'warn',
     'catch_exc',
@@ -44,10 +45,23 @@ __all__ = (
 )
 
 
+class RError(Exception):
+    """
+    Rey `error` type.
+    """
+
+
+class RActiveError(RError):
+    """
+    Rey's `active error` type.
+    """
+
+
 def throw(
     exception: type[BaseException] = AssertionError,
     value: Any = RNull,
     *values: Any,
+    text: Optional[str] = None,
     frame: int = 2
 ) -> NoReturn:
     """
@@ -58,21 +72,21 @@ def throw(
     exception : Exception Type.
     value : Exception value.
     values : Exception values.
+    text : Exception text.
     frame : Number of code to upper level.
     """
 
     # Text.
-
-    ## Describe.
-    if exception.__doc__ is not None:
-        text = exception.__doc__.strip()
-    if (
-        text is None
-        or text == ''
-    ):
-        text = 'use error'
-    else:
-        text = text[0].lower() + text[1:]
+    if text is None:
+        if exception.__doc__ is not None:
+            text = exception.__doc__.strip()
+        if (
+            text is None
+            or text == ''
+        ):
+            text = 'use error'
+        else:
+            text = text[0].lower() + text[1:]
 
     ## Value.
     if value is not RNull:

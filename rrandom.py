@@ -9,18 +9,25 @@
 """
 
 
-from typing import Union, Optional, Literal, overload
+from __future__ import annotations
+from typing import Dict, Union, Optional, Literal, Self, overload
+from types import TracebackType
 from collections.abc import Sequence
 from string import digits as string_digits, ascii_letters as string_ascii_letters, punctuation as string_punctuation
 from math import ceil as math_ceil
+from random import Random
 from secrets import randbelow as secrets_randbelow
+from threading import get_ident as threading_get_ident
 
 from .rdata import Element
 from .rexception import throw
 from .rnumber import digits
+from .rtype import RConfigMeta
 
 
 __all__ = (
+    'RConfigRandom',
+    'RRandomSeed',
     'randn',
     'randb',
     'randi',
@@ -29,22 +36,101 @@ __all__ = (
 )
 
 
-@overload
-def randn(*thresholds: int, precision: None = None) -> int: ...
+class RConfigRandom(object, metaclass=RConfigMeta):
+    """
+    Rey's `config random` type.
+    """
+
+    # RRandom.
+    _rrandom_dict: Dict[int, RRandomSeed] = {}
+
+
+class RRandomSeed(object):
+    """
+    Rey's `random seed` type.
+    To be used in syntax `with`, set random seed.
+    If set, based on `random` package.
+    If not set, based on `secrets` package.
+    """
+
+
+    def __init__(self, seed: Union[int, float, str, bytes, bytearray]) -> None:
+        """
+        Build `random` attributes.
+        """
+
+        # Build.
+        self.seed = seed
+        self.random = Random(seed)
+
+        # Record.
+        thread_id = threading_get_ident()
+        RConfigRandom._rrandom_dict[thread_id] = self
+
+
+    def __enter__(self) -> Self:
+        """
+        Enter syntax `with`.
+
+        Returns
+        -------
+        Self.
+        """
+
+        return self
+
+
+    def __exit__(
+        self,
+        exc_type: Optional[type[BaseException]],
+        exc_instance: Optional[BaseException],
+        exc_traceback: Optional[TracebackType]
+    ) -> None:
+        """
+        Exit syntax `with`.
+
+        Parameters
+        ----------
+        exc_type : Exception type.
+        exc_instance : Exception instance.
+        exc_traceback : Exception traceback instance.
+        """
+
+        # Delete.
+        thread_id = threading_get_ident()
+        del RConfigRandom._rrandom_dict[thread_id]
+
 
 @overload
-def randn(*thresholds: float, precision: None = None) -> float: ...
+def randn(
+    *thresholds: int,
+    precision: None = None
+) -> int: ...
 
 @overload
-def randn(*thresholds: float, precision: Literal[0] = None) -> int: ...
+def randn(
+    *thresholds: float,
+    precision: None = None
+) -> float: ...
 
 @overload
-def randn(*thresholds: float, precision: int = None) -> float: ...
+def randn(
+    *thresholds: float,
+    precision: Literal[0] = None
+) -> int: ...
 
-def randn(*thresholds: float, precision: Optional[int] = None) -> Union[int, float]:
+@overload
+def randn(
+    *thresholds: float,
+    precision: int = None
+) -> float: ...
+
+def randn(
+    *thresholds: float,
+    precision: Optional[int] = None
+) -> Union[int, float]:
     """
     Random number.
-    Random method based on secrets package.
 
     Parameters
     ----------
@@ -87,9 +173,18 @@ def randn(*thresholds: float, precision: Optional[int] = None) -> Union[int, flo
     magnifier = 10 ** precision
     threshold_low = int(threshold_low * magnifier)
     threshold_high = int(threshold_high * magnifier)
-    range_ = threshold_high - threshold_low + 1
-    number = secrets_randbelow(range_)
-    number += threshold_low
+
+    ## No seed.
+    thread_id = threading_get_ident()
+    rrandom = RConfigRandom._rrandom_dict.get(thread_id)
+    if rrandom is None:
+        range_ = threshold_high - threshold_low + 1
+        number = secrets_randbelow(range_)
+        number += threshold_low
+
+    ## Seed.
+    else:
+        number = rrandom.random.randint(threshold_low, threshold_high)
     number = number / magnifier
 
     # Convert Integer.

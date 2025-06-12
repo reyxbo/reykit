@@ -515,7 +515,7 @@ class RTimeMark():
 
     def __init__(self) -> None:
         """
-        Build `time mark` instance.
+        Build `time mark` attributes.
         """
 
         # Record table.

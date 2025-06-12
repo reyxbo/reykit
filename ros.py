@@ -312,7 +312,7 @@ class RFile(object):
         path: str
     ) -> None:
         """
-        Build `file` instance.
+        Build `file` attributes.
 
         Parameters
         ----------
@@ -778,7 +778,7 @@ class RFolder(object):
         path: Optional[str] = None
     ) -> None:
         """
-        Build `folder` instance.
+        Build `folder` attributes.
 
         Parameters
         ----------
@@ -1154,7 +1154,7 @@ class RTempFile(object):
         type_: Literal['str', 'bytes'] = 'bytes'
     ) -> None:
         """
-        Build `temporary file` instance.
+        Build `temporary file` attributes.
 
         Parameters
         ----------
@@ -1437,7 +1437,7 @@ class RTempFolder(object):
         dir_: Optional[str] = None
     ) -> None:
         """
-        Build `temporary folder` instance.
+        Build `temporary folder` attributes.
 
         Parameters
         ----------

@@ -47,25 +47,57 @@ class RConfigRandom(object, metaclass=RConfigMeta):
 
 class RRandomSeed(object):
     """
-    Rey's `random seed` type.
-    To be used in syntax `with`, set random seed.
+    Rey's `random seed` type, set random seed.
     If set, based on `random` package.
     If not set, based on `secrets` package.
+
+    Examples
+    --------
+    Use active switch.
+    >>> RRandomSeed(seed)
+    >>> randn()
+    >>> RRandomSeed()
+
+    Use `with` syntax.
+    >>> with RRandomSeed(seed):
+    >>>     randn()
     """
 
 
-    def __init__(self, seed: Union[int, float, str, bytes, bytearray]) -> None:
+    def __init__(self, seed: Optional[Union[int, float, str, bytes, bytearray]] = None) -> None:
         """
         Build `random` attributes.
+
+        Parameters
+        ----------
+        seed : Random seed.
+            - `None`: Clear seed.
+            - `Union[int, float, str, bytes, bytearray]` : Set seed.
         """
 
-        # Build.
-        self.seed = seed
-        self.random = Random(seed)
+        # Delete.
+        if seed is None:
+            self.__del__()
 
-        # Record.
+        # Build.
+        else:
+            self.seed = seed
+            self.random = Random(seed)
+
+            ## Record.
+            thread_id = threading_get_ident()
+            RConfigRandom._rrandom_dict[thread_id] = self
+
+
+    def __del__(self) -> None:
+        """
+        Delete instance.
+        """
+
+        # Delete.
         thread_id = threading_get_ident()
-        RConfigRandom._rrandom_dict[thread_id] = self
+        if thread_id in RConfigRandom._rrandom_dict:
+            del RConfigRandom._rrandom_dict[thread_id]
 
 
     def __enter__(self) -> Self:
@@ -97,8 +129,7 @@ class RRandomSeed(object):
         """
 
         # Delete.
-        thread_id = threading_get_ident()
-        del RConfigRandom._rrandom_dict[thread_id]
+        self.__del__()
 
 
 @overload

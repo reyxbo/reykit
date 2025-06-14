@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, TypedDict, Optional, Union, overload
+from typing import Any, TypedDict, overload
 from collections.abc import Iterable
 from os.path import abspath as os_abspath
 from pandas import DataFrame, ExcelWriter, isnull
@@ -34,13 +34,13 @@ __all__ = (
 )
 
 
-type Table = Union[list[dict], dict, CursorResult, DataFrame]
-SheetSet = TypedDict('SheetsSet', {'name': str, 'index': int, 'fields': Union[str, list[str]]})
+type Table = list[dict] | dict | CursorResult | DataFrame
+SheetSet = TypedDict('SheetsSet', {'name': str, 'index': int, 'fields': str | list[str]})
 
 
 def to_table(
-    data: Union[Table, Iterable[Iterable]],
-    fields: Optional[Iterable] = None
+    data: Table | Iterable[Iterable],
+    fields: Iterable | None = None
 ) -> list[dict]:
     """
     Convert data to table in `list[dict]` format, keys and keys sort of the dictionary are the same.
@@ -95,23 +95,23 @@ def to_table(
 
 @overload
 def to_dict(
-    data: Union[Table, Iterable[Iterable]],
-    key_field: Union[int, str] = 0,
+    data: Table | Iterable[Iterable],
+    key_field: int | str = 0,
     val_field: None = None
 ) -> dict[Any, dict]: ...
 
 @overload
 def to_dict(
-    data: Union[Table, Iterable[Iterable]],
-    key_field: Union[int, str] = 0,
-    val_field: Union[int, str] = None
+    data: Table | Iterable[Iterable],
+    key_field: int | str = 0,
+    val_field: int | str = None
 ) -> dict: ...
 
 def to_dict(
-    data: Union[Table, Iterable[Iterable]],
-    key_field: Union[int, str] = 0,
-    val_field: Optional[Union[int, str]] = None
-) -> Union[dict[Any, dict], dict]:
+    data: Table | Iterable[Iterable],
+    key_field: int | str = 0,
+    val_field: int | str | None = None
+) -> dict[Any, dict] | dict:
     """
     Convert data as dictionary.
 
@@ -169,8 +169,8 @@ def to_dict(
 
 
 def to_list(
-    data: Union[Table, Iterable[Iterable]],
-    field: Union[int, str] = 0,
+    data: Table | Iterable[Iterable],
+    field: int | str = 0,
 ) -> list:
     """
     Convert data as list.
@@ -209,8 +209,8 @@ def to_list(
 
 
 def to_df(
-    data: Union[Table, Iterable[Iterable]],
-    fields: Optional[Iterable] = None
+    data: Table | Iterable[Iterable],
+    fields: Iterable | None = None
 ) -> DataFrame:
     """
     Convert data to table of `DataFrame` object.
@@ -253,8 +253,8 @@ def to_df(
 
 
 def to_json(
-    data: Union[Table, Iterable[Iterable]],
-    fields: Optional[Iterable] = None,
+    data: Table | Iterable[Iterable],
+    fields: Iterable | None = None,
     compact: bool = True
 ) -> str:
     """
@@ -283,8 +283,8 @@ def to_json(
 
 
 def to_text(
-    data: Union[Table, Iterable[Iterable]],
-    fields: Optional[Iterable] = None,
+    data: Table | Iterable[Iterable],
+    fields: Iterable | None = None,
     width: int = 100
 ) -> str:
     """
@@ -313,8 +313,8 @@ def to_text(
 
 
 def to_sql(
-    data: Union[Table, Iterable[Iterable]],
-    fields: Optional[Iterable] = None
+    data: Table | Iterable[Iterable],
+    fields: Iterable | None = None
 ) -> str:
     """
     Convert data to SQL string.
@@ -365,8 +365,8 @@ def to_sql(
 
 
 def to_html(
-    data: Union[Table, Iterable[Iterable]],
-    fields: Optional[Iterable] = None
+    data: Table | Iterable[Iterable],
+    fields: Iterable | None = None
 ) -> str:
     """
     Convert data to HTML string.
@@ -393,9 +393,9 @@ def to_html(
 
 
 def to_csv(
-    data: Union[Table, Iterable[Iterable]],
+    data: Table | Iterable[Iterable],
     path: str = 'data.csv',
-    fields: Optional[Iterable] = None
+    fields: Iterable | None = None
 ) -> str:
     """
     Convert data to save CSV format file.
@@ -429,10 +429,10 @@ def to_csv(
 
 
 def to_excel(
-    data: Union[Table, Iterable[Iterable]],
+    data: Table | Iterable[Iterable],
     path: str = 'data.xlsx',
-    group_field: Optional[str] = None,
-    sheets_set: dict[Union[str, int], SheetSet] = {}
+    group_field: str | None = None,
+    sheets_set: dict[str | int, SheetSet] = {}
 ) -> str:
     """
     Convert data to save Excel format file and return sheet name and sheet data.

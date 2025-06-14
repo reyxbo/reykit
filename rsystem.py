@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, TypedDict, Literal, Optional, Union, overload
+from typing import Any, TypedDict, Literal, overload
 from collections.abc import Callable, Iterable, Sequence
 from inspect import signature as inspect_signature, _ParameterKind, _empty
 from sys import path as sys_path, modules as sys_modules
@@ -110,17 +110,17 @@ ComputerInfo = TypedDict(
 NetWorkInfo = TypedDict(
     'NetWorkTable',
     {
-        'family': Optional[str],
-        'socket': Optional[str],
+        'family': str | None,
+        'socket': str | None,
         'local_ip': str,
         'local_port': int,
-        'remote_ip': Optional[str],
-        'remote_port': Optional[int],
-        'status': Optional[str],
-        'pid': Optional[int]
+        'remote_ip': str | None,
+        'remote_port': int | None,
+        'status': str | None,
+        'pid': int | None
     }
 )
-ProcessInfo = TypedDict('ProcessInfo', {'create_time': datetime, 'id': int, 'name': str, 'ports': Optional[list[int]]})
+ProcessInfo = TypedDict('ProcessInfo', {'create_time': datetime, 'id': int, 'name': str, 'ports': list[int] | None})
 
 
 class RConfigSystem(object, metaclass=RConfigMeta):
@@ -208,7 +208,7 @@ def del_modules(path: str) -> list[str]:
     return deleted_dict
 
 
-def dos_command(command: Union[str, Iterable[str]]) -> str:
+def dos_command(command: str | Iterable[str]) -> str:
     """
     Execute DOS command.
 
@@ -444,7 +444,7 @@ def is_number_str(
 
 def get_first_notnull(
     *values: Any,
-    default: Union[None, Any, Literal['exception']] = None,
+    default: Any | Literal['exception'] | None = None,
     nulls: tuple = (None,)) -> Any:
     """
     Get the first value that is not null.
@@ -482,12 +482,12 @@ def get_first_notnull(
 
 
 @overload
-def get_name(obj: tuple, frame: int = 2) -> Optional[tuple[str, ...]]: ...
+def get_name(obj: tuple, frame: int = 2) -> tuple[str, ...] | None: ...
 
 @overload
-def get_name(obj: Any, frame: int = 2) -> Optional[str]: ...
+def get_name(obj: Any, frame: int = 2) -> str | None: ...
 
-def get_name(obj: Any, frame: int = 2) -> Optional[Union[str, tuple[str, ...]]]:
+def get_name(obj: Any, frame: int = 2) -> str | tuple[str, ...] | None:
     """
     Get name of object or variable.
 
@@ -588,7 +588,7 @@ def get_stack_param(format_: Literal['floor'] = 'floor', limit: int = 2) -> dict
 @overload
 def get_stack_param(format_: Literal['full'] = 'floor', limit: int = 2) -> list[dict]: ...
 
-def get_stack_param(format_: Literal['floor', 'full'] = 'floor', limit: int = 2) -> Union[dict, list[dict]]:
+def get_stack_param(format_: Literal['floor', 'full'] = 'floor', limit: int = 2) -> dict | list[dict]:
     """
     Get code stack parameters.
 
@@ -644,7 +644,7 @@ def get_stack_param(format_: Literal['floor', 'full'] = 'floor', limit: int = 2)
 def get_arg_info(func: Callable) -> list[
     dict[
         Literal['name', 'type', 'annotation', 'default'],
-        Optional[str]
+        str | None
     ]
 ]:
     """
@@ -890,9 +890,9 @@ def get_process_table() -> list[ProcessInfo]:
 
 
 def search_process(
-    id_: Optional[Union[int, Sequence[int]]] = None,
-    name: Optional[Union[str, Sequence[str]]] = None,
-    port: Optional[Union[str, int, Sequence[Union[str, int]]]] = None,
+    id_: int | Sequence[int] | None = None,
+    name: str | Sequence[str] | None = None,
+    port: str | int | Sequence[str | int] | None = None,
 ) -> list[Process]:
     """
     Search process by ID or name or port.
@@ -976,9 +976,9 @@ def search_process(
 
 
 def kill_process(
-    id_: Optional[Union[int, Sequence[int]]] = None,
-    name: Optional[Union[str, Sequence[str]]] = None,
-    port: Optional[Union[str, int, Sequence[Union[str, int]]]] = None,
+    id_: int | Sequence[int] | None = None,
+    name: str | Sequence[str] | None = None,
+    port: str | int | Sequence[str | int] | None = None,
 ) -> list[Process]:
     """
     Search and kill process by ID or name or port.
@@ -1014,9 +1014,9 @@ def kill_process(
 
 
 def stop_process(
-    id_: Optional[Union[int, Sequence[int]]] = None,
-    name: Optional[Union[str, Sequence[str]]] = None,
-    port: Optional[Union[str, int, Sequence[Union[str, int]]]] = None,
+    id_: int | Sequence[int] | None = None,
+    name: str | Sequence[str] | None = None,
+    port: str | int | Sequence[str | int] | None = None,
 ) -> list[Process]:
     """
     Search and stop process by ID or name or port.
@@ -1052,9 +1052,9 @@ def stop_process(
 
 
 def start_process(
-    id_: Optional[Union[int, Sequence[int]]] = None,
-    name: Optional[Union[str, Sequence[str]]] = None,
-    port: Optional[Union[str, int, Sequence[Union[str, int]]]] = None,
+    id_: int | Sequence[int] | None = None,
+    name: str | Sequence[str] | None = None,
+    port: str | int | Sequence[str | int] | None = None,
 ) -> list[Process]:
     """
     Search and start process by ID or name or port.
@@ -1110,7 +1110,7 @@ def get_idle_port(min: int = 49152) -> int:
 
 
 def memory_read(
-    process: Union[int, str],
+    process: int | str,
     dll: str,
     offset: int
 ) -> int:
@@ -1149,7 +1149,7 @@ def memory_read(
 
 
 def memory_write(
-    process: Union[int, str],
+    process: int | str,
     dll: str,
     offset: int,
     value: int
@@ -1200,8 +1200,8 @@ def open_browser(url: str) -> bool:
 
 def popup_message(
     style: Literal['info', 'warn', 'error'] = 'info',
-    message: Optional[str] = None,
-    title: Optional[str] = None
+    message: str | None = None,
+    title: str | None = None
 ) -> None:
     """
     Pop up system message box.
@@ -1237,22 +1237,22 @@ def popup_message(
 @overload
 def popup_ask(
     style: Literal['yes_no_cancel'] = 'yes_no',
-    message: Optional[str] = None,
-    title: Optional[str] = None
-) -> Optional[bool]: ...
+    message: str | None = None,
+    title: str | None = None
+) -> bool | None: ...
 
 @overload
 def popup_ask(
     style: Literal['yes_no', 'ok_cancel', 'retry_cancel'] = 'yes_no',
-    message: Optional[str] = None,
-    title: Optional[str] = None
+    message: str | None = None,
+    title: str | None = None
 ) -> bool: ...
 
 def popup_ask(
     style: Literal['yes_no', 'ok_cancel', 'retry_cancel', 'yes_no_cancel'] = 'yes_no',
-    message: Optional[str] = None,
-    title: Optional[str] = None
-) -> Optional[bool]:
+    message: str | None = None,
+    title: str | None = None
+) -> bool | None:
     """
     Pop up system ask box.
 
@@ -1292,35 +1292,35 @@ def popup_ask(
 @overload
 def popup_select(
     style: Literal['file', 'save'] = 'file',
-    title : Optional[str] = None,
-    init_folder : Optional[str] = None,
-    init_file : Optional[str] = None,
-    filter_file : Optional[list[tuple[str, str | list[str]]]] = None
+    title : str | None = None,
+    init_folder : str | None = None,
+    init_file : str | None = None,
+    filter_file : list[tuple[str, str | list[str]]] | None = None
 ) -> str: ...
 
 @overload
 def popup_select(
     style: Literal['files'] = 'file',
-    title : Optional[str] = None,
-    init_folder : Optional[str] = None,
-    init_file : Optional[str] = None,
-    filter_file : Optional[list[tuple[str, str | list[str]]]] = None
+    title : str | None = None,
+    init_folder : str | None = None,
+    init_file : str | None = None,
+    filter_file : list[tuple[str, str | list[str]]] | None = None
 ) -> tuple[str, ...]: ...
 
 @overload
 def popup_select(
     style: Literal['folder'] = 'file',
-    title : Optional[str] = None,
-    init_folder : Optional[str] = None
+    title : str | None = None,
+    init_folder : str | None = None
 ) -> str: ...
 
 def popup_select(
     style: Literal['file', 'files', 'folder', 'save'] = 'file',
-    title : Optional[str] = None,
-    init_folder : Optional[str] = None,
-    init_file : Optional[str] = None,
-    filter_file : Optional[list[tuple[str, str | list[str]]]] = None
-) -> Union[str, tuple[str, ...]]:
+    title : str | None = None,
+    init_folder : str | None = None,
+    init_file : str | None = None,
+    filter_file : list[tuple[str, str | list[str]]] | None = None
+) -> str | tuple[str, ...]:
     """
     Pop up system select box.
 

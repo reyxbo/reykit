@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, Literal, Union, Optional
+from typing import Any, Literal
 from collections.abc import Callable
 from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -123,8 +123,8 @@ class RSchedule(object):
         self,
         func: Callable,
         trigger: Literal['date', 'interval', 'cron'] = 'date',
-        args: Optional[tuple] = None,
-        kwargs: Optional[dict] = None,
+        args: tuple | None = None,
+        kwargs: dict | None = None,
         **trigger_kwargs: Any
     ) -> Job:
         """
@@ -157,10 +157,10 @@ class RSchedule(object):
 
     def modify_task(
         self,
-        task: Union[Job, str],
-        trigger: Optional[Literal['date', 'interval', 'cron']] = None,
-        args: Optional[tuple] = None,
-        kwargs: Optional[dict] = None,
+        task: Job | str,
+        trigger: Literal['date', 'interval', 'cron'] | None = None,
+        args: tuple | None = None,
+        kwargs: dict | None = None,
         **trigger_kwargs: Any
     ) -> None:
         """
@@ -205,7 +205,7 @@ class RSchedule(object):
 
     def remove_task(
         self,
-        task: Union[Job, str]
+        task: Job | str
     ) -> None:
         """
         Remove task.
@@ -227,7 +227,7 @@ class RSchedule(object):
 
     def pause_task(
         self,
-        task: Union[Job, str]   
+        task: Job | str   
     ) -> None:
         """
         Pause task.
@@ -249,7 +249,7 @@ class RSchedule(object):
 
     def resume_task(
         self,
-        task: Union[Job, str]
+        task: Job | str
     ) -> None:
         """
         Resume task.

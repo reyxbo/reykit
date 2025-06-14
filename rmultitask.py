@@ -10,7 +10,7 @@
 
 
 from __future__ import annotations
-from typing import Any, Optional, Literal, Union
+from typing import Any, Literal
 from collections.abc import Callable, Iterable, Generator, Coroutine
 from threading import RLock as TRLock, get_ident as threading_get_ident
 from concurrent.futures import ThreadPoolExecutor, Future as CFuture, as_completed as concurrent_as_completed
@@ -78,15 +78,15 @@ def async_run(*coroutines: Coroutine) -> list:
 
 async def async_request(
     url: str,
-    params: Optional[dict] = None,
-    data: Optional[Union[dict, str, bytes]] = None,
-    json: Optional[dict] = None,
+    params: dict | None = None,
+    data: dict | str | bytes | None = None,
+    json: dict | None = None,
     headers: dict[str, str] = {},
-    timeout: Optional[float] = None,
-    proxy: Optional[str] = None,
-    method: Optional[Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head']] = None,
-    check: Union[bool, int, Iterable[int]] = False,
-    handler: Optional[Union[str, tuple[str], Callable[[ClientResponse], Union[Coroutine, Any]]]] = None
+    timeout: float | None = None,
+    proxy: str | None = None,
+    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = None,
+    check: bool | int | Iterable[int] = False,
+    handler: str | tuple[str] | Callable[[ClientResponse], Coroutine | Any] | None = None
 ) -> Any:
     """
     Get asynchronous `Coroutine` instance of send request.
@@ -119,7 +119,6 @@ async def async_request(
         - `Literal[True]`: Check if is between 200 and 299.
         - `int`: Check if is this value.
         - `Iterable`: Check if is in sequence.
-
     handler : Response handler.
         - `None`: Automatic handle.
             `Response 'Content-Type' is 'application/json'`: Use `ClientResponse.json` method.
@@ -247,7 +246,7 @@ class RThreadLock():
 
         # Set attribute.
         self.lock = TRLock()
-        self.acquire_thread_id: Optional[int] = None
+        self.acquire_thread_id: int | None = None
 
 
     def acquire(
@@ -372,7 +371,7 @@ class RThreadPool(object):
         self,
         task: Callable,
         *args: Any,
-        _max_workers: Optional[int] = None,
+        _max_workers: int | None = None,
         **kwargs: Any
     ) -> None:
         """
@@ -498,7 +497,7 @@ class RThreadPool(object):
 
     def generate(
         self,
-        timeout: Optional[float] = None
+        timeout: float | None = None
     ) -> Generator[CFuture]:
         """
         Return the generator of added task instance.
@@ -601,7 +600,7 @@ class RAsyncPool(object):
         async_func: Callable[..., Coroutine],
         *args: Any,
         _max_async: int = 10,
-        _exc_handler: Optional[Callable] = None,
+        _exc_handler: Callable | None = None,
         **kwargs: Any
     ) -> None:
         """
@@ -783,7 +782,7 @@ class RAsyncPool(object):
 
     def get(
         self,
-        timeout: Optional[float] = None
+        timeout: float | None = None
     ) -> Any:
         """
         Get one execution result of asynchronous `Coroutine`, will block.

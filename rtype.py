@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, Optional, Self
+from typing import Any, Self
 from collections.abc import Callable
 
 
@@ -86,7 +86,7 @@ class RSingleton(object):
     When instantiated, method `__singleton__` will be called only once, and will accept arguments.
     """
 
-    _instance: Optional[Self] = None
+    _instance: Self | None = None
 
 
     def __new__(self, *arg: Any, **kwargs: Any) -> Self:

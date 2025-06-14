@@ -9,8 +9,6 @@
 """
 
 
-from typing import Optional, Union
-from io import BufferedIOBase
 from smtplib import SMTP
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -101,12 +99,12 @@ class REmail(object):
 
     def create_email(
         self,
-        title: Optional[str],
-        text: Optional[str],
+        title: str | None,
+        text: str | None,
         attachment: dict[str, bytes],
-        show_from: Optional[str],
-        show_to: Optional[list[str]],
-        show_cc: Optional[list[str]]
+        show_from: str | None,
+        show_to: list[str] | None,
+        show_cc: list[str] | None
     ) -> str:
         """
         create email content.
@@ -169,14 +167,14 @@ class REmail(object):
 
     def send_email(
         self,
-        to: Union[str, list[str]],
-        title: Optional[str] = None,
-        text: Optional[str] = None,
+        to: str | list[str],
+        title: str | None = None,
+        text: str | None = None,
         attachment: dict[str, FileBytes] = {},
-        cc: Optional[Union[str, list[str]]] = None,
-        show_from: Optional[str] = None,
-        show_to: Optional[Union[str, list[str]]] = None,
-        show_cc: Optional[Union[str, list[str]]] = None
+        cc: str | list[str] | None = None,
+        show_from: str | None = None,
+        show_to: str | list[str] | None = None,
+        show_cc: str | list[str] | None = None
     ) -> None:
         """
         Send email.

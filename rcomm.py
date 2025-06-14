@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal
 from collections.abc import Callable, Iterable
 from warnings import filterwarnings
 from os.path import abspath as os_abspath, isfile as os_isfile
@@ -149,7 +149,7 @@ def split_cookie(cookie: str) -> dict[str, str]:
     return params
 
 
-def get_content_type(file: Union[str, bytes]) -> Optional[str]:
+def get_content_type(file: str | bytes) -> str | None:
     """
     Get HTTP content type of file.
 
@@ -184,17 +184,17 @@ def get_content_type(file: Union[str, bytes]) -> Optional[str]:
 
 def request(
     url: str,
-    params: Optional[dict] = None,
-    data: Optional[Union[dict, str, bytes]] = None,
-    json: Optional[dict] = None,
-    files: Optional[dict[str, Union[str, bytes, tuple[Union[str, bytes], dict]]]] = None,
+    params: dict | None = None,
+    data: dict | str | bytes | None = None,
+    json: dict | None = None,
+    files: dict[str, str | bytes | tuple[str | bytes, dict]] | None = None,
     headers: dict[str, str] = {},
-    timeout: Optional[float] = None,
+    timeout: float | None = None,
     proxies: dict[str, str] = {},
     stream: bool = False,
     verify: bool = False,
-    method: Optional[Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head']] = None,
-    check: Union[bool, int, Iterable[int]] = False
+    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = None,
+    check: bool | int | Iterable[int] = False
 ) -> Response:
     """
     Send request.
@@ -318,7 +318,7 @@ def request(
     return response
 
 
-def download(url: str, path: Optional[str] = None) -> str:
+def download(url: str, path: str | None = None) -> str:
     """
     Download file from URL.
 
@@ -363,7 +363,7 @@ def download(url: str, path: Optional[str] = None) -> str:
 
 
 def get_file_stream_time(
-    file: Union[str, bytes, int],
+    file: str | bytes | int,
     bandwidth: float
 ) -> float:
     """
@@ -402,7 +402,7 @@ def get_file_stream_time(
 
 def listen_socket(
     host: str,
-    port: Union[str, int],
+    port: str | int,
     handler: Callable[[bytes], Any]
 ) -> None:
     """

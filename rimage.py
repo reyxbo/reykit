@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, Union, Optional
+from typing import Any
 from io import BytesIO
 from qrcode import make as qrcode_make
 from qrcode.image.pil import PilImage
@@ -42,7 +42,7 @@ monkey_image_type = monkey_path_pil_image_get_bytes()
 RImage = monkey_image_type
 
 
-def encode_qrcode(text: str, path: Optional[str] = None) -> bytes:
+def encode_qrcode(text: str, path: str | None = None) -> bytes:
     """
     Encoding text to QR code image.
 
@@ -73,7 +73,7 @@ def encode_qrcode(text: str, path: Optional[str] = None) -> bytes:
     return file_bytes
 
 
-def decode_qrcode(image: Union[str, bytes]) -> list[str]:
+def decode_qrcode(image: str | bytes) -> list[str]:
     """
     Decoding QR code or bar code image.
 
@@ -108,14 +108,14 @@ def decode_qrcode(image: Union[str, bytes]) -> list[str]:
 
 
 def compress_image(
-    input_image: Union[str, bytes],
-    ouput_image: Optional[str] = None,
+    input_image: str | bytes,
+    ouput_image: str | None = None,
     target_size: float = 0.5,
     rate: int = 5,
     reduce: bool = False,
     max_quality: int = 75,
     min_quality: int = 0
-) -> Optional[bytes]:
+) -> bytes | None:
     """
     Compress image file.
 
@@ -187,7 +187,7 @@ def compress_image(
         rfile(content)
 
 
-def to_pimage(image: Union[str, bytes]) -> RImage:
+def to_pimage(image: str | bytes) -> RImage:
     """
     Get `Image` instance of `PIL` package.
 
@@ -215,8 +215,8 @@ def to_pimage(image: Union[str, bytes]) -> RImage:
 
 
 def generate_captcha_image(
-    text: Optional[Union[int, str]] = None,
-    path: Optional[str] = None,
+    text: int | str | None = None,
+    path: str | None = None,
     **kwargs: Any
 ) -> bytes:
     """

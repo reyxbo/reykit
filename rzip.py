@@ -10,7 +10,6 @@
 
 
 from __future__ import annotations
-from typing import Optional
 from zipfile import ZipFile, is_zipfile, ZIP_DEFLATED
 from os import getcwd as os_getcwd, walk as os_walk
 from os.path import join as os_join, isfile as os_isfile
@@ -27,7 +26,7 @@ __all__ = (
 
 def compress(
     obj_path: str,
-    build_dir: Optional[str] = None,
+    build_dir: str | None = None,
     overwrite: bool = True
 ) -> None:
     """
@@ -82,8 +81,8 @@ def compress(
 
 def decompress(
     obj_path: str,
-    build_dir: Optional[str] = None,
-    password: Optional[str] = None
+    build_dir: str | None = None,
+    password: str | None = None
 ) -> None:
     """
     Decompress compressed object.
@@ -114,7 +113,7 @@ def decompress(
 
 def zip(
     obj_path: str,
-    build_dir: Optional[str] = None
+    build_dir: str | None = None
 ) -> None:
     """
     Automatic judge and compress or decompress object.

@@ -20,7 +20,7 @@
 """
 
 
-from typing import Any, Optional, Union, NoReturn
+from typing import Any, NoReturn
 from types import TracebackType
 from collections.abc import Iterable
 from sys import exc_info as sys_exc_info
@@ -61,7 +61,7 @@ def throw(
     exception: type[BaseException] = AssertionError,
     value: Any = RNull,
     *values: Any,
-    text: Optional[str] = None,
+    text: str | None = None,
     frame: int = 2
 ) -> NoReturn:
     """
@@ -176,7 +176,7 @@ def warn(
 
 
 def catch_exc(
-    title: Optional[str] = None
+    title: str | None = None
 ) -> tuple[str, type[BaseException], BaseException, TracebackType]:
     """
     Catch exception information and print, must used in `except` syntax.
@@ -303,7 +303,7 @@ def check_file_exist(path: str) -> None:
 
 def check_response_code(
     code: int,
-    range_: Optional[Union[int, Iterable[int]]] = None
+    range_: int | Iterable[int] | None = None
 ) -> bool:
     """
     Check if the response code is in range.

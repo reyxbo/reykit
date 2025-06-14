@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, Literal, Optional, Union, Final, Self
+from typing import Any, Literal, Final, Self
 from collections.abc import Callable
 import sys
 from io import TextIOWrapper
@@ -60,9 +60,9 @@ class RConfigStdout(object, metaclass=RConfigMeta):
 
 def beautify_text(
     data: tuple[Any],
-    title: Union[bool, str] = True,
-    width: Optional[int] = None,
-    frame: Optional[Literal['full', 'half', 'top', 'half_plain', 'top_plain']] = 'full'
+    title: bool | str = True,
+    width: int | None = None,
+    frame: Literal['full', 'half', 'top', 'half_plain', 'top_plain'] | None = 'full'
 ) -> str:
     """
     Beautify data to text.
@@ -132,9 +132,9 @@ def beautify_text(
 
 def echo(
     *data: Any,
-    title: Union[bool, str] = True,
-    width: Optional[int] = None,
-    frame: Optional[Literal['full', 'half', 'top', 'half_plain', 'top_plain']] = 'full'
+    title: bool | str = True,
+    width: int | None = None,
+    frame: Literal['full', 'half', 'top', 'half_plain', 'top_plain'] | None = 'full'
 ) -> str:
     """
     Beautify data to text, and print.
@@ -176,10 +176,10 @@ def echo(
 
 def rinput(
     *data: Any,
-    title: Union[bool, str] = True,
-    width: Optional[int] = None,
-    frame: Optional[Literal['full', 'half', 'top', 'half_plain', 'top_plain']] = 'full',
-    extra: Optional[str] = None
+    title: bool | str = True,
+    width: int | None = None,
+    frame: Literal['full', 'half', 'top', 'half_plain', 'top_plain'] | None = 'full',
+    extra: str | None = None
 ) -> str:
     """
     Beautify data to text, and print data, and read string from standard input.
@@ -251,7 +251,7 @@ def start_print() -> None:
     RConfigStdout._stoped = False
 
 
-def modify_print(preprocess: Callable[[str], Optional[str]]) -> None:
+def modify_print(preprocess: Callable[[str], str] | None) -> None:
     """
     Modify standard output print write method.
 
@@ -264,7 +264,7 @@ def modify_print(preprocess: Callable[[str], Optional[str]]) -> None:
 
 
     # Define.
-    def write(__s: str) -> Optional[int]:
+    def write(__s: str) -> int | None:
         """
         Modified standard output write method.
 

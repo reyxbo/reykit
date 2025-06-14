@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 from collections.abc import Iterable
 from decimal import Decimal
 from pprint import pformat as pprint_pformat
@@ -278,7 +278,7 @@ def join_filter_text(data: Iterable, char: str = ',', filter_: tuple = (None, ''
 
 def add_text_frame(
     *texts: str,
-    title: Optional[str],
+    title: str | None,
     width: int,
     frame: Literal['full', 'half', 'top', 'half_plain', 'top_plain']
 ) -> str:
@@ -289,7 +289,7 @@ def add_text_frame(
     ----------
     texts : Texts.
     title : Frame title.
-        - `Union[None, Literal['']]`: No title.
+        - `None | Literal['']`: No title.
         - `str`: Use this value as the title.
     width : Frame width.
     frame : Frame type.

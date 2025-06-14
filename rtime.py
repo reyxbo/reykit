@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, TypedDict, Literal, Optional, Union, overload, NoReturn
+from typing import Any, TypedDict, Literal, overload, NoReturn
 from collections.abc import Callable
 from pandas import (
     DataFrame,
@@ -47,7 +47,7 @@ __all__ = (
 )
 
 
-RecordData = TypedDict('RecordData', {'timestamp': int, 'datetime': datetime_datetime, 'timedelta': Optional[datetime_timedelta], 'note': Optional[str]})
+RecordData = TypedDict('RecordData', {'timestamp': int, 'datetime': datetime_datetime, 'timedelta': datetime_timedelta | None, 'note': str | None})
 
 
 @overload
@@ -78,13 +78,7 @@ def now(
         'time_str',
         'timestamp'
     ] = 'datetime'
-) -> Union[
-    datetime_datetime,
-    datetime_date,
-    datetime_time,
-    str,
-    int
-]:
+) -> datetime_datetime | datetime_date | datetime_time | str | int:
     """
     Get the now time.
 
@@ -126,15 +120,7 @@ def now(
 
 @overload
 def time_to(
-    obj: Union[
-        datetime_datetime,
-        datetime_date,
-        datetime_time,
-        datetime_timedelta,
-        time_struct_time,
-        pd_timestamp,
-        pd_timedelta
-    ],
+    obj: datetime_datetime | datetime_date | datetime_time | datetime_timedelta | time_struct_time | pd_timestamp | pd_timedelta,
     decimal: bool = False,
     raising: bool = True
 ) -> str: ...
@@ -241,13 +227,7 @@ def time_to(
 
 def text_to_time(
     string: str
-) -> Optional[
-    Union[
-        datetime_datetime,
-        datetime_date,
-        datetime_time
-    ]
-]:
+) -> datetime_datetime | datetime_date | datetime_time | None:
     """
     Convert text to time object.
 
@@ -332,11 +312,11 @@ def text_to_time(
 def to_time(
     obj: str,
     raising: bool = True
-) -> Union[datetime_datetime, datetime_date, datetime_time]: ...
+) -> datetime_datetime | datetime_date | datetime_time: ...
 
 @overload
 def to_time(
-    obj: Union[time_struct_time, float],
+    obj: time_struct_time | float,
     raising: bool = True
 ) -> datetime_datetime: ...
 
@@ -413,7 +393,7 @@ def to_time(
 
 def sleep(
     *thresholds: float,
-    precision: Optional[int] = None
+    precision: int | None = None
 ) -> float:
     """
     Sleep random seconds.
@@ -452,7 +432,7 @@ def wait(
     func: Callable[..., bool],
     *args: Any,
     _interval: float = 1,
-    _timeout: Optional[float] = None,
+    _timeout: float | None = None,
     **kwargs: Any
 ) -> float:
     """
@@ -522,7 +502,7 @@ class RTimeMark():
         self.record: dict[int, RecordData] = {}
 
 
-    def mark(self, note: Optional[str] = None) -> int:
+    def mark(self, note: str | None = None) -> int:
         """
         Marking now time.
 
@@ -560,7 +540,7 @@ class RTimeMark():
         return index
 
 
-    def report(self, title: Optional[str] = None) -> DataFrame:
+    def report(self, title: str | None = None) -> DataFrame:
         """
         Print and return time mark information table.
 

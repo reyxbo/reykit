@@ -29,7 +29,6 @@ def monkey_patch_sqlalchemy_result_more_fetch():
     """
 
 
-    from typing import Optional
     from sqlalchemy.engine.cursor import CursorResult
     from pandas import DataFrame, NA, concat
 
@@ -81,7 +80,7 @@ def monkey_patch_sqlalchemy_result_more_fetch():
 
 
     # Print result.
-    def method_show(self: RResult, limit: Optional[int] = None) -> None:
+    def method_show(self: RResult, limit: int | None = None) -> None:
         """
         Print result.
 
@@ -207,18 +206,18 @@ def monkey_patch_sqlalchemy_row_index_field():
     """
 
 
-    from typing import Any, Union, overload
+    from typing import Any, overload
     from sqlalchemy.engine.row import Row
 
 
     # Define.
     @overload
-    def __getitem__(self, index: Union[str, int]) -> Any: ...
+    def __getitem__(self, index: str | int) -> Any: ...
 
     @overload
     def __getitem__(self, index: slice) -> tuple: ...
 
-    def __getitem__(self, index: Union[str, int, slice]) -> Union[Any, tuple]:
+    def __getitem__(self, index: str | int | slice) -> Any | tuple:
         """
         Index row value.
 

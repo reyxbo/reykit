@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, Union
+from typing import Any
 
 from .rexception import throw
 
@@ -21,7 +21,7 @@ __all__ = (
 )
 
 
-def digits(number: Union[int, float]) -> tuple[int, int]:
+def digits(number: int | float) -> tuple[int, int]:
     """
     Judge the number of integer digits and decimal digits.
 

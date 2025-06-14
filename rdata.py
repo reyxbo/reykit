@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, TypedDict, Optional, Literal, NoReturn, TypeVar, overload
+from typing import Any, TypedDict, Literal, NoReturn, TypeVar, overload
 from collections.abc import Callable, Iterable, Generator
 
 from .rexception import check_least_one, check_most_one
@@ -87,7 +87,7 @@ def count(
     return result
 
 
-def flatten(data: Any, *, _flattern_data: Optional[list] = None) -> list:
+def flatten(data: Any, *, _flattern_data: list | None = None) -> list:
     """
     Flatten data.
 
@@ -136,9 +136,9 @@ def split(data: Iterable[Element], share: None = None, bin_size: None = None) ->
 def split(data: Iterable[Element], share: int = None, bin_size: int = None) -> NoReturn: ...
 
 @overload
-def split(data: Iterable[Element], share: Optional[int] = None, bin_size: Optional[int] = None) -> list[list[Element]]: ...
+def split(data: Iterable[Element], share: int | None = None, bin_size: int | None = None) -> list[list[Element]]: ...
 
-def split(data: Iterable[Element], share: Optional[int] = None, bin_size: Optional[int] = None) -> list[list[Element]]:
+def split(data: Iterable[Element], share: int | None = None, bin_size: int | None = None) -> list[list[Element]]:
     """
     Split data into multiple data.
 

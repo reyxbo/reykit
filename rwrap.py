@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, Optional, Union, Literal, overload
+from typing import Any, Literal, overload
 from collections.abc import Callable
 from io import IOBase, StringIO
 from inspect import getdoc
@@ -78,7 +78,7 @@ def wrap_frame(decorator: Callable) -> Callable:
 
     # Decorate Decorator.
     @overload
-    def wrap(func: Callable, *args: Any, _execute: None = None, **kwargs: Any) -> Union[Callable, Any]: ...
+    def wrap(func: Callable, *args: Any, _execute: None = None, **kwargs: Any) -> Callable | Any: ...
 
     @overload
     def wrap(func: Callable, *args: Any, _execute: Literal[True] = None, **kwargs: Any) -> Any: ...
@@ -87,7 +87,7 @@ def wrap_frame(decorator: Callable) -> Callable:
     def wrap(func: Callable, *args: Any, _execute: Literal[False] = None, **kwargs: Any) -> Callable: ...
 
     @functools_wraps(decorator)
-    def wrap(func: Callable, *args: Any, _execute: Optional[bool] = None, **kwargs: Any) -> Union[Callable, Any]:
+    def wrap(func: Callable, *args: Any, _execute: bool | None = None, **kwargs: Any) -> Callable | Any:
         """
         Decorative shell.
 
@@ -167,7 +167,7 @@ def wrap_runtime(
     *args: Any,
     _return_report: bool = False,
     **kwargs: Any
-) -> Union[Any, tuple[Any, str]]:
+) -> Any | tuple[Any, str]:
     """
     Decorator, print or return runtime report of the function.
 
@@ -260,19 +260,19 @@ def wrap_thread(
 def wrap_exc(
     func: Callable,
     *args: Any,
-    _exception: Union[BaseException, tuple[BaseException, ...]] = BaseException,
-    _handler: Optional[Callable] = None,
+    _exception: BaseException | tuple[BaseException, ...] = BaseException,
+    _handler: Callable | None = None,
     **kwargs: Any
-) -> Optional[Any]: ...
+) -> Any | None: ...
 
 @wrap_frame
 def wrap_exc(
     func: Callable,
     *args: Any,
-    _exception: Union[BaseException, tuple[BaseException, ...]] = BaseException,
-    _handler: Optional[Callable] = None,
+    _exception: BaseException | tuple[BaseException, ...] = BaseException,
+    _handler: Callable | None = None,
     **kwargs: Any
-) -> Optional[Any]:
+) -> Any | None:
     """
     Decorator, execute function with `try` and `except` syntax.
 
@@ -307,8 +307,8 @@ def wrap_exc(
 def wrap_retry(
     func: Callable,
     *args: Any,
-    _report: Optional[str] = None,
-    _exception: Union[BaseException, tuple[BaseException, ...]] = BaseException,
+    _report: str | None = None,
+    _exception: BaseException | tuple[BaseException, ...] = BaseException,
     _try_total: int = 1,
     _try_count: int = 0,
     **kwargs: Any
@@ -318,8 +318,8 @@ def wrap_retry(
 def wrap_retry(
     func: Callable,
     *args: Any,
-    _report: Optional[str] = None,
-    _exception: Union[BaseException, tuple[BaseException, ...]] = BaseException,
+    _report: str | None = None,
+    _exception: BaseException | tuple[BaseException, ...] = BaseException,
     _try_total: int = 1,
     _try_count: int = 0,
     **kwargs: Any
@@ -569,7 +569,7 @@ def wrap_cache(
 def wrap_redirect_stdout(
     func: Callable,
     *args: Any,
-    _redirect: Optional[Union[list, IOBase]] = None,
+    _redirect: list | IOBase | None = None,
     **kwargs: Any
 ) -> Any: ...
 
@@ -577,7 +577,7 @@ def wrap_redirect_stdout(
 def wrap_redirect_stdout(
     func: Callable,
     *args: Any,
-    _redirect: Optional[Union[list, IOBase]] = None,
+    _redirect: list | IOBase | None = None,
     **kwargs: Any
 ) -> Any:
     """

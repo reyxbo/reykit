@@ -10,7 +10,7 @@
 
 
 from __future__ import annotations
-from typing import Union, Optional, Literal, Self, overload
+from typing import Literal, Self, overload
 from types import TracebackType
 from collections.abc import Sequence
 from string import digits as string_digits, ascii_letters as string_ascii_letters, punctuation as string_punctuation
@@ -64,7 +64,7 @@ class RRandomSeed(object):
     """
 
 
-    def __init__(self, seed: Optional[Union[int, float, str, bytes, bytearray]] = None) -> None:
+    def __init__(self, seed: int | float | str | bytes | bytearray | None = None) -> None:
         """
         Build `random` attributes.
 
@@ -72,7 +72,7 @@ class RRandomSeed(object):
         ----------
         seed : Random seed.
             - `None`: Clear seed.
-            - `Union[int, float, str, bytes, bytearray]` : Set seed.
+            - `int | float | str | bytes | bytearray` : Set seed.
         """
 
         # Delete.
@@ -114,9 +114,9 @@ class RRandomSeed(object):
 
     def __exit__(
         self,
-        exc_type: Optional[type[BaseException]],
-        exc_instance: Optional[BaseException],
-        exc_traceback: Optional[TracebackType]
+        exc_type: type[BaseException] | None,
+        exc_instance: BaseException | None,
+        exc_traceback: TracebackType | None
     ) -> None:
         """
         Exit syntax `with`.
@@ -158,8 +158,8 @@ def randn(
 
 def randn(
     *thresholds: float,
-    precision: Optional[int] = None
-) -> Union[int, float]:
+    precision: int | None = None
+) -> int | float:
     """
     Random number.
 
@@ -273,9 +273,9 @@ def randi(
 
 def randi(
     data: Sequence,
-    multi: Optional[int] = None,
+    multi: int | None = None,
     unique: bool = True
-) -> Union[Element, list[Element]]:
+) -> Element | list[Element]:
     """
     Random index data element.
 

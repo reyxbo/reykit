@@ -10,7 +10,7 @@
 
 
 from __future__ import annotations
-from typing import Any, Union, Literal, Optional, NoReturn, overload
+from typing import Any, Literal, NoReturn, overload
 from io import TextIOBase, BufferedIOBase
 from os import (
     walk as os_walk,
@@ -76,12 +76,12 @@ __all__ = (
 type FilePath = str
 type FileText = str
 type FileData = bytes
-type FileStr = Union[FilePath, FileText, TextIOBase]
-type FileBytes = Union[FilePath, FileData, BufferedIOBase]
-type File = Union[FileStr, FileBytes]
+type FileStr = FilePath | FileText | TextIOBase
+type FileBytes = FilePath | FileData | BufferedIOBase
+type File = FileStr | FileBytes
 
 
-def get_md5(file: Union[str, bytes]) -> str:
+def get_md5(file: str | bytes) -> str:
     """
     Get file MD5.
 
@@ -265,7 +265,7 @@ def get_file_bytes(file: FileBytes) -> bytes:
     return file_bytes
 
 
-def read_toml(path: Union[str, RFile]) -> dict[str, Any]:
+def read_toml(path: str | RFile) -> dict[str, Any]:
     """
     Read and parse TOML file.
     Treat nan as a None or null value.
@@ -338,7 +338,7 @@ class RFile(object):
     def read(
         self,
         type_: Literal['str', 'bytes'] = 'bytes'
-    ) -> Union[bytes, str]:
+    ) -> bytes | str:
         """
         Read file data.
 
@@ -371,7 +371,7 @@ class RFile(object):
 
     def write(
         self,
-        data: Optional[Any] = '',
+        data: Any | None = '',
         append: bool = False
     ) -> None:
         """
@@ -735,7 +735,7 @@ class RFile(object):
 
     def __contains__(
         self,
-        value: Union[str, bytes]
+        value: str | bytes
     ) -> bool:
         """
         Judge if file text contain value.
@@ -775,7 +775,7 @@ class RFolder(object):
 
     def __init__(
         self,
-        path: Optional[str] = None
+        path: str | None = None
     ) -> None:
         """
         Build `folder` attributes.
@@ -873,7 +873,7 @@ class RFolder(object):
         pattern: str,
         recursion: bool = False,
         all_ : Literal[False] = False
-    ) -> Optional[str]: ...
+    ) -> str | None: ...
 
     @overload
     def search(
@@ -888,7 +888,7 @@ class RFolder(object):
         pattern: str,
         recursion: bool = False,
         all_ : bool = False
-    ) -> Optional[str]:
+    ) -> str | None:
         """
         Search file by name.
 
@@ -1149,8 +1149,8 @@ class RTempFile(object):
 
     def __init__(
         self,
-        dir_: Optional[str] = None,
-        suffix: Optional[str] = None,
+        dir_: str | None = None,
+        suffix: str | None = None,
         type_: Literal['str', 'bytes'] = 'bytes'
     ) -> None:
         """
@@ -1181,7 +1181,7 @@ class RTempFile(object):
         self.path = self.file.name
 
 
-    def read(self) -> Union[bytes, str]:
+    def read(self) -> bytes | str:
         """
         Read file data.
 
@@ -1199,7 +1199,7 @@ class RTempFile(object):
 
     def write(
         self,
-        data: Union[str, bytes]
+        data: str | bytes
     ) -> None:
         """
         Write file data.
@@ -1391,7 +1391,7 @@ class RTempFile(object):
 
     def __contains__(
         self,
-        value: Union[str, bytes]
+        value: str | bytes
     ) -> bool:
         """
         Judge if file text contain value.
@@ -1434,7 +1434,7 @@ class RTempFolder(object):
 
     def __init__(
         self,
-        dir_: Optional[str] = None
+        dir_: str | None = None
     ) -> None:
         """
         Build `temporary folder` attributes.
@@ -1529,7 +1529,7 @@ class RTempFolder(object):
         pattern: str,
         recursion: bool = False,
         all_ : Literal[False] = False
-    ) -> Optional[str]: ...
+    ) -> str | None: ...
 
     @overload
     def search(
@@ -1544,7 +1544,7 @@ class RTempFolder(object):
         pattern: str,
         recursion: bool = False,
         all_ : bool = False
-    ) -> Optional[str]:
+    ) -> str | None:
         """
         Search file by name.
 
@@ -1762,7 +1762,7 @@ class RTempFolder(object):
 
 def doc_to_docx(
     path: str,
-    save_path: Optional[str] = None
+    save_path: str | None = None
 ) -> str:
     """
     Convert `DOC` file to `DOCX` file.

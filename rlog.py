@@ -10,7 +10,7 @@
 
 
 from __future__ import annotations
-from typing import Any, Optional, Union, Literal, Final, NoReturn, overload, override
+from typing import Any, Literal, Final, NoReturn, overload, override
 from collections.abc import Callable
 from queue import Queue
 from os.path import abspath as os_abspath
@@ -291,7 +291,7 @@ class RLog(object):
     def get_default_filter_method(
         self,
         format_: str,
-        mode : Optional[Literal['print', 'file']] = None
+        mode : Literal['print', 'file'] | None = None
     ) -> Callable[[LogRecord], Literal[True]]:
         """
         Get default filter method of handler.
@@ -397,8 +397,8 @@ class RLog(object):
     def add_print(
         self,
         level: int = DEBUG,
-        format_: Optional[str] = None,
-        filter_: Optional[Callable[[LogRecord], bool]] = None
+        format_: str | None = None,
+        filter_: Callable[[LogRecord], bool] | None = None
     ) -> StreamHandler:
         """
         Add print output record handler.
@@ -443,56 +443,56 @@ class RLog(object):
     @overload
     def add_file(
         self,
-        path: Optional[str] = None,
-        mb: Optional[float] = None,
+        path: str | None = None,
+        mb: float | None = None,
         time: None = None,
         level: int = DEBUG,
-        format_: Optional[str] = None,
-        filter_: Optional[Callable[[LogRecord], bool]] = None
+        format_: str | None = None,
+        filter_: Callable[[LogRecord], bool] | None = None
     ) -> ConcurrentRotatingFileHandler: ...
 
     @overload
     def add_file(
         self,
-        path: Optional[str] = None,
+        path: str | None = None,
         mb: None = None,
-        time: Union[float, Literal['m', 'w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6']] = None,
+        time: float | Literal['m', 'w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6'] = None,
         level: int = DEBUG,
-        format_: Optional[str] = None,
-        filter_: Optional[Callable[[LogRecord], bool]] = None
+        format_: str | None = None,
+        filter_: Callable[[LogRecord], bool] | None = None
     ) -> ConcurrentTimedRotatingFileHandler: ...
 
     @overload
     def add_file(
         self,
-        path: Optional[str] = None,
+        path: str | None = None,
         mb: None = None,
         time: Any = None,
         level: int = DEBUG,
-        format_: Optional[str] = None,
-        filter_: Optional[Callable[[LogRecord], bool]] = None
+        format_: str | None = None,
+        filter_: Callable[[LogRecord], bool] | None = None
     ) -> NoReturn: ...
 
     @overload
     def add_file(
         self,
-        path: Optional[str] = None,
+        path: str | None = None,
         mb: float = None,
-        time: Union[float, Literal['m', 'w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6']] = None,
+        time: float | Literal['m', 'w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6'] = None,
         level: int = DEBUG,
-        format_: Optional[str] = None,
-        filter_: Optional[Callable[[LogRecord], bool]] = None
+        format_: str | None = None,
+        filter_: Callable[[LogRecord], bool] | None = None
     ) -> NoReturn: ...
 
     def add_file(
         self,
-        path: Optional[str] = None,
-        mb: Optional[float] = None,
-        time: Optional[Union[float, Literal['m', 'w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6']]] = None,
+        path: str | None = None,
+        mb: float | None = None,
+        time: float | Literal['m', 'w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6'] | None = None,
         level: int = DEBUG,
-        format_: Optional[str] = None,
-        filter_: Optional[Callable[[LogRecord], bool]] = None
-    ) -> Union[ConcurrentRotatingFileHandler, ConcurrentTimedRotatingFileHandler]:
+        format_: str | None = None,
+        filter_: Callable[[LogRecord], bool] | None = None
+    ) -> ConcurrentRotatingFileHandler | ConcurrentTimedRotatingFileHandler:
         """
         Add file output record handler, can split files based on size or time.
 
@@ -613,9 +613,9 @@ class RLog(object):
 
     def add_queue(
         self,
-        queue: Optional[Queue] = None,
+        queue: Queue | None = None,
         level: int = DEBUG,
-        filter_: Optional[Callable[[LogRecord], bool]] = None
+        filter_: Callable[[LogRecord], bool] | None = None
     ) -> tuple[QueueHandler, Queue[LogRecord]]:
         """
         Add queue output record handler.
@@ -655,7 +655,7 @@ class RLog(object):
         self,
         method: Callable[[LogRecord], Any],
         level: int = DEBUG,
-        filter_: Optional[Callable[[LogRecord], bool]] = None
+        filter_: Callable[[LogRecord], bool] | None = None
     ) -> None:
         """
         Add method record handler.
@@ -771,7 +771,7 @@ class RLog(object):
     def log(
         self,
         *messages: Any,
-        level: Optional[int] = None,
+        level: int | None = None,
         catch: bool = True,
         **params: Any
     ) -> None:
@@ -970,7 +970,7 @@ class RRecord(object):
 
     def __init__(
         self,
-        path: Optional[str] = '_rrecord'
+        path: str | None = '_rrecord'
     ) -> None:
         """
         Build `record` attributes.

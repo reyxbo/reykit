@@ -10,7 +10,7 @@
 
 
 from __future__ import annotations
-from typing import Dict, Union, Optional, Literal, Self, overload
+from typing import Union, Optional, Literal, Self, overload
 from types import TracebackType
 from collections.abc import Sequence
 from string import digits as string_digits, ascii_letters as string_ascii_letters, punctuation as string_punctuation
@@ -42,7 +42,7 @@ class RConfigRandom(object, metaclass=RConfigMeta):
     """
 
     # RRandom.
-    _rrandom_dict: Dict[int, RRandomSeed] = {}
+    _rrandom_dict: dict[int, RRandomSeed] = {}
 
 
 class RRandomSeed(object):

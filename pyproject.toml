@@ -1,0 +1,37 @@
+[project]
+name = "reykit"
+version = "1.1.2"
+description = "Rey's kit method set."
+readme = "README.md"
+requires-python = ">=3.12"
+license = {file = "LICENSE"}
+keywords = ["rey", "reyxbo", "kit", "tool", "tools"]
+authors = [
+    {name = "Rey", email = "reyxbo@163.com"}
+]
+dependencies = [
+    "aiohttp",
+    "apscheduler",
+    "captcha",
+    "concurrent-log-handler",
+    "filetype",
+    "pandas",
+    "pyzbar",
+    "pdfplumber",
+    "psutil",
+    "pymem",
+    "python-docx",
+    "qrcode",
+    "requests",
+    "tqdm",
+    "urwid",
+    "varname",
+    "Pillow"
+]
+
+[project.urls]
+homepage = "https://github.com/reyxbo/reykit/"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

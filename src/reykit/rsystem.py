@@ -208,7 +208,13 @@ def del_modules(path: str) -> list[str]:
     return deleted_dict
 
 
-def dos_command(command: str | Iterable[str]) -> str:
+@overload
+def dos_command(command: str | Iterable[str], read: False = False) -> None: ...
+
+@overload
+def dos_command(command: str | Iterable[str], read: True = False) -> str: ...
+
+def dos_command(command: str | Iterable[str], read: bool = False) -> str | None:
     """
     Execute DOS command.
 
@@ -218,26 +224,22 @@ def dos_command(command: str | Iterable[str]) -> str:
         - `str`: Use this command.
         - `Iterable[str]`: Join strings with space as command.
             When space in the string, automatic add quotation mark (e.g., ['echo', 'a b'] -> 'echo 'a b'').
+    read : Whether read command output, will block.
 
     Returns
     -------
-    Command standard output.
+    Command standard output or None.
     """
 
     # Execute.
     popen = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
 
-    # Check.
-    error_bytes: bytes = popen.stderr.read()
-    if error_bytes != b'':
-        error = error_bytes.decode('GBK')
-        throw(value=error)
+    # Output.
+    if read:
+        output_bytes: bytes = popen.stdout.read()
+        output = output_bytes.decode('GBK')
 
-    # Standard output.
-    output_bytes: bytes = popen.stdout.read()
-    output = output_bytes.decode('GBK')
-
-    return output
+        return output
 
 
 def dos_command_var(*vars: Any) -> list[Any]:

@@ -1265,6 +1265,10 @@ def popup_ask(
         - `Literal['yes_no_cancel']`: Buttons are `yes` and `no` and `cancel`.
     message : Ask box content.
     title : Ask box title.
+
+    Returns
+    -------
+    Ask result.
     """
 
     # Pop up.
@@ -1296,7 +1300,7 @@ def popup_select(
     init_folder : str | None = None,
     init_file : str | None = None,
     filter_file : list[tuple[str, str | list[str]]] | None = None
-) -> str: ...
+) -> str | None: ...
 
 @overload
 def popup_select(
@@ -1305,14 +1309,14 @@ def popup_select(
     init_folder : str | None = None,
     init_file : str | None = None,
     filter_file : list[tuple[str, str | list[str]]] | None = None
-) -> tuple[str, ...]: ...
+) -> tuple[str, ...] | None: ...
 
 @overload
 def popup_select(
     style: Literal['folder'] = 'file',
     title : str | None = None,
     init_folder : str | None = None
-) -> str: ...
+) -> str | None: ...
 
 def popup_select(
     style: Literal['file', 'files', 'folder', 'save'] = 'file',
@@ -1320,7 +1324,7 @@ def popup_select(
     init_folder : str | None = None,
     init_file : str | None = None,
     filter_file : list[tuple[str, str | list[str]]] | None = None
-) -> str | tuple[str, ...]:
+) -> str | tuple[str, ...] | None:
     """
     Pop up system select box.
 
@@ -1337,6 +1341,11 @@ def popup_select(
     filter_file : Filter file.
         - `tuple[str, str]`: Filter name and filter pattern.
         - `tuple[str, list[str]]`: Filter name and multiple filter patterns (or).
+
+    Returns
+    -------
+    File or folder path.
+        - `None`: Close select box.
     """
 
     # Pop up.
@@ -1370,5 +1379,6 @@ def popup_select(
             method = tkinter_asksaveasfilename
 
     path = method(**kwargs)
+    path = path or None
 
     return path

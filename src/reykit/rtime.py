@@ -433,10 +433,11 @@ def wait(
     *args: Any,
     _interval: float = 1,
     _timeout: float | None = None,
+    _raising: bool = True,
     **kwargs: Any
-) -> float:
+) -> float | None:
     """
-    Wait success, timeout throw exception.
+    Wait success.
 
     Parameters
     ----------
@@ -446,11 +447,12 @@ def wait(
     _timeout : Timeout seconds, timeout throw exception.
         - `None`: Infinite time.
         - `float`: Use this time.
+    _raising : When timeout, whether throw exception, otherwise return None.
     kwargs : Keyword arguments of decorated function.
 
     Returns
     -------
-    Total spend seconds.
+    Total spend seconds or None.
     """
 
     # Set parameter.
@@ -477,7 +479,12 @@ def wait(
             ## Timeout.
             rtm()
             if rtm.total_spend > _timeout:
-                throw(TimeoutError, _timeout)
+
+                ### Throw exception.
+                if _raising:
+                    throw(TimeoutError, _timeout)
+
+                return
 
             ## Sleep.
             sleep(_interval)

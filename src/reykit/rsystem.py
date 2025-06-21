@@ -232,11 +232,13 @@ def dos_command(command: str | Iterable[str], read: bool = False) -> str | None:
     """
 
     # Execute.
-    popen = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
+    popen = Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
 
     # Output.
     if read:
-        output_bytes: bytes = popen.stdout.read()
+        stderr_bytes: bytes = popen.stderr.read()
+        stdout_bytes: bytes = popen.stdout.read()
+        output_bytes = stdout_bytes + stderr_bytes
         output = output_bytes.decode('GBK')
 
         return output

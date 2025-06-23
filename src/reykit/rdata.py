@@ -9,11 +9,12 @@
 """
 
 
-from typing import Any, TypedDict, Literal, NoReturn, TypeVar, overload
+from typing import Any, TypedDict, Literal, overload
 from collections.abc import Callable, Iterable, Generator
 
 from .rexception import check_least_one, check_most_one
 from .rsystem import is_iterable
+from .rtype import AnyValue
 
 
 __all__ = (
@@ -28,7 +29,6 @@ __all__ = (
 
 
 CountResult = TypedDict('CountResult', {'value': Any, 'count': int})
-Element = TypeVar('Element')
 
 
 def count(
@@ -130,15 +130,12 @@ def flatten(data: Any, *, _flattern_data: list | None = None) -> list:
 
 
 @overload
-def split(data: Iterable[Element], share: None = None, bin_size: None = None) -> NoReturn: ...
+def split(data: Iterable[AnyValue], share: int = None, bin_size: None = None) -> list[list[AnyValue]]: ...
 
 @overload
-def split(data: Iterable[Element], share: int = None, bin_size: int = None) -> NoReturn: ...
+def split(data: Iterable[AnyValue], share: None = None, bin_size: int = None) -> list[list[AnyValue]]: ...
 
-@overload
-def split(data: Iterable[Element], share: int | None = None, bin_size: int | None = None) -> list[list[Element]]: ...
-
-def split(data: Iterable[Element], share: int | None = None, bin_size: int | None = None) -> list[list[Element]]:
+def split(data: Iterable[AnyValue], share: int | None = None, bin_size: int | None = None) -> list[list[AnyValue]]:
     """
     Split data into multiple data.
 
@@ -186,7 +183,7 @@ def split(data: Iterable[Element], share: int | None = None, bin_size: int | Non
     return _data
 
 
-def unique(data: Iterable[Element]) -> list[Element]:
+def unique(data: Iterable[AnyValue]) -> list[AnyValue]:
     """
     De duplication of data.
 

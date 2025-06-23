@@ -10,7 +10,7 @@
 
 
 from __future__ import annotations
-from typing import Any, Literal, Final, NoReturn, overload, override
+from typing import Any, Literal, Final, overload, override
 from collections.abc import Callable
 from queue import Queue
 from os.path import abspath as os_abspath
@@ -461,28 +461,6 @@ class RLog(object):
         format_: str | None = None,
         filter_: Callable[[LogRecord], bool] | None = None
     ) -> ConcurrentTimedRotatingFileHandler: ...
-
-    @overload
-    def add_file(
-        self,
-        path: str | None = None,
-        mb: None = None,
-        time: Any = None,
-        level: int = DEBUG,
-        format_: str | None = None,
-        filter_: Callable[[LogRecord], bool] | None = None
-    ) -> NoReturn: ...
-
-    @overload
-    def add_file(
-        self,
-        path: str | None = None,
-        mb: float = None,
-        time: float | Literal['m', 'w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6'] = None,
-        level: int = DEBUG,
-        format_: str | None = None,
-        filter_: Callable[[LogRecord], bool] | None = None
-    ) -> NoReturn: ...
 
     def add_file(
         self,

@@ -10,7 +10,7 @@
 
 
 from __future__ import annotations
-from typing import Any, Literal, NoReturn, overload
+from typing import Any, Literal, overload
 from io import TextIOBase, BufferedIOBase
 from os import (
     walk as os_walk,
@@ -218,12 +218,6 @@ def get_file_str(file: FileStr) -> str:
 
     return file_str
 
-
-@overload
-def get_file_bytes(file: FileBytes) -> bytes: ...
-
-@overload
-def get_file_bytes(file: Any) -> NoReturn: ...
 
 def get_file_bytes(file: FileBytes) -> bytes:
     """

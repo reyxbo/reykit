@@ -34,6 +34,7 @@ from .rnumber import digits
 from .rrandom import randn
 from .rregex import search
 from .rstdout import echo
+from .rtype import AnyValue
 
 
 __all__ = (
@@ -64,9 +65,6 @@ def now(format_: Literal['datetime_str', 'date_str', 'time_str'] = 'datetime') -
 
 @overload
 def now(format_: Literal['timestamp'] = 'datetime') -> int: ...
-
-@overload
-def now(format_: Any) -> NoReturn: ...
 
 def now(
     format_: Literal[
@@ -134,10 +132,10 @@ def time_to(
 
 @overload
 def time_to(
-    obj: Any,
+    obj: AnyValue,
     decimal: bool = False,
     raising: Literal[False] = True
-) -> Any: ...
+) -> AnyValue: ...
 
 def time_to(
     obj: Any,
@@ -328,9 +326,9 @@ def to_time(
 
 @overload
 def to_time(
-    obj: Any,
+    obj: AnyValue,
     raising: Literal[False] = True
-) -> Any: ...
+) -> AnyValue: ...
 
 def to_time(
     obj: Any,

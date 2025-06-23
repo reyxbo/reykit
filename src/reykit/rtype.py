@@ -9,16 +9,20 @@
 """
 
 
-from typing import Any, Self
+from typing import Any, Self, TypeVar
 from collections.abc import Callable
 
 
 __all__ = (
+    'AnyValue',
     'RStaticMeta',
     'RConfigMeta',
     'RNull',
     'RSingleton'
 )
+
+
+AnyValue = TypeVar('AnyValue')
 
 
 class RStaticMeta(type):

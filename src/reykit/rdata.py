@@ -14,7 +14,7 @@ from collections.abc import Callable, Iterable, Generator
 
 from .rexception import check_least_one, check_most_one
 from .rsystem import is_iterable
-from .rtype import AnyValue
+from .rtype import T
 
 
 __all__ = (
@@ -130,12 +130,12 @@ def flatten(data: Any, *, _flattern_data: list | None = None) -> list:
 
 
 @overload
-def split(data: Iterable[AnyValue], share: int = None, bin_size: None = None) -> list[list[AnyValue]]: ...
+def split(data: Iterable[T], share: int = None, bin_size: None = None) -> list[list[T]]: ...
 
 @overload
-def split(data: Iterable[AnyValue], share: None = None, bin_size: int = None) -> list[list[AnyValue]]: ...
+def split(data: Iterable[T], share: None = None, bin_size: int = None) -> list[list[T]]: ...
 
-def split(data: Iterable[AnyValue], share: int | None = None, bin_size: int | None = None) -> list[list[AnyValue]]:
+def split(data: Iterable[T], share: int | None = None, bin_size: int | None = None) -> list[list[T]]:
     """
     Split data into multiple data.
 
@@ -183,7 +183,7 @@ def split(data: Iterable[AnyValue], share: int | None = None, bin_size: int | No
     return _data
 
 
-def unique(data: Iterable[AnyValue]) -> list[AnyValue]:
+def unique(data: Iterable[T]) -> list[T]:
     """
     De duplication of data.
 

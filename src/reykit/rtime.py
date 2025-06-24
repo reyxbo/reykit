@@ -34,7 +34,7 @@ from .rnumber import digits
 from .rrandom import randn
 from .rregex import search
 from .rstdout import echo
-from .rtype import AnyValue
+from .rtype import T
 
 
 __all__ = (
@@ -125,10 +125,10 @@ def time_to(
 
 @overload
 def time_to(
-    obj: AnyValue,
+    obj: T,
     decimal: bool = False,
     raising: Literal[False] = True
-) -> AnyValue: ...
+) -> T: ...
 
 def time_to(
     obj: Any,
@@ -313,9 +313,9 @@ def to_time(
 
 @overload
 def to_time(
-    obj: AnyValue,
+    obj: T,
     raising: Literal[False] = True
-) -> AnyValue: ...
+) -> T: ...
 
 def to_time(
     obj: Any,

@@ -14,7 +14,7 @@ from collections.abc import Callable
 
 
 __all__ = (
-    'AnyValue',
+    'T',
     'RStaticMeta',
     'RConfigMeta',
     'RNull',
@@ -22,7 +22,7 @@ __all__ = (
 )
 
 
-AnyValue = TypeVar('AnyValue')
+T = TypeVar('T')
 
 
 class RStaticMeta(type):

@@ -11,22 +11,22 @@
 
 from typing import Any, TypedDict, Literal, overload
 from collections.abc import Callable
-from pandas import (
-    DataFrame,
-    Timestamp as pd_timestamp,
-    Timedelta as pd_timedelta
-)
 from time import (
-    struct_time as time_struct_time,
+    struct_time as StructTime,
     strftime as time_strftime,
     time as time_time,
     sleep as time_sleep
 )
 from datetime import (
-    datetime as datetime_datetime,
-    date as datetime_date,
-    time as datetime_time,
-    timedelta as datetime_timedelta
+    datetime as Datetime,
+    date as Date,
+    time as Time,
+    timedelta as Timedelta
+)
+from pandas import (
+    DataFrame,
+    Timestamp as PTimestamp,
+    Timedelta as PTimedelta
 )
 
 from .rexception import throw
@@ -48,17 +48,17 @@ __all__ = (
 )
 
 
-RecordData = TypedDict('RecordData', {'timestamp': int, 'datetime': datetime_datetime, 'timedelta': datetime_timedelta | None, 'note': str | None})
+RecordData = TypedDict('RecordData', {'timestamp': int, 'datetime': Datetime, 'timedelta': Timedelta | None, 'note': str | None})
 
 
 @overload
-def now(format_: Literal['datetime'] = 'datetime') -> datetime_datetime: ...
+def now(format_: Literal['datetime'] = 'datetime') -> Datetime: ...
 
 @overload
-def now(format_: Literal['date'] = 'datetime') -> datetime_date: ...
+def now(format_: Literal['date'] = 'datetime') -> Date: ...
 
 @overload
-def now(format_: Literal['time'] = 'datetime') -> datetime_time: ...
+def now(format_: Literal['time'] = 'datetime') -> Time: ...
 
 @overload
 def now(format_: Literal['datetime_str', 'date_str', 'time_str'] = 'datetime') -> str: ...
@@ -76,7 +76,7 @@ def now(
         'time_str',
         'timestamp'
     ] = 'datetime'
-) -> datetime_datetime | datetime_date | datetime_time | str | int:
+) -> Datetime | Date | Time | str | int:
     """
     Get the now time.
 
@@ -99,17 +99,17 @@ def now(
     # Return.
     match format_:
         case 'datetime':
-            return datetime_datetime.now()
+            return Datetime.now()
         case 'date':
-            return datetime_datetime.now().date()
+            return Datetime.now().date()
         case 'time':
-            return datetime_datetime.now().time()
+            return Datetime.now().time()
         case 'datetime_str':
-            return datetime_datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            return Datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         case 'date_str':
-            return datetime_datetime.now().strftime('%Y-%m-%d')
+            return Datetime.now().strftime('%Y-%m-%d')
         case 'time_str':
-            return datetime_datetime.now().strftime('%H:%M:%S')
+            return Datetime.now().strftime('%H:%M:%S')
         case 'timestamp':
             return int(time_time() * 1000)
         case _:
@@ -118,7 +118,7 @@ def now(
 
 @overload
 def time_to(
-    obj: datetime_datetime | datetime_date | datetime_time | datetime_timedelta | time_struct_time | pd_timestamp | pd_timedelta,
+    obj: Datetime | Date | Time | Timedelta | StructTime | PTimestamp | PTimedelta,
     decimal: bool = False,
     raising: bool = True
 ) -> str: ...
@@ -156,7 +156,7 @@ def time_to(
     match obj:
 
         # Type 'datetime'.
-        case datetime_datetime() | pd_timestamp():
+        case Datetime() | PTimestamp():
             if decimal:
                 format_ = '%Y-%m-%d %H:%M:%S.%f'
             else:
@@ -164,11 +164,11 @@ def time_to(
             text = obj.strftime(format_)
 
         # Type 'date'.
-        case datetime_date():
+        case Date():
             text = obj.strftime('%Y-%m-%d')
 
         # Type 'time'.
-        case datetime_time():
+        case Time():
             if decimal:
                 format_ = '%H:%M:%S.%f'
             else:
@@ -176,11 +176,11 @@ def time_to(
             text = obj.strftime(format_)
 
         # Type 'timedelta'.
-        case datetime_timedelta() | pd_timedelta():
+        case Timedelta() | PTimedelta():
             timestamp = obj.seconds + obj.microseconds / 1000_000
             if timestamp >= 0:
                 timestamp += 57600
-                time = datetime_datetime.fromtimestamp(timestamp).time()
+                time = Datetime.fromtimestamp(timestamp).time()
                 if decimal:
                     format_ = '%H:%M:%S.%f'
                 else:
@@ -198,7 +198,7 @@ def time_to(
                 return obj
 
         # Type 'struct_time'.
-        case time_struct_time():
+        case StructTime():
             if decimal:
                 format_ = '%Y-%m-%d %H:%M:%S.%f'
             else:
@@ -218,7 +218,7 @@ def time_to(
 
 def text_to_time(
     string: str
-) -> datetime_datetime | datetime_date | datetime_time | None:
+) -> Datetime | Date | Time | None:
     """
     Convert text to time object.
 
@@ -240,21 +240,21 @@ def text_to_time(
     ## Standard.
     if 14 <= str_len <= 19:
         try:
-            time_obj = datetime_datetime.strptime(string, '%Y-%m-%d %H:%M:%S')
+            time_obj = Datetime.strptime(string, '%Y-%m-%d %H:%M:%S')
         except ValueError:
             pass
         else:
             return time_obj
     if 8 <= str_len <= 10:
         try:
-            time_obj = datetime_datetime.strptime(string, '%Y-%m-%d').date()
+            time_obj = Datetime.strptime(string, '%Y-%m-%d').date()
         except ValueError:
             pass
         else:
             return time_obj
     if 5 <= str_len <= 8:
         try:
-            time_obj = datetime_datetime.strptime(string, '%H:%M:%S').time()
+            time_obj = Datetime.strptime(string, '%H:%M:%S').time()
         except ValueError:
             pass
         else:
@@ -271,7 +271,7 @@ def text_to_time(
                 int(value)
                 for value in result
             ]
-            time_obj = datetime_datetime(year, month, day, hour, minute, second)
+            time_obj = Datetime(year, month, day, hour, minute, second)
             return time_obj
 
     ### Type 'date'.
@@ -283,7 +283,7 @@ def text_to_time(
                 int(value)
                 for value in result
             ]
-            time_obj = datetime_date(year, month, day)
+            time_obj = Date(year, month, day)
             return time_obj
 
     ### Type 'time'.
@@ -295,7 +295,7 @@ def text_to_time(
                 int(value)
                 for value in result
             ]
-            time_obj = datetime_time(hour, minute, second)
+            time_obj = Time(hour, minute, second)
             return time_obj
 
 
@@ -303,13 +303,13 @@ def text_to_time(
 def to_time(
     obj: str,
     raising: bool = True
-) -> datetime_datetime | datetime_date | datetime_time: ...
+) -> Datetime | Date | Time: ...
 
 @overload
 def to_time(
-    obj: time_struct_time | float,
+    obj: StructTime | float,
     raising: bool = True
-) -> datetime_datetime: ...
+) -> Datetime: ...
 
 @overload
 def to_time(
@@ -341,8 +341,8 @@ def to_time(
             time_obj = text_to_time(obj)
 
         # Type 'struct_time'.
-        case time_struct_time():
-            time_obj = datetime_datetime(
+        case StructTime():
+            time_obj = Datetime(
                 obj.tm_year,
                 obj.tm_mon,
                 obj.tm_mday,
@@ -356,9 +356,9 @@ def to_time(
             int_len, _ = digits(obj)
             match int_len:
                 case 10:
-                    time_obj = datetime_datetime.fromtimestamp(obj)
+                    time_obj = Datetime.fromtimestamp(obj)
                 case 13:
-                    time_obj = datetime_datetime.fromtimestamp(obj / 1000)
+                    time_obj = Datetime.fromtimestamp(obj / 1000)
                 case _:
                     time_obj = None
 

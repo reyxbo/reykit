@@ -19,10 +19,9 @@ from random import Random
 from secrets import randbelow as secrets_randbelow
 from threading import get_ident as threading_get_ident
 
-from .rdata import Element
 from .rexception import throw
 from .rnumber import digits
-from .rtype import RConfigMeta
+from .rtype import T, RConfigMeta
 
 
 __all__ = (
@@ -259,23 +258,23 @@ def randb(pr: float = 0.5) -> bool:
 
 @overload
 def randi(
-    data: Sequence[Element],
+    data: Sequence[T],
     multi: None = None,
     unique: bool = True
-) -> Element: ...
+) -> T: ...
 
 @overload
 def randi(
     data: Sequence,
     multi: int = None,
     unique: bool = True
-) -> list[Element]: ...
+) -> list[T]: ...
 
 def randi(
     data: Sequence,
     multi: int | None = None,
     unique: bool = True
-) -> Element | list[Element]:
+) -> T | list[T]:
     """
     Random index data element.
 
@@ -362,7 +361,7 @@ def randchar(
     return chars
 
 
-def randsort(data: Sequence[Element]) -> list[Element]:
+def randsort(data: Sequence[T]) -> list[T]:
     """
     Random sorting data.
 

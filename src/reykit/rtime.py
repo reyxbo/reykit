@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, TypedDict, Literal, overload, NoReturn
+from typing import Any, TypedDict, Literal, overload
 from collections.abc import Callable
 from pandas import (
     DataFrame,
@@ -122,13 +122,6 @@ def time_to(
     decimal: bool = False,
     raising: bool = True
 ) -> str: ...
-
-@overload
-def time_to(
-    obj: Any,
-    decimal: bool = False,
-    raising: Literal[True] = True
-) -> NoReturn: ...
 
 @overload
 def time_to(
@@ -317,12 +310,6 @@ def to_time(
     obj: time_struct_time | float,
     raising: bool = True
 ) -> datetime_datetime: ...
-
-@overload
-def to_time(
-    obj: Any,
-    raising: Literal[True] = True
-) -> NoReturn: ...
 
 @overload
 def to_time(

@@ -10,7 +10,9 @@
 
 
 from __future__ import annotations
-from typing import Any, Literal, overload
+from typing import Any, Literal, TextIO, BinaryIO, overload, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import OpenTextMode, OpenBinaryMode
 from io import TextIOBase, BufferedIOBase
 from os import (
     walk as os_walk,
@@ -318,6 +320,84 @@ class RFile(object):
 
 
     @overload
+    def open(
+        self,
+        mode: OpenTextMode = 'wb+'
+    ) -> TextIO: ...
+
+    @overload
+    def open(
+        self,
+        mode: OpenBinaryMode = 'wb+'
+    ) -> BinaryIO: ...
+
+    def open(
+        self,
+        mode: OpenTextMode | OpenBinaryMode = 'wb+'
+    ) -> TextIO | BinaryIO:
+        """
+        Open file.
+
+        Parameters
+        ----------
+        mode : Open mode.
+
+        Returns
+        -------
+        IO object.
+        """
+
+        # Get parameter.
+        if (
+            (
+                'r' in mode
+                or '+' in mode
+            )
+            and 'b' not in mode
+        ):
+            encoding = 'utf-8'
+        else:
+            encoding = None
+
+        # Open.
+        io = open(self.path, mode, encoding=encoding)
+
+        return io
+
+
+    @overload
+    def __getattr__(self, name: Literal['open_r', 'open_w', 'open_a']) -> TextIO: ...
+
+    @overload
+    def __getattr__(self, name: Literal['open_rb', 'open_wb', 'open_ab']) -> BinaryIO: ...
+
+    def __getattr__(self, name: Literal['open_r', 'open_w', 'open_a', 'open_rb', 'open_wb', 'open_ab']) -> TextIO | BinaryIO:
+        """
+        Get attribute.
+
+        Parameters
+        ----------
+        name : Open mode.
+
+        Returns
+        -------
+        IO object.
+        """
+
+        if name in (
+            'open_r',
+            'open_w',
+            'open_a',
+            'open_rb',
+            'open_wb',
+            'open_ab'
+        ):
+            mode: Literal['r', 'w', 'a', 'rb', 'wb', 'ab']  = name[5:]
+            io = self.open(mode)
+            return io
+
+
+    @overload
     def read(
         self,
         type_: Literal['bytes'] = 'bytes'
@@ -351,13 +431,11 @@ class RFile(object):
         match type_:
             case 'bytes':
                 mode = 'rb'
-                encoding = None
             case 'str':
                 mode = 'r'
-                encoding='utf-8'
 
         # Read.
-        with open(self.path, mode, encoding=encoding) as file:
+        with self.open(mode) as file:
             content = file.read()
 
         return content
@@ -398,7 +476,7 @@ class RFile(object):
                 data = str(data)
 
         # Write.
-        with open(self.path, mode) as file:
+        with self.open(mode) as file:
             file.write(data)
 
 

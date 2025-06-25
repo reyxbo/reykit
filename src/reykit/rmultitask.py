@@ -10,8 +10,8 @@
 
 
 from __future__ import annotations
-from typing import Any, Literal
-from collections.abc import Callable, Iterable, Generator, Coroutine
+from typing import Any, Literal, Self
+from collections.abc import Callable, Iterable, Iterator, Generator, Coroutine, AsyncIterator
 from threading import RLock as TRLock, get_ident as threading_get_ident
 from concurrent.futures import ThreadPoolExecutor, Future as CFuture, as_completed as concurrent_as_completed
 from asyncio import (
@@ -36,7 +36,8 @@ __all__ = (
     'RThreadLock',
     'RAsyncLock',
     'RThreadPool',
-    'RAsyncPool'
+    'RAsyncPool',
+    'RAsyncIterator'
 )
 
 
@@ -868,3 +869,67 @@ class RAsyncPool(object):
 
 
     __mul__ = repeat
+
+
+class RAsyncIterator(AsyncIterator):
+    """
+    Rey's `asynchronous iterator` type.
+    """
+
+
+    def __init__(
+        self,
+        task: Callable,
+        args_iter: Iterable[Iterable] | None = None,
+        kwargs_iter: Iterable[dict] | None = None
+    ) -> None:
+        """
+        Build `asynchronous iterator` attributes.
+
+        Parameters
+        ----------
+        task : Asynchronous task.
+        args_iter : Iterable of task position arguments.
+        kwargs_iter : Iterable of task keyword arguments.
+        """
+
+        # Set attribute.
+        self.task = task
+        if args_iter is not None:
+            args_iter: Iterator[Iterable] = iter(args_iter)
+        self.args_iter = args_iter
+        if kwargs_iter is not None:
+            kwargs_iter: Iterator[dict] = iter(kwargs_iter)
+        self.kwargs_iter = kwargs_iter
+
+
+    def __aiter__(self) -> Self:
+        """
+        Get asynchronous iterator.
+        """
+
+        return self
+
+
+    async def __anext__(self):
+        """
+        Get next value from asynchronous iterator.
+        """
+
+        # Get parameter.
+        args = ()
+        kwargs = {}
+
+        ## Next.
+        try:
+            if self.args_iter is not None:
+                args = next(self.args_iter)
+            if self.kwargs_iter is not None:
+                kwargs = next(self.kwargs_iter)
+        except StopIteration:
+            raise StopAsyncIteration
+
+        # Execute.
+        result = self.task(*args, **kwargs)
+
+        return result

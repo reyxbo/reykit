@@ -133,7 +133,22 @@ class RRandomSeed(object):
 
 @overload
 def randn(
-    *thresholds: int,
+    *,
+    precision: None = None
+) -> int: ...
+
+@overload
+def randn(
+    high: int = 10,
+    *,
+    precision: None = None
+) -> int: ...
+
+@overload
+def randn(
+    low: int = 0,
+    high: int = 10,
+    *,
     precision: None = None
 ) -> int: ...
 

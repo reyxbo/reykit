@@ -21,9 +21,32 @@ __all__ = (
 )
 
 
+def is_int(number: int | float) -> bool:
+    """
+    Judge is integer, excluding decimal part is 0.
+
+    Parameters
+    ----------
+    number : Number to judge.
+
+    Returns
+    -------
+    Judge result.
+    """
+
+    # judge.
+    match number:
+        case int():
+            judge = True
+        case _:
+            judge = number % 1 == 0
+
+    return judge
+
+
 def digits(number: int | float) -> tuple[int, int]:
     """
-    Judge the number of integer digits and decimal digits.
+    Judge the number of integer digits and decimal digits, excluding decimal part is 0.
 
     Parameters
     ----------
@@ -34,17 +57,17 @@ def digits(number: int | float) -> tuple[int, int]:
     Integer digits and decimal digits.
     """
 
-    # Handle parameter.
-    number_str = str(number)
-
     # Get digits.
-    if '.' in number_str:
+    if is_int(number):
+        number_str = str(number)
+        int_digits = len(number_str)
+        dec_digits = 0
+    else:
+        number = int(number)
+        number_str = str(number)
         int_str, dec_str = number_str.split('.')
         int_digits = len(int_str)
         dec_digits = len(dec_str)
-    else:
-        int_digits = len(number_str)
-        dec_digits = 0
 
     return int_digits, dec_digits
 
@@ -76,7 +99,7 @@ def to_number(
             throw(ValueError, data)
 
     else:
-        if data % 1 == 0:
+        if is_int(data):
             data = int(data)
 
     return data

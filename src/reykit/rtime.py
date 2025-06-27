@@ -30,7 +30,7 @@ from pandas import (
 )
 
 from .rexception import throw
-from .rnumber import digits
+from .rnumber import digits, to_number
 from .rrandom import randn
 from .rregex import search
 from .rstdout import echo
@@ -376,6 +376,45 @@ def to_time(
     return time_obj
 
 
+@overload
+def sleep(
+    *,
+    precision: None = None
+) -> int: ...
+
+@overload
+def sleep(
+    second: int,
+    *,
+    precision: None = None
+) -> int: ...
+
+@overload
+def sleep(
+    low: int = 0,
+    high: int = 10,
+    *,
+    precision: None = None
+) -> int: ...
+
+@overload
+def sleep(
+    *thresholds: float,
+    precision: None = None
+) -> float: ...
+
+@overload
+def sleep(
+    *thresholds: float,
+    precision: Literal[0] = None
+) -> int: ...
+
+@overload
+def sleep(
+    *thresholds: float,
+    precision: int = None
+) -> float: ...
+
 def sleep(
     *thresholds: float,
     precision: int | None = None
@@ -403,7 +442,7 @@ def sleep(
 
     # Handle parameter.
     if len(thresholds) == 1:
-        second = float(thresholds[0])
+        second = thresholds[0]
     else:
         second = randn(*thresholds, precision=precision)
 

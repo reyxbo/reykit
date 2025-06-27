@@ -10,71 +10,502 @@
 
 
 from __future__ import annotations
-from typing import Any, Literal, Self
-from collections.abc import Callable, Iterable, Iterator, Generator, Coroutine, AsyncIterator
+from typing import Any, Literal, overload
+from collections.abc import Callable, Iterable, Generator, Coroutine
 from threading import RLock as TRLock, get_ident as threading_get_ident
 from concurrent.futures import ThreadPoolExecutor, Future as CFuture, as_completed as concurrent_as_completed
+from queue import Queue as QQueue
 from asyncio import (
     Future as AFuture,
-    Queue as AQueue,
     Lock as ALock,
+    Task as ATask,
+    Queue as AQueue,
+    sleep as asyncio_sleep,
     run as asyncio_run,
     gather as asyncio_gather,
-    iscoroutine
+    iscoroutine as asyncio_iscoroutine,
+    iscoroutinefunction as asyncio_iscoroutinefunction,
+    run_coroutine_threadsafe as asyncio_run_coroutine_threadsafe,
+    new_event_loop as asyncio_new_event_loop,
+    set_event_loop as asyncio_set_event_loop
 )
-from asyncio.queues import QueueEmpty
 from aiohttp import ClientSession, ClientResponse
 
 from .rexception import throw, check_most_one, check_response_code
-from .rtime import sleep, RTimeMark
+from .rtime import randn, RTimeMark
+from .rtype import T
 from .rwrap import wrap_thread
 
 
 __all__ = (
-    'async_run',
-    'async_request',
-    'RThreadLock',
-    'RAsyncLock',
     'RThreadPool',
-    'RAsyncPool',
-    'RAsyncIterator'
+    'async_run',
+    'async_sleep',
+    'async_wait',
+    'async_request',
+    'RAsyncPool'
 )
 
 
-def async_run(*coroutines: Coroutine) -> list:
+class RThreadPool(object):
     """
-    Asynchronous run `Coroutine` instances.
-
-    Parameters
-    ----------
-    coroutines : `Coroutine` instances.
-
-    Returns
-    -------
-    Run result list.
+    Rey's `thread pool` type.
     """
 
+    Queue = QQueue
+    Lock = TRLock
 
-    # Define.
-    async def gather_coroutine() -> AFuture:
+
+    def __init__(
+        self,
+        task: Callable,
+        *args: Any,
+        _max_workers: int | None = None,
+        **kwargs: Any
+    ) -> None:
         """
-        Get `Future` instance.
+        Build `thread pool` attributes.
+
+        Parameters
+        ----------
+        task : Thread task.
+        args : ATask default position arguments.
+        _max_workers : Maximum number of threads.
+            - `None`: Number of CPU + 4, 32 maximum.
+            - `int`: Use this value, no maximum limit.
+        kwargs : ATask default keyword arguments.
+        """
+
+        # Set attribute.
+        self.task = task
+        self.args = args
+        self.kwargs = kwargs
+        self.pool = ThreadPoolExecutor(
+            _max_workers,
+            task.__name__
+        )
+        self.futures: list[CFuture] = []
+
+
+    def one(
+        self,
+        *args: Any,
+        **kwargs: Any
+    ) -> CFuture:
+        """
+        Start a task.
+
+        Parameters
+        ----------
+        args : ATask position arguments, after default position arguments.
+        kwargs : ATask keyword arguments, after default keyword arguments.
 
         Returns
         -------
-        Future instance.
+        ATask instance.
         """
 
-        # Gather.
-        future = await asyncio_gather(*coroutines)
+        # Set parameter.
+        func_args = (
+            *self.args,
+            *args
+        )
+        func_kwargs = {
+            **self.kwargs,
+            **kwargs
+        }
+
+        # Add.
+        future = self.pool.submit(
+            self.task,
+            *func_args,
+            **func_kwargs
+        )
+
+        # Save.
+        self.futures.append(future)
 
         return future
 
 
-    # Run.
-    result = asyncio_run(gather_coroutine())
+    def batch(
+        self,
+        *args: tuple,
+        **kwargs: tuple
+    ) -> list[CFuture]:
+        """
+        Batch start tasks.
+        parameters sequence will combine one by one, and discard excess parameters.
 
-    return result
+        Parameters
+        ----------
+        args : Sequence of task position arguments, after default position arguments.
+        kwargs : Sequence of task keyword arguments, after default keyword arguments.
+
+        Returns
+        -------
+        ATask instance list.
+
+        Examples
+        --------
+        >>> func = lambda *args, **kwargs: print(args, kwargs)
+        >>> a = (1, 2)
+        >>> b = (3, 4, 5)
+        >>> c = (11, 12)
+        >>> d = (13, 14, 15)
+        >>> thread_pool = RThreadPool(func, 0, z=0)
+        >>> thread_pool.batch(a, b, c=c, d=d)
+        (0, 1, 3) {'z': 0, 'c': 11, 'd': 13}
+        (0, 2, 4) {'z': 0, 'c': 12, 'd': 14}
+        """
+
+        # Combine.
+        args_zip = zip(*args)
+        kwargs_zip = zip(
+            *[
+                [
+                    (key, value)
+                    for value in values
+                ]
+                for key, values in kwargs.items()
+            ]
+        )
+        params_zip = zip(args_zip, kwargs_zip)
+
+        # Batch add.
+        futures = [
+            self.one(*args_, **dict(kwargs_))
+            for args_, kwargs_ in params_zip
+        ]
+
+        # Save.
+        self.futures.extend(futures)
+
+        return futures
+
+
+    def repeat(
+        self,
+        number: int
+    ) -> list[CFuture]:
+        """
+        Batch start tasks, and only with default parameters.
+
+        Parameters
+        ----------
+        number : Number of add.
+
+        Returns
+        -------
+        ATask instance list.
+        """
+
+        # Batch add.
+        futures = [
+            self.one()
+            for _ in range(number)
+        ]
+
+        # Save.
+        self.futures.extend(futures)
+
+        return futures
+
+
+    def generate(
+        self,
+        timeout: float | None = None
+    ) -> Generator[CFuture]:
+        """
+        Return the generator of added task instance.
+
+        Parameters
+        ----------
+        timeout : Call generator maximum waiting seconds, timeout throw exception.
+            - `None`: Infinite.
+            - `float`: Set this seconds.
+
+        Returns
+        -------
+        Generator of added task instance.
+        """
+
+        # Build.
+        generator = concurrent_as_completed(
+            self.futures,
+            timeout
+        )
+
+        return generator
+
+
+    def join(
+        self,
+        timeout: float | None = None
+    ) -> None:
+        """
+        Block until all tasks are done.
+
+        Parameters
+        ----------
+        timeout : Call generator maximum waiting seconds, timeout throw exception.
+            - `None`: Infinite.
+            - `float`: Set this seconds.
+        """
+
+        # Generator.
+        generator = self.generate(timeout)
+
+        # Wait.
+        for _ in generator:
+            pass
+
+
+    def __iter__(self) -> Generator:
+        """
+        Return the generator of task result.
+
+        Returns
+        -------
+        Generator of task result.
+        """
+
+        # Generator.
+        generator = self.generate()
+        self.futures.clear()
+
+        # Generate.
+        for future in generator:
+            yield future.result()
+
+
+    @property
+    def thread_id(self) -> int:
+        """
+        Get current thread ID.
+
+        Returns
+        -------
+        Current thread ID.
+        """
+
+        # Get.
+        thread_id = threading_get_ident()
+
+        return thread_id
+
+
+    __call__ = one
+
+
+    __mul__ = repeat
+
+
+@overload
+def async_run(
+    coroutine: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
+    *,
+    return_exceptions: bool = False
+) -> T: ...
+
+@overload
+def async_run(
+    *coroutines: Coroutine[Any, Any, T] | ATask[Any, Any, T] |  Callable[[], Coroutine[Any, Any, T]],
+    return_exceptions: bool = False
+) -> list[T]: ...
+
+def async_run(
+    *coroutines: Coroutine[Any, Any, T] | ATask[Any, Any, T] |  Callable[[], Coroutine[Any, Any, T]],
+    return_exceptions: bool = False
+) -> T | list[T]:
+    """
+    Asynchronous run coroutines.
+
+    Parameters
+    ----------
+    coroutines : `Coroutine` instances or `ATask` instances or `Coroutine` function.
+    return_exceptions : Whether return exception instances, otherwise throw first exception.
+
+    Returns
+    -------
+    run results.
+    """
+
+    # Handle parameter.
+    coroutines = [
+        coroutine()
+        if asyncio_iscoroutinefunction(coroutine)
+        else coroutine
+        for coroutine in coroutines
+    ]
+
+    # Define.
+    async def async_run_coroutine() -> list:
+        """
+        Asynchronous run coroutines.
+
+        Returns
+        -------
+        Run result list.
+        """
+
+        # Gather.
+        results = await asyncio_gather(*coroutines, return_exceptions=return_exceptions)
+
+        return results
+
+
+    # Run.
+    coroutine = async_run_coroutine()
+    results = asyncio_run(coroutine)
+
+    # One.
+    if len(results) == 1:
+        results = results[0]
+
+    return results
+
+
+@overload
+async def async_sleep(
+    *,
+    precision: None = None
+) -> int: ...
+
+@overload
+async def async_sleep(
+    second: int,
+    *,
+    precision: None = None
+) -> int: ...
+
+@overload
+async def async_sleep(
+    low: int = 0,
+    high: int = 10,
+    *,
+    precision: None = None
+) -> int: ...
+
+@overload
+async def async_sleep(
+    *thresholds: float,
+    precision: None = None
+) -> float: ...
+
+@overload
+async def async_sleep(
+    *thresholds: float,
+    precision: Literal[0] = None
+) -> int: ...
+
+@overload
+async def async_sleep(
+    *thresholds: float,
+    precision: int = None
+) -> float: ...
+
+async def async_sleep(
+    *thresholds: float,
+    precision: int | None = None
+) -> float:
+    """
+    Sleep random seconds, in the coroutine.
+
+    Parameters
+    ----------
+    thresholds : Low and high thresholds of random range, range contains thresholds.
+        - When `length is 0`, then low and high thresholds is `0` and `10`.
+        - When `length is 1`, then sleep this value.
+        - When `length is 2`, then low and high thresholds is `thresholds[0]` and `thresholds[1]`.
+    
+    precision : Precision of random range, that is maximum decimal digits of sleep seconds.
+        - `None`: Set to Maximum decimal digits of element of parameter `thresholds`.
+        - `int`: Set to this value.
+    
+    Returns
+    -------
+    Random seconds.
+        - When parameters `precision` is `0`, then return int.
+        - When parameters `precision` is `greater than 0`, then return float.
+    """
+
+    # Handle parameter.
+    if len(thresholds) == 1:
+        second = thresholds[0]
+    else:
+        second = randn(*thresholds, precision=precision)
+
+    # Sleep.
+    await asyncio_sleep(second)
+
+    return second
+
+
+async def async_wait(
+    func: Callable[..., bool],
+    *args: Any,
+    _interval: float = 1,
+    _timeout: float | None = None,
+    _raising: bool = True,
+    **kwargs: Any
+) -> float | None:
+    """
+    Wait success.
+
+    Parameters
+    ----------
+    func : Function to be decorated, must return `bool` value.
+    args : Position arguments of decorated function.
+    _interval : Interval seconds.
+    _timeout : Timeout seconds, timeout throw exception.
+        - `None`: Infinite time.
+        - `float`: Use this time.
+    _raising : When timeout, whether throw exception, otherwise return None.
+    kwargs : Keyword arguments of decorated function.
+
+    Returns
+    -------
+    Total spend seconds or None.
+    """
+
+    # Set parameter.
+    rtm = RTimeMark()
+    rtm()
+
+    # Not set timeout.
+    if _timeout is None:
+
+        ## Wait.
+        while True:
+            success = func(*args, **kwargs)
+            if success: break
+            await async_sleep(_interval)
+
+    # Set timeout.
+    else:
+
+        ## Wait.
+        while True:
+            success = func(*args, **kwargs)
+            if success: break
+
+            ## Timeout.
+            rtm()
+            if rtm.total_spend > _timeout:
+
+                ### Throw exception.
+                if _raising:
+                    throw(TimeoutError, _timeout)
+
+                return
+
+            ## Sleep.
+            await async_sleep(_interval)
+
+    ## Return.
+    rtm()
+    return rtm.total_spend
 
 
 async def async_request(
@@ -200,7 +631,7 @@ async def async_request(
                         result = result()
 
                         #### Coroutine.
-                        if iscoroutine(result):
+                        if asyncio_iscoroutine(result):
                             result = await result
 
                 ## Attributes.
@@ -214,7 +645,7 @@ async def async_request(
                             result_element = result_element()
 
                             #### Coroutine.
-                            if iscoroutine(result_element):
+                            if asyncio_iscoroutine(result_element):
                                 result_element = await result_element
 
                         result.append(result_element)
@@ -224,7 +655,7 @@ async def async_request(
                     result = handler(response)
 
                     ### Coroutine.
-                    if iscoroutine(result):
+                    if asyncio_iscoroutine(result):
                         result = await result
 
                 ## Throw exception.
@@ -234,374 +665,19 @@ async def async_request(
             return result
 
 
-class RThreadLock():
-    """
-    Rey's `thread lock` type.
-    """
-
-
-    def __init__(self) -> None:
-        """
-        Build `thread lock` attributes.
-        """
-
-        # Set attribute.
-        self.lock = TRLock()
-        self.acquire_thread_id: int | None = None
-
-
-    def acquire(
-        self,
-        timeout: float = None
-    ) -> bool:
-        """
-        Wait and acquire thread lock.
-
-        Parameters
-        ----------
-        timeout : Maximum wait seconds.
-            - `None`: Not limit.
-            - `float`: Use this value.
-
-        Returns
-        -------
-        Whether acquire success.
-        """
-
-        # Handle parameter.
-        if timeout is None:
-            timeout = -1
-
-        # Acquire.
-        result = self.lock.acquire(timeout=timeout)
-
-        # Update attribute.
-        if result:
-            thread_id = threading_get_ident()
-            self.acquire_thread_id = thread_id
-
-        return result
-
-
-    def release(self) -> None:
-        """
-        Release thread lock.
-        """
-
-        # Release.
-        self.lock.release()
-
-        # Update attribute.
-        self.acquire_thread_id = None
-
-
-    def __call__(self) -> None:
-        """
-        Automatic judge, wait and acquire thread lock, or release thread lock.
-        """
-
-        # Release.
-        thread_id = threading_get_ident()
-        if thread_id == self.acquire_thread_id:
-            self.release()
-
-        # Acquire.
-        else:
-            self.acquire()
-
-
-class RAsyncLock():
-    """
-    Rey's `asynchronous lock` type.
-    """
-
-
-    def __init__(self) -> None:
-        """
-        Build `asynchronous lock` attributes.
-        """
-
-        # Set attribute.
-        self.lock = ALock()
-
-
-    def acquire(
-        self,
-        timeout: float = None
-    ) -> bool:
-        """
-        Wait and acquire thread lock.
-
-        Parameters
-        ----------
-        timeout : Maximum wait seconds.
-            - `None`: Not limit.
-            - `float`: Use this value.
-
-        Returns
-        -------
-        Whether acquire success.
-        """
-
-        # Handle parameter.
-        if timeout is None:
-            timeout = -1
-
-        # Acquire.
-        result = self.lock.acquire()
-
-        return result
-
-
-    def release(self) -> None:
-        """
-        Release thread lock.
-        """
-
-        # Release.
-        self.lock.release()
-
-
-class RThreadPool(object):
-    """
-    Rey's `thread pool` type.
-    """
-
-
-    def __init__(
-        self,
-        task: Callable,
-        *args: Any,
-        _max_workers: int | None = None,
-        **kwargs: Any
-    ) -> None:
-        """
-        Build `thread pool` attributes.
-
-        Parameters
-        ----------
-        task : Thread task.
-        args : Task default position arguments.
-        _max_workers : Maximum number of threads.
-            - `None`: Number of CPU + 4, 32 maximum.
-            - `int`: Use this value, no maximum limit.
-        kwargs : Task default keyword arguments.
-        """
-
-        # Set attribute.
-        self.task = task
-        self.args = args
-        self.kwargs = kwargs
-        self.thread_pool = ThreadPoolExecutor(
-            _max_workers,
-            task.__name__
-        )
-        self.futures: list[CFuture] = []
-
-
-    def one(
-        self,
-        *args: Any,
-        **kwargs: Any
-    ) -> CFuture:
-        """
-        Add and start a task to the thread pool.
-
-        Parameters
-        ----------
-        args : Task position arguments, after default position arguments.
-        kwargs : Task keyword arguments, after default keyword arguments.
-
-        Returns
-        -------
-        Task instance.
-        """
-
-        # Set parameter.
-        func_args = (
-            *self.args,
-            *args
-        )
-        func_kwargs = {
-            **self.kwargs,
-            **kwargs
-        }
-
-        # Submit.
-        future = self.thread_pool.submit(
-            self.task,
-            *func_args,
-            **func_kwargs
-        )
-
-        # Save.
-        self.futures.append(future)
-
-        return future
-
-
-    def batch(
-        self,
-        *args: tuple,
-        **kwargs: tuple
-    ) -> list[CFuture]:
-        """
-        Add and start a batch of tasks to the thread pool.
-        parameters sequence will combine one by one, and discard excess parameters.
-
-        Parameters
-        ----------
-        args : Sequence of task position arguments, after default position arguments.
-        kwargs : Sequence of task keyword arguments, after default keyword arguments.
-
-        Returns
-        -------
-        Task instance list.
-
-        Examples
-        --------
-        >>> func = lambda *args, **kwargs: print(args, kwargs)
-        >>> a = (1, 2)
-        >>> b = (3, 4, 5)
-        >>> c = (11, 12)
-        >>> d = (13, 14, 15)
-        >>> thread_pool = RThreadPool(func, 0, z=0)
-        >>> thread_pool.batch(a, b, c=c, d=d)
-        (0, 1, 3) {'z': 0, 'c': 11, 'd': 13}
-        (0, 2, 4) {'z': 0, 'c': 12, 'd': 14}
-        """
-
-        # Combine.
-        args_zip = zip(*args)
-        kwargs_zip = zip(
-            *[
-                [
-                    (key, value)
-                    for value in values
-                ]
-                for key, values in kwargs.items()
-            ]
-        )
-        params_zip = zip(args_zip, kwargs_zip)
-
-        # Batch submit.
-        futures = [
-            self.one(*args_, **dict(kwargs_))
-            for args_, kwargs_ in params_zip
-        ]
-
-        # Save.
-        self.futures.extend(futures)
-
-        return futures
-
-
-    def generate(
-        self,
-        timeout: float | None = None
-    ) -> Generator[CFuture]:
-        """
-        Return the generator of added task instance.
-
-        Parameters
-        ----------
-        timeout : Call generator maximum waiting seconds, timeout throw exception.
-            - `None`: Infinite.
-            - `float`: Set this seconds.
-
-        Returns
-        -------
-        Generator of added task instance.
-        """
-
-        # Get parameter.
-        self.futures, futures = [], self.futures
-
-        # Build.
-        generator = concurrent_as_completed(
-            futures,
-            timeout
-        )
-
-        return generator
-
-
-    def repeat(
-        self,
-        number: int
-    ) -> list[CFuture]:
-        """
-        Add and start a batch of tasks to the thread pool, and only with default parameters.
-
-        Parameters
-        ----------
-        number : Number of add.
-
-        Returns
-        -------
-        Task instance list.
-        """
-
-        # Batch submit.
-        futures = [
-            self.one()
-            for _ in range(number)
-        ]
-
-        # Save.
-        self.futures.extend(futures)
-
-        return futures
-
-
-    def join(self) -> None:
-        """
-        Block until all tasks are done.
-        """
-
-        # Generator.
-        generator = self.generate()
-
-        # Wait.
-        for _ in generator:
-            pass
-
-
-    def __iter__(self) -> Generator:
-        """
-        Return the generator of task result.
-
-        Returns
-        -------
-        Generator of task result.
-        """
-
-        # Generator.
-        generator = self.generate()
-
-        # Generate.
-        for future in generator:
-            yield future.result()
-
-
-    __call__ = one
-
-
-    __mul__ = repeat
-
-
 class RAsyncPool(object):
     """
     Rey's `asynchronous pool` type.
     """
 
+    Queue = AQueue
+    Lock = ALock
+
 
     def __init__(
         self,
-        async_func: Callable[..., Coroutine],
+        task: Callable[..., Coroutine],
         *args: Any,
-        _max_async: int = 10,
-        _exc_handler: Callable | None = None,
         **kwargs: Any
     ) -> None:
         """
@@ -611,76 +687,31 @@ class RAsyncPool(object):
         ----------
         async_func : Function of create asynchronous `Coroutine`.
         args : Function default position arguments.
-        _max_async : Maximum number of asynchronous.
-        _exc_handler : `Coroutine` execution exception handler, will return value.
         kwargs : Function default keyword arguments.
         """
 
         # Set attribute.
-        self.async_func = async_func
+        self.task = task
         self.args = args
         self.kwargs = kwargs
-        self.exc_handler = _exc_handler
-        self.queue_input: AQueue[tuple[tuple, dict]] = AQueue()
-        self.queue_output = AQueue()
-        self.queue_count = 0
+        self.loop = asyncio_new_event_loop()
+        self.futures: list[AFuture] = []
 
         # Start.
-        self._start_workers(_max_async)
+        self._start_loop()
 
 
     @wrap_thread
-    def _start_workers(
-        self,
-        worker_n: int
-    ) -> None:
+    def _start_loop(self) -> None:
         """
-        Start workers of execute asynchronous `Coroutine`.
-
-        Parameters
-        ----------
-        worker_n : Number of execute asynchronous `Coroutine` workers.
+        Start event loop.
         """
 
+        # Set.
+        asyncio_set_event_loop(self.loop)
 
-        # Define.
-        async def async_worker() -> None:
-            """
-            Worker of execute asynchronous `Coroutine`.
-            """
-
-            # Loop.
-            while True:
-
-                # Get parameter.
-                args, kwargs = await self.queue_input.get()
-
-                # Execute.
-                try:
-                    result = await self.async_func(*args, **kwargs)
-
-                # Handle exception.
-                except:
-                    if self.exc_handler is not None:
-                        result = self.exc_handler()
-                        await self.queue_output.put(result)
-
-                    ## Count.
-                    else:
-                        self.queue_count -= 1
-
-                else:
-                    await self.queue_output.put(result)
-
-
-        # Create.
-        coroutines = [
-            async_worker()
-            for _ in range(worker_n)
-        ]
-
-        # Start.
-        async_run(*coroutines)
+        ## Start and block.
+        self.loop.run_forever()
 
 
     def one(
@@ -689,7 +720,7 @@ class RAsyncPool(object):
         **kwargs: Any
     ) -> None:
         """
-        Add and start a task to the pool.
+        Start a task.
 
         Parameters
         ----------
@@ -706,16 +737,15 @@ class RAsyncPool(object):
             **self.kwargs,
             **kwargs
         }
-        item = (
-            func_args,
-            func_kwargs
-        )
 
-        # Count.
-        self.queue_count += 1
+        # Create.
+        coroutine = self.task(*func_args, **func_kwargs)
 
-        # Put.
-        self.queue_input.put_nowait(item)
+        # Add.
+        future = asyncio_run_coroutine_threadsafe(coroutine, self.loop)
+
+        # Save.
+        self.futures.append(future)
 
 
     def batch(
@@ -724,7 +754,7 @@ class RAsyncPool(object):
         **kwargs: tuple
     ) -> None:
         """
-        Add and start a batch of tasks to the pool.
+        Batch start tasks.
         parameters sequence will combine one by one, and discard excess parameters.
 
         Parameters
@@ -759,7 +789,7 @@ class RAsyncPool(object):
         )
         params_zip = zip(args_zip, kwargs_zip)
 
-        # Batch submit.
+        # Batch add.
         for args_, kwargs_ in params_zip:
             self.one(*args_, **dict(kwargs_))
 
@@ -769,167 +799,95 @@ class RAsyncPool(object):
         number: int
     ) -> list[CFuture]:
         """
-        Add and start a batch of tasks to the pool, and only with default parameters.
+        Batch start tasks, and only with default parameters.
 
         Parameters
         ----------
         number : Number of add.
         """
 
-        # Batch submit.
+        # Batch add.
         for _ in range(number):
             self.one()
 
 
-    def get(
+    def generate(
         self,
         timeout: float | None = None
-    ) -> Any:
+    ) -> Generator[CFuture]:
         """
-        Get one execution result of asynchronous `Coroutine`, will block.
+        Return the generator of added task instance.
 
         Parameters
         ----------
-        timeout : Maximum seconds of block.
+        timeout : Call generator maximum waiting seconds, timeout throw exception.
+            - `None`: Infinite.
+            - `float`: Set this seconds.
 
         Returns
         -------
-        One execution result.
+        Generator of added task instance.
         """
 
-        # Set parameter.
-        if timeout is not None:
-            rtm = RTimeMark()
-            rtm()
+        # Build.
+        generator = concurrent_as_completed(
+            self.futures,
+            timeout
+        )
 
-        # Loop.
-        while True:
-
-            # Judge.
-            if not self.queue_output.empty():
-
-                # Get.
-                try:
-                    result = self.queue_output.get_nowait()
-                except QueueEmpty:
-                    pass
-                else:
-
-                    # Count.
-                    self.queue_count -= 1
-
-                    return result
-
-            # Timeout.
-            if timeout is not None:
-                rtm()
-                if rtm.total_spend > timeout:
-                    throw(TimeoutError, timeout)
-
-            # Sleep.
-            sleep(0.01)
+        return generator
 
 
-    def join(self) -> None:
+    def join(
+        self,
+        timeout: float | None = None
+    ) -> None:
         """
-        Block until all asynchronous `Coroutine` are done.
+        Block until all tasks are done.
+
+        Parameters
+        ----------
+        timeout : Call generator maximum waiting seconds, timeout throw exception.
+            - `None`: Infinite.
+            - `float`: Set this seconds.
         """
 
-        # Generate.
-        while True:
+        # Generator.
+        generator = self.generate(timeout)
 
-            # Break.
-            if self.queue_count == 0:
-                break
-
-            self.get()
+        # Wait.
+        for _ in generator:
+            pass
 
 
     def __iter__(self) -> Generator:
         """
-        Return the generator of result of asynchronous `Coroutine`.
+        Return the generator of task result.
 
         Returns
         -------
-        Generator of result of asynchronous `Coroutine`.
+        Generator of task result.
         """
 
+        # Generator.
+        generator = self.generate()
+        self.futures.clear()
+
         # Generate.
-        while True:
+        for future in generator:
+            yield future.result()
 
-            # Break.
-            if self.queue_count == 0:
-                break
 
-            result = self.get()
-            yield result
+    def __del__(self) -> None:
+        """
+        End loop.
+        """
+
+        # Stop.
+        self.loop.stop()
 
 
     __call__ = one
 
 
     __mul__ = repeat
-
-
-class RAsyncIterator(AsyncIterator):
-    """
-    Rey's `asynchronous iterator` type.
-    """
-
-
-    def __init__(
-        self,
-        task: Callable,
-        args_iter: Iterable[Iterable] | None = None,
-        kwargs_iter: Iterable[dict] | None = None
-    ) -> None:
-        """
-        Build `asynchronous iterator` attributes.
-
-        Parameters
-        ----------
-        task : Asynchronous task.
-        args_iter : Iterable of task position arguments.
-        kwargs_iter : Iterable of task keyword arguments.
-        """
-
-        # Set attribute.
-        self.task = task
-        if args_iter is not None:
-            args_iter: Iterator[Iterable] = iter(args_iter)
-        self.args_iter = args_iter
-        if kwargs_iter is not None:
-            kwargs_iter: Iterator[dict] = iter(kwargs_iter)
-        self.kwargs_iter = kwargs_iter
-
-
-    def __aiter__(self) -> Self:
-        """
-        Get asynchronous iterator.
-        """
-
-        return self
-
-
-    async def __anext__(self):
-        """
-        Get next value from asynchronous iterator.
-        """
-
-        # Get parameter.
-        args = ()
-        kwargs = {}
-
-        ## Next.
-        try:
-            if self.args_iter is not None:
-                args = next(self.args_iter)
-            if self.kwargs_iter is not None:
-                kwargs = next(self.kwargs_iter)
-        except StopIteration:
-            raise StopAsyncIteration
-
-        # Execute.
-        result = self.task(*args, **kwargs)
-
-        return result

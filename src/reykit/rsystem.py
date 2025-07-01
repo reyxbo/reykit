@@ -545,33 +545,34 @@ def get_stack_text(format_: Literal['plain', 'full'] = 'plain', limit: int = 2) 
     Code stack text.
     """
 
+    # Get.
     match format_:
 
-        # Plain.
+        ## Plain.
         case 'plain':
             limit += 1
             stacks = format_stack(limit=limit)
 
-            ## Check.
+            ### Check.
             if len(stacks) != limit:
                 throw(value=limit)
 
-            ## Convert.
+            ### Convert.
             text = stacks[0]
             index_end = text.find(', in ')
             text = text[2:index_end]
 
-        # Full.
+        ## Full.
         case 'full':
             stacks = format_stack()
             index_limit = len(stacks) - limit
             stacks = stacks[:index_limit]
 
-            ## Check.
+            ### Check.
             if len(stacks) == 0:
                 throw(value=limit)
 
-            ## Convert.
+            ### Convert.
             stacks = [
                 stack[2:].replace('\n  ', '\n', 1)
                 for stack in stacks
@@ -579,7 +580,7 @@ def get_stack_text(format_: Literal['plain', 'full'] = 'plain', limit: int = 2) 
             text = ''.join(stacks)
             text = text[:-1]
 
-        # Throw exception.
+        ## Throw exception.
         case _:
             throw(ValueError, format_)
 

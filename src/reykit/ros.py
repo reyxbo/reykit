@@ -195,26 +195,27 @@ def get_file_str(file: FileStr) -> str:
     File string data.
     """
 
+    # Get.
     match file:
 
-        # Path or string.
+        ## Path or string.
         case str():
             exist = os_exists(file)
 
-            # Path.
+            ## Path.
             if exist:
                 rfile = RFile(file)
                 file_str = rfile.str
 
-            # String.
+            ## String.
             else:
                 file_str = file
 
-        # IO.
+        ## IO.
         case TextIOBase():
             file_str = file.read()
 
-        # Throw exception.
+        ## Throw exception.
         case _:
             throw(TypeError, file)
 
@@ -237,24 +238,25 @@ def get_file_bytes(file: FileBytes) -> bytes:
     File bytes data.
     """
 
+    # Get.
     match file:
 
-        # Bytes.
+        ## Bytes.
         case bytes():
             file_bytes = file
         case bytearray():
             file_bytes = bytes(file)
 
-        # Path.
+        ## Path.
         case str():
             rfile = RFile(file)
             file_bytes = rfile.bytes
 
-        # IO.
+        ## IO.
         case BufferedIOBase():
             file_bytes = file.read()
 
-        # Throw exception.
+        ## Throw exception.
         case _:
             throw(TypeError, file)
 
@@ -366,12 +368,24 @@ class RFile(object):
 
 
     @overload
-    def __getattr__(self, name: Literal['open_r', 'open_w', 'open_a']) -> TextIO: ...
+    def r(self) -> TextIO: ...
 
     @overload
-    def __getattr__(self, name: Literal['open_rb', 'open_wb', 'open_ab']) -> BinaryIO: ...
+    def w(self) -> TextIO: ...
 
-    def __getattr__(self, name: Literal['open_r', 'open_w', 'open_a', 'open_rb', 'open_wb', 'open_ab']) -> TextIO | BinaryIO:
+    @overload
+    def a(self) -> TextIO: ...
+
+    @overload
+    def rb(self) -> BinaryIO: ...
+
+    @overload
+    def wb(self) -> BinaryIO: ...
+
+    @overload
+    def ab(self) -> BinaryIO: ...
+
+    def __getattr__(self, name: Literal['r', 'w', 'a', 'rb', 'wb', 'ab']) -> TextIO | BinaryIO:
         """
         Get attribute.
 
@@ -384,16 +398,8 @@ class RFile(object):
         IO object.
         """
 
-        if name in (
-            'open_r',
-            'open_w',
-            'open_a',
-            'open_rb',
-            'open_wb',
-            'open_ab'
-        ):
-            mode: Literal['r', 'w', 'a', 'rb', 'wb', 'ab']  = name[5:]
-            io = self.open(mode)
+        if name in ('r', 'w', 'a', 'rb', 'wb', 'ab'):
+            io = self.open(name)
             return io
 
 

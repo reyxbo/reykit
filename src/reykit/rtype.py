@@ -88,6 +88,10 @@ class RSingleton(object):
     """
     Rey's `singleton` type.
     When instantiated, method `__singleton__` will be called only once, and will accept arguments.
+
+    Attributes
+    ----------
+    _instance : Global singleton instance.
     """
 
     _instance: Self | None = None

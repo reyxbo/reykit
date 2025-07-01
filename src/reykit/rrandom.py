@@ -71,7 +71,7 @@ class RRandomSeed(object):
         ----------
         seed : Random seed.
             - `None`: Clear seed.
-            - `int | float | str | bytes | bytearray` : Set seed.
+            - `int | float | str | bytes | bytearray`: Set seed.
         """
 
         # Delete.

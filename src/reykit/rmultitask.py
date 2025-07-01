@@ -50,6 +50,11 @@ __all__ = (
 class RThreadPool(object):
     """
     Rey's `thread pool` type.
+
+    Attributes
+    ----------
+    Queue : Thread queue type.
+    Lock : Thread lock type.
     """
 
     Queue = QQueue
@@ -668,6 +673,11 @@ async def async_request(
 class RAsyncPool(object):
     """
     Rey's `asynchronous pool` type.
+
+    Attributes
+    ----------
+    Queue : asynchronous queue type.
+    Lock : asynchronous lock type.
     """
 
     Queue = AQueue

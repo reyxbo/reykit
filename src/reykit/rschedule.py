@@ -27,6 +27,7 @@ class RSchedule(object):
     Rey's `schedule` type.
     """
 
+
     def __init__(
         self,
         max_workers: int = 10,

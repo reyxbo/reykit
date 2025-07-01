@@ -153,9 +153,10 @@ def time_to(
     Converted text.
     """
 
+    # Convert.
     match obj:
 
-        # Type 'datetime'.
+        ## Type 'datetime'.
         case Datetime() | PTimestamp():
             if decimal:
                 format_ = '%Y-%m-%d %H:%M:%S.%f'
@@ -163,11 +164,11 @@ def time_to(
                 format_ = '%Y-%m-%d %H:%M:%S'
             text = obj.strftime(format_)
 
-        # Type 'date'.
+        ## Type 'date'.
         case Date():
             text = obj.strftime('%Y-%m-%d')
 
-        # Type 'time'.
+        ## Type 'time'.
         case Time():
             if decimal:
                 format_ = '%H:%M:%S.%f'
@@ -175,7 +176,7 @@ def time_to(
                 format_ = '%H:%M:%S'
             text = obj.strftime(format_)
 
-        # Type 'timedelta'.
+        ## Type 'timedelta'.
         case Timedelta() | PTimedelta():
             timestamp = obj.seconds + obj.microseconds / 1000_000
             if timestamp >= 0:
@@ -189,15 +190,15 @@ def time_to(
                 if obj.days != 0:
                     text = f'{obj.days}day ' + text
 
-            ## Throw exception.
+            ### Throw exception.
             elif raising:
                 throw(ValueError, obj)
 
-            ## Not raise.
+            ### Not raise.
             else:
                 return obj
 
-        # Type 'struct_time'.
+        ## Type 'struct_time'.
         case StructTime():
             if decimal:
                 format_ = '%Y-%m-%d %H:%M:%S.%f'
@@ -205,11 +206,11 @@ def time_to(
                 format_ = '%Y-%m-%d %H:%M:%S'
             text = time_strftime(format_, obj)
 
-        # Throw exception.
+        ## Throw exception.
         case _ if raising:
             throw(TypeError, obj)
 
-        # Not raise.
+        ## Not raise.
         case _:
             return obj
 
@@ -334,13 +335,14 @@ def to_time(
     Time object.
     """
 
+    # Convert.
     match obj:
 
-        # Type 'str'.
+        ## Type 'str'.
         case str():
             time_obj = text_to_time(obj)
 
-        # Type 'struct_time'.
+        ## Type 'struct_time'.
         case StructTime():
             time_obj = Datetime(
                 obj.tm_year,
@@ -351,7 +353,7 @@ def to_time(
                 obj.tm_sec
             )
 
-        # Type 'float'.
+        ## Type 'float'.
         case int() | float():
             int_len, _ = digits(obj)
             match int_len:
@@ -362,14 +364,14 @@ def to_time(
                 case _:
                     time_obj = None
 
-    # No time object.
+    ## No time object.
     if time_obj is None:
 
-        ## Throw exception.
+        ### Throw exception.
         if raising:
             throw(ValueError, obj)
 
-        ## Not raise.
+        ### Not raise.
         else:
             return obj
 

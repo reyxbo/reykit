@@ -20,7 +20,7 @@
 """
 
 
-from typing import Any, NoReturn
+from typing import Any, NoReturn, overload
 from types import TracebackType
 from collections.abc import Iterable
 from sys import exc_info as sys_exc_info
@@ -213,6 +213,12 @@ def catch_exc(
     return exc_report, exc_type, exc_instance, exc_traceback
 
 
+@overload
+def check_least_one(*values: None) -> NoReturn: ...
+
+@overload
+def check_least_one(*values: Any) -> None: ...
+
 def check_least_one(*values: Any) -> None:
     """
     Check that at least one of multiple values is not null, when check fail, then throw exception.
@@ -249,22 +255,23 @@ def check_most_one(*values: Any) -> None:
     """
 
     # Check.
-    none_count = 0
+    exist = False
     for value in values:
         if value is not None:
-            none_count += 1
+            if exist is True:
 
-    # Throw exception.
-    if none_count > 1:
-        from .rsystem import get_name
-        vars_name = get_name(values)
-        if vars_name is not None:
-            vars_name_de_dup = list(set(vars_name))
-            vars_name_de_dup.sort(key=vars_name.index)
-            vars_name_str = ' ' + ' and '.join([f'"{var_name}"' for var_name in vars_name_de_dup])
-        else:
-            vars_name_str = ''
-        raise TypeError(f'at most one of parameters{vars_name_str} is not None')
+                # Throw exception.
+                from .rsystem import get_name
+                vars_name = get_name(values)
+                if vars_name is not None:
+                    vars_name_de_dup = list(set(vars_name))
+                    vars_name_de_dup.sort(key=vars_name.index)
+                    vars_name_str = ' ' + ' and '.join([f'"{var_name}"' for var_name in vars_name_de_dup])
+                else:
+                    vars_name_str = ''
+                raise TypeError(f'at most one of parameters{vars_name_str} is not None')
+
+            exist = True
 
 
 def check_file_found(path: str) -> None:

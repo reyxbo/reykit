@@ -998,7 +998,7 @@ class RRecord(object):
             rfile(value, True)
 
 
-    def is_record(
+    def is_recorded(
         self,
         value: Any
     ) -> bool:
@@ -1036,4 +1036,4 @@ class RRecord(object):
     __call__ = record
 
 
-    __contains__ = is_record
+    __contains__ = is_recorded

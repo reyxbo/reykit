@@ -67,6 +67,8 @@ __all__ = (
     'dos_command',
     'dos_command_var',
     'block',
+    'is_class',
+    'is_instance',
     'is_iterable',
     'is_table',
     'is_number_str',
@@ -355,6 +357,44 @@ def block() -> None:
 
             except:
                 continue
+
+
+def is_class(obj: Any) -> bool:
+    """
+    Judge whether it is class.
+
+    Parameters
+    ----------
+    obj : Judge object.
+
+    Returns
+    -------
+    Judgment result.
+    """
+
+    # Judge.
+    judge = isinstance(obj, type)
+
+    return judge
+
+
+def is_instance(obj: Any) -> bool:
+    """
+    Judge whether it is instance.
+
+    Parameters
+    ----------
+    obj : Judge object.
+
+    Returns
+    -------
+    Judgment result.
+    """
+
+    # judge.
+    judge = not is_class(obj)
+
+    return judge
 
 
 def is_iterable(

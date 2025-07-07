@@ -15,6 +15,8 @@ from collections.abc import Callable
 
 __all__ = (
     'T',
+    'KT',
+    'VT',
     'RStaticMeta',
     'RConfigMeta',
     'RNull',
@@ -22,7 +24,10 @@ __all__ = (
 )
 
 
-T = TypeVar('T')
+# Generic.
+T = TypeVar('T') # Any.
+KT = TypeVar('KT') # Any dictionary key.
+VT = TypeVar('VT') # Any dictionary value.
 
 
 class RStaticMeta(type):

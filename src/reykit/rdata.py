@@ -10,11 +10,13 @@
 
 
 from typing import Any, TypedDict, Literal, overload
+from collections import defaultdict as Defaultdict, ChainMap
 from collections.abc import Callable, Iterable, Generator
+from itertools import chain as IChain
 
 from .rexception import check_least_one, check_most_one
 from .rsystem import is_iterable
-from .rtype import T
+from .rtype import T, KT, VT, RNull
 
 
 __all__ = (
@@ -24,6 +26,8 @@ __all__ = (
     'unique',
     'in_arrs',
     'objs_in',
+    'chain',
+    'default_dict',
     'RGenerator'
 )
 
@@ -277,6 +281,79 @@ def objs_in(arr: Iterable, *objs: Any, mode: Literal['or', 'and'] = 'or') -> boo
                     return False
 
             return True
+
+
+@overload
+def chain(*iterables: dict[KT, VT]) -> ChainMap[KT, VT]: ...
+
+@overload
+def chain(*iterables: Iterable[T]) -> IChain[T]: ...
+
+def chain(*iterables: dict[KT, VT] | Iterable[T]) -> ChainMap[KT, VT] | IChain[T]:
+    """
+    Connect multiple iterables.
+
+    Parameters
+    ----------
+    iterables : Multiple iterables.
+        - `dict`: Connect to chain mapping.
+        - `Iterable`: Connect to chain.
+
+    Returns
+    -------
+    Chain instance.
+    """
+
+    # Dict.
+    if all(
+        [
+            isinstance(iterable, dict)
+            for iterable in iterables
+        ]
+    ):
+        data = ChainMap(*iterables)
+
+    # Other.
+    else:
+        data = IChain(*iterables)
+
+    return data
+
+
+def default_dict(default: Any = RNull, data: dict[KT, VT] | None = None) -> Defaultdict[KT, VT]:
+    """
+    Set `dict` instance, default value when key does not exist.
+
+    Parameters
+    ----------
+    default : Default value.
+        - `Type[RNull]`: Nest function self.
+        - `Callable`: Use call return value.
+    data : `dict` instance.
+        - `None`: Empty `dict`.
+    """
+
+    # Handle parameter.
+
+    ## Null.
+    if default == RNull:
+        default_factory = default_dict
+
+    ## Callable.
+    elif callable(default):
+        default_factory = default
+
+    ## Not callable.
+    else:
+        default_factory = lambda : default
+
+    if data is None:
+        data = {}
+
+    # Instance.
+    dict_set = Defaultdict(default_factory, data)
+
+    return dict_set
 
 
 class RGenerator(object):

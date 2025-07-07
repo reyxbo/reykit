@@ -32,7 +32,7 @@ __all__ = (
     'encode_qrcode',
     'decode_qrcode',
     'compress_image',
-    'to_pimage',
+    'to_pil_image',
     'generate_captcha_image'
 )
 
@@ -187,13 +187,13 @@ def compress_image(
         rfile(content)
 
 
-def to_pimage(image: str | bytes) -> RImage:
+def to_pil_image(source: str | bytes) -> RImage:
     """
     Get `Image` instance of `PIL` package.
 
     Parameters
     ----------
-    image : Image source data.
+    source : Image source data.
         - `str`: Image file path.
         - `bytes`: Image bytes data.
 
@@ -203,12 +203,12 @@ def to_pimage(image: str | bytes) -> RImage:
     """
 
     # File path.
-    if image.__class__ == str:
-        pil_image = pil_open(image)
+    if source.__class__ == str:
+        pil_image = pil_open(source)
 
     # Bytes data.
-    if image.__class__ in (bytes, bytearray):
-        bytes_io = BytesIO(image)
+    if source.__class__ in (bytes, bytearray):
+        bytes_io = BytesIO(source)
         pil_image = pil_open(bytes_io)
 
     return pil_image

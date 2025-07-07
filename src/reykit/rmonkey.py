@@ -26,6 +26,23 @@ def monkey_patch_sqlalchemy_result_more_fetch():
     Returns
     -------
     Modified type.
+
+    Examples
+    --------
+    >>> result = connection.execute(sql)
+    >>> result.fetch_table()
+    >>> result.fetch_dict()
+    >>> result.fetch_list()
+    >>> result.fetch_df()
+    >>> result.fetch_json()
+    >>> result.fetch_text()
+    >>> result.fetch_sql()
+    >>> result.fetch_html()
+    >>> result.fetch_csv()
+    >>> result.fetch_excel()
+    >>> result.show()
+    >>> result.exist
+    >>> result.empty
     """
 
 
@@ -203,6 +220,12 @@ def monkey_patch_sqlalchemy_result_more_fetch():
 def monkey_patch_sqlalchemy_row_index_field():
     """
     Monkey patch of package `sqlalchemy`, add index by field method to `Row` object.
+
+    Examples
+    --------
+    >>> result = connection.execute(sql)
+    >>> for row in result:
+    ...     row['field']
     """
 
 
@@ -295,6 +318,11 @@ def monkey_path_pil_image_get_bytes():
     Returns
     -------
     Image object.
+
+    Examples
+    --------
+    >>> image = to_pil_image(source)
+    >>> image.get_bytes()
     """
 
 

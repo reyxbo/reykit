@@ -320,7 +320,7 @@ def chain(*iterables: dict[KT, VT] | Iterable[T]) -> ChainMap[KT, VT] | IChain[T
     return data
 
 
-def default_dict(default: Any = Null, data: dict[KT, VT] | None = None) -> Defaultdict[KT, VT]:
+def default_dict(default: T = Null, data: dict[KT, VT] | None = None) -> Defaultdict[KT, VT | T]:
     """
     Set `dict` instance, default value when key does not exist.
 

@@ -19,8 +19,9 @@ __all__ = (
     'VT',
     'RStaticMeta',
     'RConfigMeta',
+    'RSingleton',
     'RNull',
-    'RSingleton'
+    'Null'
 )
 
 
@@ -83,12 +84,6 @@ class RConfigMeta(RStaticMeta):
         setattr(cls, name, value)
 
 
-class RNull(object, metaclass=RStaticMeta):
-    """
-    Rey's `null` type.
-    """
-
-
 class RSingleton(object):
     """
     Rey's `singleton` type.
@@ -117,3 +112,12 @@ class RSingleton(object):
                 __singleton__(self, *arg, **kwargs)
 
         return self._instance
+
+
+class RNull(RSingleton):
+    """
+    Rey's `null` type.
+    """
+
+
+Null = RNull()

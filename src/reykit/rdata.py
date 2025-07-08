@@ -16,7 +16,7 @@ from itertools import chain as IChain
 
 from .rexception import check_least_one, check_most_one
 from .rsystem import is_iterable
-from .rtype import T, KT, VT, RNull
+from .rtype import T, KT, VT, Null
 
 
 __all__ = (
@@ -320,14 +320,14 @@ def chain(*iterables: dict[KT, VT] | Iterable[T]) -> ChainMap[KT, VT] | IChain[T
     return data
 
 
-def default_dict(default: Any = RNull, data: dict[KT, VT] | None = None) -> Defaultdict[KT, VT]:
+def default_dict(default: Any = Null, data: dict[KT, VT] | None = None) -> Defaultdict[KT, VT]:
     """
     Set `dict` instance, default value when key does not exist.
 
     Parameters
     ----------
     default : Default value.
-        - `Type[RNull]`: Nest function self.
+        - `Literal[Null]`: Nest function self.
         - `Callable`: Use call return value.
     data : `dict` instance.
         - `None`: Empty `dict`.
@@ -336,7 +336,7 @@ def default_dict(default: Any = RNull, data: dict[KT, VT] | None = None) -> Defa
     # Handle parameter.
 
     ## Null.
-    if default == RNull:
+    if default == Null:
         default_factory = default_dict
 
     ## Callable.

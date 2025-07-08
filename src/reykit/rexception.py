@@ -28,7 +28,7 @@ from os.path import exists as os_exists
 from traceback import format_exc
 from warnings import warn as warnings_warn
 
-from .rtype import RNull
+from .rtype import Null
 
 
 __all__ = (
@@ -59,7 +59,7 @@ class RActiveError(RError):
 
 def throw(
     exception: type[BaseException] = AssertionError,
-    value: Any = RNull,
+    value: Any = Null,
     *values: Any,
     text: str | None = None,
     frame: int = 2
@@ -89,7 +89,7 @@ def throw(
             text = text[0].lower() + text[1:]
 
     ## Value.
-    if value is not RNull:
+    if value != Null:
         values = (value,) + values
 
         ### Name.

@@ -55,6 +55,7 @@ from .rexception import throw
 from .rregex import search, sub
 from .rsystem import dos_command
 from .rtext import to_json
+from .rtype import RBase
 
 
 __all__ = (
@@ -299,7 +300,7 @@ def read_toml(path: str | RFile) -> dict[str, Any]:
     return params
 
 
-class RFile(object):
+class RFile(RBase):
     """
     Rey's `file` type.
     """
@@ -845,7 +846,7 @@ class RFile(object):
     __call__ = write
 
 
-class RFolder(object):
+class RFolder(RBase):
     """
     Rey's `folder` type.
     """
@@ -1219,7 +1220,7 @@ class RFolder(object):
     __call__ = paths
 
 
-class RTempFile(object):
+class RTempFile(RBase):
     """
     Rey's `temporary file` type.
     """
@@ -1504,7 +1505,7 @@ class RTempFile(object):
     __call__ = write
 
 
-class RTempFolder(object):
+class RTempFolder(RBase):
     """
     Rey's `temporary folder` type.
     """

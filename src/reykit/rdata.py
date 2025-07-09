@@ -16,7 +16,7 @@ from itertools import chain as IChain
 
 from .rexception import check_least_one, check_most_one
 from .rsystem import is_iterable
-from .rtype import T, KT, VT, Null
+from .rtype import T, KT, VT, RBase, Null
 
 
 __all__ = (
@@ -356,7 +356,7 @@ def default_dict(default: T = Null, data: dict[KT, VT] | None = None) -> Default
     return dict_set
 
 
-class RGenerator(object):
+class RGenerator(RBase):
     """
     Rey's `generator` type.
     """

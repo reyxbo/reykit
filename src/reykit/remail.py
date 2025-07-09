@@ -17,6 +17,7 @@ from email.mime.application import MIMEApplication
 from .rdata import unique
 from .rexception import throw
 from .ros import FileBytes, get_file_bytes
+from .rtype import RBase
 
 
 __all__ = (
@@ -24,7 +25,7 @@ __all__ = (
 )
 
 
-class REmail(object):
+class REmail(RBase):
     """
     Rey's `email` type.
     """

@@ -37,7 +37,7 @@ from .rstdout import RConfigStdout, modify_print, reset_print
 from .rsystem import get_first_notnull, get_stack_param
 from .rtext import to_text
 from .rtime import now, time_to
-from .rtype import RConfigMeta
+from .rtype import RBase, RConfigMeta
 from .rwrap import wrap_thread
 
 

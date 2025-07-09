@@ -33,7 +33,7 @@ from aiohttp import ClientSession, ClientResponse
 
 from .rexception import throw, check_most_one, check_response_code
 from .rtime import randn, RTimeMark
-from .rtype import T
+from .rtype import T, RBase
 from .rwrap import wrap_thread
 
 
@@ -47,7 +47,7 @@ __all__ = (
 )
 
 
-class RThreadPool(object):
+class RThreadPool(RBase):
     """
     Rey's `thread pool` type.
 
@@ -670,7 +670,7 @@ async def async_request(
             return result
 
 
-class RAsyncPool(object):
+class RAsyncPool(RBase):
     """
     Rey's `asynchronous pool` type.
 

@@ -17,6 +17,7 @@ __all__ = (
     'T',
     'KT',
     'VT',
+    'RBase',
     'RStaticMeta',
     'RConfigMeta',
     'RSingleton',
@@ -31,7 +32,13 @@ KT = TypeVar('KT') # Any dictionary key.
 VT = TypeVar('VT') # Any dictionary value.
 
 
-class RStaticMeta(type):
+class RBase(RBase):
+    """
+    Rey's `base` type.
+    """
+
+
+class RStaticMeta(RBase, type):
     """
     Rey's `static meta` type.
     """
@@ -52,7 +59,7 @@ class RConfigMeta(RStaticMeta):
     """
 
 
-    def __getitem__(cls, name: str):
+    def __getitem__(cls, name: str) -> Any:
         """
         Get item.
 
@@ -84,7 +91,7 @@ class RConfigMeta(RStaticMeta):
         setattr(cls, name, value)
 
 
-class RSingleton(object):
+class RSingleton(RBase):
     """
     Rey's `singleton` type.
     When instantiated, method `__singleton__` will be called only once, and will accept arguments.

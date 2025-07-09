@@ -18,7 +18,7 @@ from os.path import abspath as os_abspath
 
 from .rsystem import get_first_notnull, get_name, get_stack_param
 from .rtext import to_text, add_text_frame
-from .rtype import RConfigMeta
+from .rtype import RBase, RConfigMeta
 
 
 __all__ = (
@@ -34,7 +34,7 @@ __all__ = (
 )
 
 
-class RConfigStdout(object, metaclass=RConfigMeta):
+class RConfigStdout(RBase, metaclass=RConfigMeta):
     """
     Rey's `config standard output` type.
 

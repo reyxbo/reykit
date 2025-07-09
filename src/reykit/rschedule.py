@@ -16,13 +16,15 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.job import Job
 
+from .rtype import RBase
+
 
 __all__ = (
     'RSchedule',
 )
 
 
-class RSchedule(object):
+class RSchedule(RBase):
     """
     Rey's `schedule` type.
     """

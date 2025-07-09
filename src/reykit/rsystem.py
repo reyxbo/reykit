@@ -56,7 +56,7 @@ from tkinter.filedialog import (
 )
 
 from .rexception import throw
-from .rtype import RConfigMeta
+from .rtype import RBase, RConfigMeta
 
 
 __all__ = (
@@ -125,7 +125,7 @@ NetWorkInfo = TypedDict(
 ProcessInfo = TypedDict('ProcessInfo', {'create_time': datetime, 'id': int, 'name': str, 'ports': list[int] | None})
 
 
-class RConfigSystem(object, metaclass=RConfigMeta):
+class RConfigSystem(RBase, metaclass=RConfigMeta):
     """
     Rey's `config system` type.
     """

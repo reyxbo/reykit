@@ -21,7 +21,7 @@ from threading import get_ident as threading_get_ident
 
 from .rexception import throw
 from .rnumber import digits
-from .rtype import T, RConfigMeta
+from .rtype import T, RBase, RConfigMeta
 
 
 __all__ = (
@@ -35,7 +35,7 @@ __all__ = (
 )
 
 
-class RConfigRandom(object, metaclass=RConfigMeta):
+class RConfigRandom(RBase, metaclass=RConfigMeta):
     """
     Rey's `config random` type.
     """
@@ -44,7 +44,7 @@ class RConfigRandom(object, metaclass=RConfigMeta):
     _rrandom_dict: dict[int, RRandomSeed] = {}
 
 
-class RRandomSeed(object):
+class RRandomSeed(RBase):
     """
     Rey's `random seed` type, set random seed.
     If set, based on `random` package.

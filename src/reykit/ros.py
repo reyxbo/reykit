@@ -311,7 +311,7 @@ class RFile(RBase):
         path: str
     ) -> None:
         """
-        Build `file` attributes.
+        Build `file` instance attributes.
 
         Parameters
         ----------
@@ -857,7 +857,7 @@ class RFolder(RBase):
         path: str | None = None
     ) -> None:
         """
-        Build `folder` attributes.
+        Build `folder` instance attributes.
 
         Parameters
         ----------
@@ -1233,7 +1233,7 @@ class RTempFile(RBase):
         type_: Literal['str', 'bytes'] = 'bytes'
     ) -> None:
         """
-        Build `temporary file` attributes.
+        Build `temporary file` instance attributes.
 
         Parameters
         ----------
@@ -1516,7 +1516,7 @@ class RTempFolder(RBase):
         dir_: str | None = None
     ) -> None:
         """
-        Build `temporary folder` attributes.
+        Build `temporary folder` instance attributes.
 
         Parameters
         ----------

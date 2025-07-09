@@ -37,7 +37,7 @@ class REmail(RBase):
         password: str
     ) -> None:
         """
-        Build `email` attributes.
+        Build `email` instance attributes.
 
         Parameters
         ----------

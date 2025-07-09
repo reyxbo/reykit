@@ -91,7 +91,7 @@ class RLog(object):
         name: str = 'Log'
     ) -> None:
         """
-        Build `log` attributes.
+        Build `log` instance attributes.
 
         Parameters
         ----------
@@ -901,9 +901,9 @@ class RLog(object):
         self.log(*messages, level=self.CRITICAL, **params)
 
 
-    def stop(self) -> None:
+    def pause(self) -> None:
         """
-        Stop record.
+        Pause record.
         """
 
         # Set level.
@@ -913,9 +913,9 @@ class RLog(object):
         self.stoped = True
 
 
-    def start(self) -> None:
+    def resume(self) -> None:
         """
-        Start record.
+        Resume record.
         """
 
         # Set level.
@@ -951,7 +951,7 @@ class RRecord(object):
         path: str | None = '_rrecord'
     ) -> None:
         """
-        Build `record` attributes.
+        Build `record` instance attributes.
 
         Parameters
         ----------

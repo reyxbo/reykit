@@ -369,7 +369,7 @@ class RGenerator(RBase):
         **kwargs: Any
     ) -> None:
         """
-        Build `generator` attributes.
+        Build `generator` instance attributes.
 
         Parameters
         ----------

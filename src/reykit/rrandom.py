@@ -65,7 +65,7 @@ class RRandomSeed(RBase):
 
     def __init__(self, seed: int | float | str | bytes | bytearray | None = None) -> None:
         """
-        Build `random` attributes.
+        Build `random` instance attributes.
 
         Parameters
         ----------

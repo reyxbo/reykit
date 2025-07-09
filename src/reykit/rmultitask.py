@@ -69,7 +69,7 @@ class RThreadPool(RBase):
         **kwargs: Any
     ) -> None:
         """
-        Build `thread pool` attributes.
+        Build `thread pool` instance attributes.
 
         Parameters
         ----------
@@ -691,7 +691,7 @@ class RAsyncPool(RBase):
         **kwargs: Any
     ) -> None:
         """
-        Build `asynchronous pool` attributes.
+        Build `asynchronous pool` instance attributes.
 
         Parameters
         ----------

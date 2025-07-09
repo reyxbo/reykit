@@ -38,7 +38,7 @@ class RSchedule(RBase):
         block: bool = False
     ) -> None:
         """
-        Build `schedule` attributes.
+        Build `schedule` instance attributes.
 
         Parameters
         ----------

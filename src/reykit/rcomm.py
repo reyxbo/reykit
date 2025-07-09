@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, Literal
+from typing import Any, Literal, TypedDict, NotRequired
 from collections.abc import Callable, Iterable
 from warnings import filterwarnings
 from os.path import abspath as os_abspath, isfile as os_isfile
@@ -17,12 +17,23 @@ from socket import socket as  Socket
 from urllib.parse import urlsplit as urllib_urlsplit, quote as urllib_quote, unquote as urllib_unquote
 from requests.api import request as requests_request
 from requests.models import Response
+from requests_cache import (
+    ALL_METHODS,
+    OriginalResponse,
+    CachedResponse,
+    install_cache as requests_cache_install_cache,
+    uninstall_cache as requests_cache_uninstall_cache,
+    is_installed as requests_cache_is_installed,
+    clear as requests_cache_clear
+)
 from mimetypes import guess_type
 from filetype import guess as filetype_guess
+from datetime import datetime
 
 from .rexception import throw, check_response_code
 from .ros import RFile
 from .rregex import search
+from .rtype import RBase
 
 
 __all__ = (
@@ -34,7 +45,21 @@ __all__ = (
     'request',
     'download',
     'get_file_stream_time',
-    'listen_socket'
+    'listen_socket',
+    'RRequestCache'
+)
+
+
+RequestCacheParameters = TypedDict(
+    'RequestCacheParameters',
+    {
+        'cache_name': str,
+        'backend': Literal['sqllite', 'memory'],
+        'expire_after': NotRequired[float | datetime],
+        'code': Iterable[int],
+        'method': Iterable[str],
+        'judge': NotRequired[Callable[[Response], bool]]
+    }
 )
 
 
@@ -429,3 +454,122 @@ def listen_socket(
         socket_conn, _ = socket.accept()
         data = socket_conn.recv(rece_size)
         handler(data)
+
+
+class RRequestCache(RBase):
+    """
+    Rey's `requests cache` type.
+    """
+
+
+    def __init__(
+        self,
+        path: str | None = 'cache.sqlite',
+        timeout: float | datetime | None = None,
+        codes: Iterable[int] | None = (200,),
+        methods: Iterable[str] | None = ('get', 'head'),
+        judge: Callable[[Response | OriginalResponse | CachedResponse], bool] | None = None
+    ) -> None:
+        """
+        Build `requests cache` instance attributes.
+
+        Parameters
+        ----------
+        path : Cache file path.
+            - `None`: Use memory cache.
+            - `str`: Use SQLite cache.
+        timeout : Cache timeout.
+            - `None`: Not timeout.
+            - `float`: Timeout seconds.
+            - `datetime`: Timeout threshold time.
+        codes : Cache response code range.
+            - `None`: All.
+        methods : Cache request method range.
+            - `None`: All.
+        judge : Judge function, `True` cache, `False` not cache.
+            - `None`: Not judgment.
+        """
+
+        # Build.
+        self.path = path
+        self.timeout = timeout
+        self.codes = codes
+        self.methods = methods
+        self.judge = judge
+
+
+    @property
+    def _start_params(self) -> RequestCacheParameters:
+        """
+        Get cache start parameters.
+
+        Returns
+        -------
+        Cache start parameters.
+        """
+
+        # Generate.
+        params = {}
+        if self.path is None:
+            params['cache_name'] = 'cache'
+            params['backend'] = 'memory'
+        else:
+            params['cache_name'] = self.path
+            params['backend'] = 'sqlite'
+        if self.timeout is not None:
+            params['expire_after'] = self.timeout
+        if self.codes is None:
+            params['allowable_codes'] = tuple(range(100, 600))
+        else:
+            params['allowable_codes'] = self.codes
+        if self.methods is None:
+            params['allowable_methods'] = ALL_METHODS
+        else:
+            params['allowable_methods'] = tuple([method.upper() for method in self.methods])
+        if self.judge is not None:
+            params['filter_fn'] = self.judge
+
+        return params
+
+
+    def start(self) -> None:
+        """
+        Start cache.
+        """
+
+        # Start.
+        requests_cache_install_cache(**self._start_params)
+
+
+    def stop(self) -> None:
+        """
+        Stop cache.
+        """
+
+        # Stop.
+        requests_cache_uninstall_cache()
+
+
+    @property
+    def started(self) -> bool:
+        """
+        Whether started.
+
+        Returns
+        -------
+        Result.
+        """
+
+        # Get.
+        result = requests_cache_is_installed()
+
+        return result
+
+
+    def clear(self) -> None:
+        """
+        Clear cache.
+        """
+
+        # Clear.
+        requests_cache_clear()

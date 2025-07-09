@@ -32,7 +32,7 @@ KT = TypeVar('KT') # Any dictionary key.
 VT = TypeVar('VT') # Any dictionary value.
 
 
-class RBase(RBase):
+class RBase(object):
     """
     Rey's `base` type.
     """

@@ -10,7 +10,7 @@
 
 
 from typing import Any, TypedDict, Literal, overload
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable, Iterable, Sequence, Mapping
 from inspect import signature as inspect_signature, _ParameterKind, _empty
 from sys import path as sys_path, modules as sys_modules
 from os import getpid as os_getpid
@@ -32,6 +32,7 @@ from psutil import (
     Process
 )
 from traceback import format_stack, extract_stack
+from atexit import register as atexit_register
 from subprocess import Popen, PIPE
 from pymem import Pymem
 from argparse import ArgumentParser
@@ -67,6 +68,7 @@ __all__ = (
     'dos_command',
     'dos_command_var',
     'block',
+    'at_exit',
     'is_class',
     'is_instance',
     'is_iterable',
@@ -357,6 +359,40 @@ def block() -> None:
 
             except:
                 continue
+
+
+def at_exit(*contents: str | Callable | tuple[Callable, Iterable, Mapping]) -> list[Callable]:
+    """
+    At exiting print text or execute function.
+
+    Parameters
+    ----------
+    contents : execute contents.
+        - `str`: Define the print text function and execute it.
+        - `Callable`: Execute function.
+        - `tuple[Callable, Iterable, Mapping]`: Execute function and position arguments and keyword arguments.
+
+    Returns
+    -------
+    Execute functions.
+    """
+
+    # Register.
+    funcs = []
+    for content in reversed(contents):
+        args = ()
+        kwargs = {}
+        if content.__class__ == str:
+            func = lambda : print(content)
+        elif callable(content):
+            func = content
+        elif content.__class__ == tuple:
+            func, args, kwargs = content
+        funcs.append(func)
+        atexit_register(func, *args, **kwargs)
+    funcs = list(reversed(funcs))
+
+    return funcs
 
 
 def is_class(obj: Any) -> bool:

@@ -78,16 +78,16 @@ def wrap_frame(decorator: Callable) -> Callable:
 
     # Decorate Decorator.
     @overload
-    def wrap(func: Callable, *args: Any, _execute: None = None, **kwargs: Any) -> Callable | Any: ...
+    def wrap(func: Callable, /, *args: Any, _execute: None = None, **kwargs: Any) -> Callable | Any: ...
 
     @overload
-    def wrap(func: Callable, *args: Any, _execute: Literal[True] = None, **kwargs: Any) -> Any: ...
+    def wrap(func: Callable, /, *args: Any, _execute: Literal[True] = None, **kwargs: Any) -> Any: ...
 
     @overload
-    def wrap(func: Callable, *args: Any, _execute: Literal[False] = None, **kwargs: Any) -> Callable: ...
+    def wrap(func: Callable, /, *args: Any, _execute: Literal[False] = None, **kwargs: Any) -> Callable: ...
 
     @functools_wraps(decorator)
-    def wrap(func: Callable, *args: Any, _execute: bool | None = None, **kwargs: Any) -> Callable | Any:
+    def wrap(func: Callable, /, *args: Any, _execute: bool | None = None, **kwargs: Any) -> Callable | Any:
         """
         Decorative shell.
 
@@ -149,13 +149,16 @@ def wrap_frame(decorator: Callable) -> Callable:
 @overload
 def wrap_runtime(
     func: Callable,
+    /,
     *args: Any,
     _return_report: Literal[False] = False,
     **kwargs: Any
 ) -> Any: ...
 
 @overload
-def wrap_runtime(func: Callable,
+def wrap_runtime(
+    func: Callable,
+    /,
     *args: Any,
     _return_report: Literal[True] = False,
     **kwargs: Any
@@ -164,6 +167,7 @@ def wrap_runtime(func: Callable,
 @wrap_frame
 def wrap_runtime(
     func: Callable,
+    /,
     *args: Any,
     _return_report: bool = False,
     **kwargs: Any
@@ -216,6 +220,7 @@ def wrap_runtime(
 @overload
 def wrap_thread(
     func: Callable,
+    /,
     *args: Any,
     _daemon: bool = True,
     **kwargs: Any
@@ -224,6 +229,7 @@ def wrap_thread(
 @wrap_frame
 def wrap_thread(
     func: Callable,
+    /,
     *args: Any,
     _daemon: bool = True,
     **kwargs: Any
@@ -259,6 +265,7 @@ def wrap_thread(
 @overload
 def wrap_exc(
     func: Callable,
+    /,
     *args: Any,
     _exception: BaseException | tuple[BaseException, ...] = BaseException,
     _handler: Callable | None = None,
@@ -268,6 +275,7 @@ def wrap_exc(
 @wrap_frame
 def wrap_exc(
     func: Callable,
+    /,
     *args: Any,
     _exception: BaseException | tuple[BaseException, ...] = BaseException,
     _handler: Callable | None = None,
@@ -306,6 +314,7 @@ def wrap_exc(
 @overload
 def wrap_retry(
     func: Callable,
+    /,
     *args: Any,
     _report: str | None = None,
     _exception: BaseException | tuple[BaseException, ...] = BaseException,
@@ -317,6 +326,7 @@ def wrap_retry(
 @wrap_frame
 def wrap_retry(
     func: Callable,
+    /,
     *args: Any,
     _report: str | None = None,
     _exception: BaseException | tuple[BaseException, ...] = BaseException,
@@ -384,6 +394,7 @@ def wrap_retry(
 @overload
 def wrap_dos_command(
     func: Callable,
+    /,
     *args: Any,
     **kwargs: Any
 ) -> Any: ...
@@ -391,6 +402,7 @@ def wrap_dos_command(
 @wrap_frame
 def wrap_dos_command(
     func: Callable,
+    /,
     *args: Any,
     **kwargs: Any
 ) -> Any:
@@ -509,6 +521,7 @@ wrap_cache_data: dict[Callable, list[tuple[Any, Any, Any]]] = {}
 @overload
 def wrap_cache(
     func: Callable,
+    /,
     *args: Any,
     _overwrite: bool = False,
     **kwargs: Any
@@ -517,6 +530,7 @@ def wrap_cache(
 @wrap_frame
 def wrap_cache(
     func: Callable,
+    /,
     *args: Any,
     _overwrite: bool = False,
     **kwargs: Any
@@ -568,6 +582,7 @@ def wrap_cache(
 @overload
 def wrap_redirect_stdout(
     func: Callable,
+    /,
     *args: Any,
     _redirect: list | IOBase | None = None,
     **kwargs: Any
@@ -576,6 +591,7 @@ def wrap_redirect_stdout(
 @wrap_frame
 def wrap_redirect_stdout(
     func: Callable,
+    /,
     *args: Any,
     _redirect: list | IOBase | None = None,
     **kwargs: Any

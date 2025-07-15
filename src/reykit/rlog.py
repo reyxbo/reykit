@@ -986,7 +986,7 @@ class RRecord(object):
             rfile = RFile(self.path)
 
             ## Convert.
-            if value.__class__ != str:
+            if type(value) != str:
                 value = str(value)
             if rfile:
                 value += ':'
@@ -1022,7 +1022,7 @@ class RRecord(object):
             rfile = RFile(self.path)
 
             ## Convert.
-            if value.__class__ != str:
+            if type(value) != str:
                 value = str(value)
             value = ':%s:' % value
 

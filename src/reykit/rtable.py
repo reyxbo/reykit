@@ -77,7 +77,7 @@ def to_table(
                     fields,
                     [
                         None
-                        if (value.__class__ != list and isnull(value))
+                        if (type(value) != list and isnull(value))
                         else value
                         for value in row
                     ]
@@ -140,9 +140,9 @@ def to_dict(
 
     # Get fields.
     fields = list(data[0].keys())
-    if key_field.__class__ == int:
+    if type(key_field) == int:
         key_field = fields[key_field]
-    if val_field.__class__ == int:
+    if type(val_field) == int:
         val_field = fields[val_field]
 
     # Convert.
@@ -196,7 +196,7 @@ def to_list(
 
     # Get fields.
     fields = list(data[0].keys())
-    if field.__class__ == int:
+    if type(field) == int:
         field = fields[field]
 
     # Convert.
@@ -244,7 +244,7 @@ def to_df(
 
         ## From other object.
         case _:
-            if data.__class__ == dict:
+            if type(data) == dict:
                 data = [data]
             data_df = DataFrame(data, columns=fields)
             data_df = data_df.convert_dtypes()
@@ -468,7 +468,7 @@ def to_excel(
     """
 
     # Handle parameter.
-    if data.__class__ != DataFrame:
+    if type(data) != DataFrame:
         data = to_df(data)
     path = os_abspath(path)
 

@@ -253,7 +253,7 @@ def sub_batch(text: str, *patterns: str | tuple[str, str | Callable[[RMatch], st
 
     # Replace.
     for pattern in patterns:
-        if pattern.__class__ == str:
+        if type(pattern) == str:
             replace = None
         else:
             pattern, replace = pattern

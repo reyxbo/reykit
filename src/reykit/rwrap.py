@@ -479,7 +479,7 @@ def wrap_dos_command(
         ## Position argument.
         value = getattr(namespace, info['name'])
         if value is not None:
-            if value.__class__ == list:
+            if type(value) == list:
                 command_args.extend(value)
             else:
                 command_args.append(value)
@@ -488,7 +488,7 @@ def wrap_dos_command(
         if info['type'] not in ('var_position', 'var_position'):
             kw_name = '--' + info['name']
             kw_value = getattr(namespace, kw_name)
-            if kw_value.__class__ == list:
+            if type(kw_value) == list:
                 kw_value_len = len(kw_value)
                 match kw_value_len:
                     case 0:
@@ -622,7 +622,7 @@ def wrap_redirect_stdout(
         result = func(*args, **kwargs)
 
     # Save.
-    if _redirect.__class__ == list:
+    if type(_redirect) == list:
         value = str_io.getvalue()
         _redirect.append(value)
 

@@ -111,7 +111,7 @@ def flatten(data: Any, *, _flattern_data: list | None = None) -> list:
     # Flatten.
 
     ## Recursion dict object.
-    if data.__class__ == dict:
+    if type(data) == dict:
         for element in data.values():
             _flattern_data = flatten(
                 element,
@@ -119,7 +119,7 @@ def flatten(data: Any, *, _flattern_data: list | None = None) -> list:
             )
 
     ## Recursion iterator.
-    elif is_iterable(data):
+    elif is_iterable(data, (str, bytes)):
         for element in data:
             _flattern_data = flatten(
                 element,

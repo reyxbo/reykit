@@ -472,11 +472,11 @@ class RFile(RBase):
             mode = 'a'
         else:
             mode = 'w'
-        if data.__class__ in (bytes, bytearray):
+        if type(data) in (bytes, bytearray):
             mode += 'b'
 
         ## Convert data to string.
-        if data.__class__ not in (str, bytes, bytearray):
+        if type(data) not in (str, bytes, bytearray):
             try:
                 data = to_json(data)
             except (JSONDecodeError, TypeError):

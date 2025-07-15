@@ -284,8 +284,8 @@ def dos_command_var(*vars: Any) -> list[Any]:
             var_type = str
             var_help = None
         else:
-            var_type = value.__class__
-            var_help = str(value.__class__)
+            var_type = type(value)
+            var_help = str(type(value))
 
         ## Position argument.
         parser.add_argument(
@@ -320,7 +320,7 @@ def dos_command_var(*vars: Any) -> list[Any]:
 
         ## Keyword argument.
         dos_value = getattr(namespace, kw_name)
-        if dos_value.__class__ == list:
+        if type(dos_value) == list:
             value_len = len(dos_value)
             match value_len:
                 case 0:
@@ -382,11 +382,11 @@ def at_exit(*contents: str | Callable | tuple[Callable, Iterable, Mapping]) -> l
     for content in reversed(contents):
         args = ()
         kwargs = {}
-        if content.__class__ == str:
+        if type(content) == str:
             func = lambda : print(content)
         elif callable(content):
             func = content
-        elif content.__class__ == tuple:
+        elif type(content) == tuple:
             func, args, kwargs = content
         funcs.append(func)
         atexit_register(func, *args, **kwargs)
@@ -435,7 +435,7 @@ def is_instance(obj: Any) -> bool:
 
 def is_iterable(
     obj: Any,
-    exclude_types: Iterable[type] = [str, bytes]
+    exclude_types: Iterable[type] | None = None
 ) -> bool:
     """
     Judge whether it is iterable.
@@ -450,15 +450,17 @@ def is_iterable(
     Judgment result.
     """
 
-    # Exclude types.
-    if obj.__class__ in exclude_types:
-        return False
-
     # Judge.
-    if hasattr(obj, '__iter__'):
+    if (
+        hasattr(obj, '__iter__')
+        and not (
+            exclude_types is not None
+            and type(obj) in exclude_types
+        )
+    ):
         return True
-    else:
-        return False
+
+    return False
 
 
 def is_table(
@@ -479,10 +481,10 @@ def is_table(
     """
 
     # Judge.
-    if obj.__class__ != list:
+    if type(obj) != list:
         return False
     for element in obj:
-        if element.__class__ != dict:
+        if type(element) != dict:
             return False
 
     ## Check fields of table.
@@ -591,15 +593,15 @@ def get_name(obj: Any, frame: int = 2) -> str | tuple[str, ...] | None:
     # Get name using module method.
     name = 'obj'
     for frame_ in range(1, frame + 1):
-        if name.__class__ != str:
+        if type(name) != str:
             return
         try:
             name = argname(name, frame=frame_)
         except VarnameRetrievingError:
             return
-    if name.__class__ == tuple:
+    if type(name) == tuple:
         for element in name:
-            if element.__class__ != str:
+            if type(element) != str:
                 return
 
     return name

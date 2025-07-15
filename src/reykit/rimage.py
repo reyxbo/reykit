@@ -91,7 +91,7 @@ def decode_qrcode(image: str | bytes) -> list[str]:
         raise pyzbar_decode
 
     # Handle parameter.
-    if image.__class__ in (bytes, bytearray):
+    if type(image) in (bytes, bytearray):
         image = BytesIO(image)
 
     # Decode.
@@ -141,7 +141,7 @@ def compress_image(
     """
 
     # Handle parameter.
-    if input_image.__class__ == str:
+    if type(input_image) == str:
         rfile = RFile(input_image)
         input_image = rfile.str
     now_size = len(input_image)
@@ -203,11 +203,11 @@ def to_pil_image(source: str | bytes) -> RImage:
     """
 
     # File path.
-    if source.__class__ == str:
+    if type(source) == str:
         pil_image = pil_open(source)
 
     # Bytes data.
-    if source.__class__ in (bytes, bytearray):
+    if type(source) in (bytes, bytearray):
         bytes_io = BytesIO(source)
         pil_image = pil_open(bytes_io)
 
@@ -239,7 +239,7 @@ def generate_captcha_image(
 
     # Get parameter.
     text = text or 5
-    if text.__class__ == int:
+    if type(text) == int:
         text = randchar(text, False)
 
     # Generate.

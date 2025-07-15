@@ -123,9 +123,9 @@ class REmail(RBase):
         """
 
         # Handle parameter.
-        if show_to.__class__ == list:
+        if type(show_to) == list:
             show_to = ','.join(show_to)
-        if show_cc.__class__ == list:
+        if type(show_cc) == list:
             show_cc = ','.join(show_cc)
 
         # Instance.
@@ -212,7 +212,7 @@ class REmail(RBase):
         # Handle parameter.
 
         ## To.
-        if to.__class__ == str:
+        if type(to) == str:
             to = to.split(',')
 
         ## Cc.
@@ -227,12 +227,12 @@ class REmail(RBase):
 
         ## Show to.
         show_to = show_to or to
-        if show_to.__class__ == str:
+        if type(show_to) == str:
             show_to = show_to.split(',')
 
         ## Show cc.
         show_cc = show_cc or cc
-        if show_cc.__class__ == str:
+        if type(show_cc) == str:
             show_cc = show_cc.split(',')
 
         ## Attachment.

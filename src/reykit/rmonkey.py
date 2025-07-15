@@ -114,7 +114,7 @@ def monkey_patch_sqlalchemy_result_more_fetch():
 
         # Convert.
         df: DataFrame = self.fetch_df()
-        df = df.applymap(time_to, raising=False)
+        df = df.map(time_to, raising=False)
         df = df.astype(str)
         df.replace(['NaT', '<NA>'], 'None', inplace=True)
         row_len, column_len = df.shape
@@ -254,7 +254,7 @@ def monkey_patch_sqlalchemy_row_index_field():
         """
 
         # Index.
-        if index.__class__ == str:
+        if type(index) == str:
             value = self._mapping[index]
         else:
             value = self._data[index]

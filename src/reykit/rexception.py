@@ -105,7 +105,7 @@ def throw(
         match exception:
             case TypeError():
                 values = [
-                    value.__class__
+                    type(value)
                     for value in values
                     if value is not None
                 ]
@@ -115,7 +115,7 @@ def throw(
                     if value % 1 == 0
                     else round(value, 3)
                     for value in values
-                    if value.__class__ == float
+                    if type(value) == float
                 ]
         values = [
             repr(value)
@@ -164,7 +164,7 @@ def warn(
     if infos == ():
         infos = 'Warning!'
     elif len(infos) == 1:
-        if infos[0].__class__ == str:
+        if type(infos[0]) == str:
             infos = infos[0]
         else:
             infos = str(infos[0])

@@ -221,7 +221,7 @@ def join_data_text(data: Iterable) -> str:
     # Join.
 
     ## dict type.
-    if data.__class__ == dict:
+    if type(data) == dict:
         texts = []
         for key, value in data.items():
             key_str = str(key)
@@ -409,7 +409,7 @@ def to_json(
     # Convert.
     default = lambda value: (
         value.__float__()
-        if value.__class__ == Decimal
+        if type(value) == Decimal
         else repr(value)
     )
     string = json_dumps(

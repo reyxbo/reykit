@@ -190,16 +190,16 @@ def get_content_type(file: str | bytes) -> str | None:
     # Guess.
     if (
         (
-            file.__class__ == str
+            type(file) == str
             and os_isfile(file)
-        ) or file.__class__ == bytes
+        ) or type(file) == bytes
     ):
         file_type_obj = filetype_guess(file)
     else:
         file_type_obj = None
     if file_type_obj is not None:
         file_type = file_type_obj.MIME
-    elif file.__class__ == str:
+    elif type(file) == str:
         file_type, _ = guess_type(file)
     else:
         file_type = None
@@ -275,26 +275,26 @@ def request(
         else:
             method = 'post'
     if files is None:
-        if data.__class__ == str:
+        if type(data) == str:
             rfile = RFile(data)
             data = rfile.bytes
             if 'Content-Disposition' not in headers:
                 file_name = rfile.name_suffix
                 headers['Content-Disposition'] = f'attachment; filename={file_name}'
-        if data.__class__ == bytes:
+        if type(data) == bytes:
             if 'Content-Type' not in headers:
                 headers['Content-Type'] = get_content_type(data)
     else:
         for key, value in files.items():
-            if value.__class__ == tuple:
+            if type(value) == tuple:
                 item_data, item_headers = value
             else:
                 item_data, item_headers = value, {}
-            if item_data.__class__ == str:
+            if type(item_data) == str:
                 rfile = RFile(item_data)
                 data = rfile.bytes
                 item_headers.setdefault('filename', rfile.name_suffix)
-            if item_data.__class__ == bytes:
+            if type(item_data) == bytes:
                 if 'Content-Type' not in item_headers:
                     item_headers['Content-Type'] = get_content_type(item_data)
             files[key] = (

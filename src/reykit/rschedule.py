@@ -219,7 +219,7 @@ class RSchedule(RBase):
         """
 
         # Get parameter.
-        if task.__class__ == Job:
+        if type(task) == Job:
             id_ = task.id
         else:
             id_ = task
@@ -241,7 +241,7 @@ class RSchedule(RBase):
         """
 
         # Get parameter.
-        if task.__class__ == Job:
+        if type(task) == Job:
             id_ = task.id
         else:
             id_ = task
@@ -263,7 +263,7 @@ class RSchedule(RBase):
         """
 
         # Get parameter.
-        if task.__class__ == Job:
+        if type(task) == Job:
             id_ = task.id
         else:
             id_ = task

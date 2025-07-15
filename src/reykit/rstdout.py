@@ -108,7 +108,7 @@ def beautify_text(
             titles = [title if not title.startswith('`') else '' for title in titles]
             if set(titles) != {''}:
                 title = ' │ '.join(titles)
-    if title.__class__ != str:
+    if type(title) != str:
         title = None
 
     ## Width.
@@ -287,7 +287,7 @@ def modify_print(preprocess: Callable[[str], str] | None) -> None:
         __s = preprocess(__s)
 
         # Write.
-        if __s.__class__ == str:
+        if type(__s) == str:
             write_len = RConfigStdout._io_stdout_write(__s)
             return write_len
 

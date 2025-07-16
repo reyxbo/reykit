@@ -51,9 +51,9 @@ from docx.oxml.table import CT_Tbl
 from lxml.etree import ElementChildIterator
 from pdfplumber import open as pdfplumber_open
 
-from .rexception import throw
-from .rregex import search, sub
-from .rsystem import dos_command
+from .rexc import throw
+from .rre import search, sub
+from .rsys import dos_command
 from .rtext import to_json
 from .rtype import RBase
 
@@ -1857,9 +1857,8 @@ def doc_to_docx(
     DOCX file path.
     """
 
-
+    # Import.
     from win32com.client import Dispatch, CDispatch
-
 
     # Handle parameter.
     if save_path is None:

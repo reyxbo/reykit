@@ -10,23 +10,23 @@
 Modules
 -------
 rall : All methods.
-rcomm : Network communication methods.
 rdata : Data methods.
 rdll : DLL file methods.
 remail : E-mail methods.
-rexception : Exception methods.
+rexc : Exception methods.
 rimage : Image methods.
 rlog : Log methods.
 rmonkey : Monkey patch methods.
-rmultitask : Multi task methods.
-rnumber : Number methods.
+rnet : Network methods.
+rnum : Number methods.
 ros: Operation system methods.
-rrandom : Random methods.
-rregex : Regular expression methods.
+rrand : Random methods.
+rre : Regular expression methods.
 rschedule : Schedule methods.
-rstdout : Standard output methods.
-rsystem : Interpreter system methods.
+rstdout : Standard output and input methods.
+rsys : Interpreter system methods.
 rtable : Table methods.
+rtask : Multi task methods.
 rtext : Text methods.
 rtime : Time methods.
 rtype : Type methods.

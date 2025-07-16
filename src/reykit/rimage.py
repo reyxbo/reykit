@@ -16,15 +16,9 @@ from qrcode.image.pil import PilImage
 from PIL.Image import open as pil_open, LANCZOS
 from captcha.image import ImageCaptcha
 
-from .rexception import catch_exc
 from .rmonkey import monkey_path_pil_image_get_bytes
 from .ros import RFile
-from .rrandom import randchar
-
-try:
-    from pyzbar.pyzbar import decode as pyzbar_decode
-except:
-    *_, pyzbar_decode, _ = catch_exc()
+from .rrand import randchar
 
 
 __all__ = (
@@ -85,6 +79,9 @@ def decode_qrcode(image: str | bytes) -> list[str]:
     -------
     QR code or bar code text list.
     """
+
+    # Import.
+    from pyzbar.pyzbar import decode as pyzbar_decode
 
     # Check.
     if isinstance(pyzbar_decode, BaseException):

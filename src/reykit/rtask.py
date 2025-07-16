@@ -9,7 +9,6 @@
 """
 
 
-from __future__ import annotations
 from typing import Any, Literal, overload
 from collections.abc import Callable, Iterable, Generator, Coroutine
 from threading import RLock as TRLock, get_ident as threading_get_ident
@@ -31,7 +30,7 @@ from asyncio import (
 )
 from aiohttp import ClientSession, ClientResponse
 
-from .rexception import throw, check_most_one, check_response_code
+from .rexc import throw, check_most_one, check_response_code
 from .rtime import randn, RTimeMark
 from .rtype import T, RBase
 from .rwrap import wrap_thread

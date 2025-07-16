@@ -9,17 +9,6 @@
 """
 
 
-# !/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-"""
-@Time    : 2022-12-05 14:09:42
-@Author  : Rey
-@Contact : reyxbo@163.com
-@Explain : Interpreter system methods.
-"""
-
-
 from typing import Any, NoReturn, overload
 from types import TracebackType
 from collections.abc import Iterable
@@ -93,7 +82,7 @@ def throw(
         values = (value,) + values
 
         ### Name.
-        from .rsystem import get_name
+        from .rsys import get_name
         name = get_name(value, frame)
         names = (name,)
         if values != ():
@@ -234,7 +223,7 @@ def check_least_one(*values: Any) -> None:
             return
 
     # Throw exception.
-    from .rsystem import get_name
+    from .rsys import get_name
     vars_name = get_name(values)
     if vars_name is not None:
         vars_name_de_dup = list(set(vars_name))
@@ -261,7 +250,7 @@ def check_most_one(*values: Any) -> None:
             if exist is True:
 
                 # Throw exception.
-                from .rsystem import get_name
+                from .rsys import get_name
                 vars_name = get_name(values)
                 if vars_name is not None:
                     vars_name_de_dup = list(set(vars_name))

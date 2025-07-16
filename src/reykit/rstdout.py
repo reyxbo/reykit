@@ -5,18 +5,18 @@
 @Time    : 2023-10-01 14:47:47
 @Author  : Rey
 @Contact : reyxbo@163.com
-@Explain : Standard output methods.
+@Explain : Standard output and input methods.
 """
 
 
-from typing import Any, Literal, Final, Self
+from typing import Any, Literal, Final
 from collections.abc import Callable
 import sys
 from io import TextIOWrapper
 from os import devnull as os_devnull
 from os.path import abspath as os_abspath
 
-from .rsystem import get_first_notnull, get_name, get_stack_param
+from .rsys import get_first_notnull, get_name, get_stack_param
 from .rtext import to_text, add_text_frame
 from .rtype import RBase, RConfigMeta
 

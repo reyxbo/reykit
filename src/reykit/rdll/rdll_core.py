@@ -5,7 +5,7 @@
 @Time    : 2023-12-06 16:17:04
 @Author  : Rey
 @Contact : reyxbo@163.com
-@Explain : DLL file inject method code.
+@Explain : DLL file code methods.
 """
 
 

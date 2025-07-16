@@ -9,9 +9,37 @@
 
 Modules
 -------
-rdll_inject_core : DLL file inject method code.
-rdll_inject : DLL file inject method.
+rdll_core : DLL file code methods.
 """
 
 
-from .rdll_inject import *
+from ctypes import create_string_buffer
+
+from .rdll_core import InjectDLL
+
+
+__all__ = (
+    'inject_dll',
+)
+
+
+def inject_dll(
+    id_: int,
+    path: str
+) -> None:
+    """
+    Inject DLL file.
+
+    Parameters
+    ----------
+    id_ : Process ID.
+    path : DLL file path.
+    """
+
+
+    # Get parameter.
+    path_bytes = path.encode()
+    buffer = create_string_buffer(path_bytes)
+
+    # Inject.
+    InjectDLL(id_, buffer)

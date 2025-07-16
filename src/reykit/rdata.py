@@ -14,8 +14,8 @@ from collections import defaultdict as Defaultdict, ChainMap
 from collections.abc import Callable, Iterable, Generator
 from itertools import chain as IChain
 
-from .rexception import check_least_one, check_most_one
-from .rsystem import is_iterable
+from .rexc import check_least_one, check_most_one
+from .rsys import is_iterable
 from .rtype import T, KT, VT, RBase, Null
 
 

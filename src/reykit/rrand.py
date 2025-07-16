@@ -19,8 +19,8 @@ from random import Random
 from secrets import randbelow as secrets_randbelow
 from threading import get_ident as threading_get_ident
 
-from .rexception import throw
-from .rnumber import digits
+from .rexc import throw
+from .rnum import digits
 from .rtype import T, RBase, RConfigMeta
 
 

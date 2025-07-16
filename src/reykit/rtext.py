@@ -15,9 +15,9 @@ from decimal import Decimal
 from pprint import pformat as pprint_pformat
 from json import dumps as json_dumps
 
-from .rexception import throw
+from .rexc import throw
 from .rmonkey import monkey_patch_pprint_modify_width_judgment
-from .rrandom import randi
+from .rrand import randi
 
 
 __all__ = (

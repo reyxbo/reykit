@@ -18,9 +18,9 @@ from threading import Thread
 from argparse import ArgumentParser
 from contextlib import redirect_stdout
 
-from .rexception import catch_exc
+from .rexc import catch_exc
 from .rstdout import echo
-from .rsystem import get_arg_info
+from .rsys import get_arg_info
 from .rtime import now, time_to, RTimeMark
 
 

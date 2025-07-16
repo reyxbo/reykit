@@ -29,10 +29,10 @@ from pandas import (
     Timedelta as PTimedelta
 )
 
-from .rexception import throw
-from .rnumber import digits, to_number
-from .rrandom import randn
-from .rregex import search
+from .rexc import throw
+from .rnum import digits, to_number
+from .rrand import randn
+from .rre import search
 from .rstdout import echo
 from .rtype import T
 

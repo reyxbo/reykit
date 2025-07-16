@@ -45,10 +45,9 @@ def monkey_patch_sqlalchemy_result_more_fetch():
     >>> result.empty
     """
 
-
+    # Import.
     from sqlalchemy.engine.cursor import CursorResult
     from pandas import DataFrame, NA, concat
-
     from .rstdout import echo
     from .rtable import (
         to_table,
@@ -63,7 +62,6 @@ def monkey_patch_sqlalchemy_result_more_fetch():
         to_excel
     )
     from .rtime import time_to
-
 
     # Fetch result as table in 'list[dict]' format.
     CursorResult.fetch_table = to_table
@@ -228,10 +226,9 @@ def monkey_patch_sqlalchemy_row_index_field():
     ...     row['field']
     """
 
-
+    # Import.
     from typing import Any, overload
     from sqlalchemy.engine.row import Row
-
 
     # Define.
     @overload
@@ -271,16 +268,14 @@ def monkey_patch_pprint_modify_width_judgment() -> None:
     Monkey patch of package `pprint`, modify the chinese width judgment.
     """
 
-
+    # Import.
     from pprint import PrettyPrinter, _recursion
 
 
-    # New method.
+    # Define.
     def _format(_self, obj, stream, indent, allowance, context, level):
 
-
         from .rtext import get_width
-
 
         objid = id(obj)
         if objid in context:
@@ -324,7 +319,6 @@ def monkey_path_pil_image_get_bytes():
     >>> image = to_pil_image(source)
     >>> image.get_bytes()
     """
-
 
     from PIL.Image import Image
     from io import BytesIO

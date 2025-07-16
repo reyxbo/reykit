@@ -11,7 +11,7 @@
 
 from typing import Any
 
-from .rexception import throw
+from .rexc import throw
 
 
 __all__ = (
@@ -119,7 +119,7 @@ def number_ch(number: int) -> str:
     """
 
     # Import.
-    from .rregex import sub_batch
+    from .rre import sub_batch
 
     # Set parameter.
     map_digit = {

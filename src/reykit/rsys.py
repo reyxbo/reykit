@@ -56,7 +56,7 @@ from tkinter.filedialog import (
     askdirectory as tkinter_askdirectory
 )
 
-from .rexception import throw
+from .rexc import throw
 from .rtype import RBase, RConfigMeta
 
 
@@ -184,7 +184,7 @@ def del_modules(path: str) -> list[str]:
     """
 
     # Import.
-    from .rregex import search
+    from .rre import search
 
     # Set parameter.
     deleted_dict = {}

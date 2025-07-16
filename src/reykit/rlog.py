@@ -9,7 +9,6 @@
 """
 
 
-from __future__ import annotations
 from typing import Any, Literal, Final, overload
 from collections.abc import Callable
 from queue import Queue
@@ -30,11 +29,11 @@ from logging import (
 from logging.handlers import QueueHandler
 from concurrent_log_handler import ConcurrentRotatingFileHandler, ConcurrentTimedRotatingFileHandler
 
-from .rexception import throw, catch_exc
+from .rexc import throw, catch_exc
 from .ros import RFile
-from .rregex import search, sub
+from .rre import search, sub
 from .rstdout import RConfigStdout, modify_print, reset_print
-from .rsystem import get_first_notnull, get_stack_param
+from .rsys import get_first_notnull, get_stack_param
 from .rtext import to_text
 from .rtime import now, time_to
 from .rtype import RBase, RConfigMeta

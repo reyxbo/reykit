@@ -9,23 +9,23 @@
 """
 
 
-from .rcomm import *
 from .rdata import *
 from .rdll import *
 from .remail import *
-from .rexception import *
+from .rexc import *
 from .rimage import *
 from .rlog import *
 from .rmonkey import *
-from .rmultitask import *
-from .rnumber import *
+from .rnet import *
+from .rnum import *
 from .ros import *
-from .rrandom import *
-from .rregex import *
+from .rrand import *
+from .rre import *
 from .rschedule import *
 from .rstdout import *
-from .rsystem import *
+from .rsys import *
 from .rtable import *
+from .rtask import *
 from .rtext import *
 from .rtime import *
 from .rtype import *

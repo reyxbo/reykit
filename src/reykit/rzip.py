@@ -9,7 +9,6 @@
 """
 
 
-from __future__ import annotations
 from zipfile import ZipFile, is_zipfile, ZIP_DEFLATED
 from os import getcwd as os_getcwd, walk as os_walk
 from os.path import join as os_join, isfile as os_isfile

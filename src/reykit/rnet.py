@@ -5,7 +5,7 @@
 @Time    : 2022-12-08 11:07:25
 @Author  : Rey
 @Contact : reyxbo@163.com
-@Explain : Network communication methods.
+@Explain : Network methods.
 """
 
 
@@ -30,9 +30,9 @@ from mimetypes import guess_type
 from filetype import guess as filetype_guess
 from datetime import datetime
 
-from .rexception import throw, check_response_code
+from .rexc import throw, check_response_code
 from .ros import RFile
-from .rregex import search
+from .rre import search
 from .rtype import RBase
 
 
@@ -44,7 +44,7 @@ __all__ = (
     'get_content_type',
     'request',
     'download',
-    'get_file_stream_time',
+    'compute_stream_time',
     'listen_socket',
     'RRequestCache'
 )
@@ -387,12 +387,12 @@ def download(url: str, path: str | None = None) -> str:
     return path
 
 
-def get_file_stream_time(
+def compute_stream_time(
     file: str | bytes | int,
     bandwidth: float
 ) -> float:
     """
-    Get file stream transfer time, unit second.
+    Compute file stream transfer time, unit second.
 
     Parameters
     ----------

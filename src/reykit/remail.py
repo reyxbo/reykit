@@ -17,17 +17,17 @@ from email.mime.application import MIMEApplication
 from .rdata import unique
 from .rexc import throw
 from .ros import FileBytes, get_file_bytes
-from .rtype import RBase
+from .rtype import Base
 
 
 __all__ = (
-    'REmail',
+    'Email',
 )
 
 
-class REmail(RBase):
+class Email(Base):
     """
-    Rey's `email` type.
+    Email type.
     """
 
 
@@ -37,7 +37,7 @@ class REmail(RBase):
         password: str
     ) -> None:
         """
-        Build `email` instance attributes.
+        Build instance attributes.
 
         Parameters
         ----------
@@ -108,7 +108,7 @@ class REmail(RBase):
         show_cc: list[str] | None
     ) -> str:
         """
-        create email content.
+        Create email content.
 
         Parameters
         ----------

@@ -55,7 +55,7 @@ from .rexc import throw
 from .rre import search, sub
 from .rsys import dos_command
 from .rtext import to_json
-from .rtype import RBase
+from .rtype import Base
 
 
 __all__ = (
@@ -65,10 +65,10 @@ __all__ = (
     'get_file_str',
     'get_file_bytes',
     'read_toml',
-    'RFile',
-    'RFolder',
-    'RTempFile',
-    'RTempFolder',
+    'File',
+    'Folder',
+    'TempFile',
+    'TempFolder',
     'doc_to_docx',
     'extract_docx_content',
     'extract_pdf_content',
@@ -81,7 +81,6 @@ type FileText = str
 type FileData = bytes
 type FileStr = FilePath | FileText | TextIOBase
 type FileBytes = FilePath | FileData | BufferedIOBase
-type File = FileStr | FileBytes
 
 
 def get_md5(file: str | bytes) -> str:
@@ -102,7 +101,7 @@ def get_md5(file: str | bytes) -> str:
 
         ## Path.
         case str():
-            rfile = RFile(file)
+            rfile = File(file)
             file_bytes = rfile.bytes
 
         ## Bytes.
@@ -128,7 +127,7 @@ def create_folder(*paths: str, report: bool = False) -> None:
 
     # Create.
     for path in paths:
-        rfolder = RFolder(path)
+        rfolder = Folder(path)
         rfolder.create(report)
 
 
@@ -205,7 +204,7 @@ def get_file_str(file: FileStr) -> str:
 
             ## Path.
             if exist:
-                rfile = RFile(file)
+                rfile = File(file)
                 file_str = rfile.str
 
             ## String.
@@ -250,7 +249,7 @@ def get_file_bytes(file: FileBytes) -> bytes:
 
         ## Path.
         case str():
-            rfile = RFile(file)
+            rfile = File(file)
             file_bytes = rfile.bytes
 
         ## IO.
@@ -264,14 +263,14 @@ def get_file_bytes(file: FileBytes) -> bytes:
     return file_bytes
 
 
-def read_toml(path: str | RFile) -> dict[str, Any]:
+def read_toml(path: str | File) -> dict[str, Any]:
     """
     Read and parse TOML file.
     Treat nan as a None or null value.
 
     Parameters
     ----------
-    path : File path or RFile object.
+    path : File path or File object.
 
     Returns
     -------
@@ -283,11 +282,11 @@ def read_toml(path: str | RFile) -> dict[str, Any]:
 
         ## File path.
         case str():
-            rfile = RFile(path)
+            rfile = File(path)
             text = rfile.str
 
-        ## RFile object.
-        case RFile():
+        ## File object.
+        case File():
             text = rfile.str
 
     # Parse.
@@ -300,9 +299,9 @@ def read_toml(path: str | RFile) -> dict[str, Any]:
     return params
 
 
-class RFile(RBase):
+class File(Base):
     """
-    Rey's `file` type.
+    File type.
     """
 
 
@@ -311,7 +310,7 @@ class RFile(RBase):
         path: str
     ) -> None:
         """
-        Build `file` instance attributes.
+        Build instance attributes.
 
         Parameters
         ----------
@@ -846,9 +845,9 @@ class RFile(RBase):
     __call__ = write
 
 
-class RFolder(RBase):
+class Folder(Base):
     """
-    Rey's `folder` type.
+    Folder type.
     """
 
 
@@ -857,7 +856,7 @@ class RFolder(RBase):
         path: str | None = None
     ) -> None:
         """
-        Build `folder` instance attributes.
+        Build instance attributes.
 
         Parameters
         ----------
@@ -1220,9 +1219,9 @@ class RFolder(RBase):
     __call__ = paths
 
 
-class RTempFile(RBase):
+class TempFile(Base):
     """
-    Rey's `temporary file` type.
+    Temporary file type.
     """
 
 
@@ -1233,7 +1232,7 @@ class RTempFile(RBase):
         type_: Literal['str', 'bytes'] = 'bytes'
     ) -> None:
         """
-        Build `temporary file` instance attributes.
+        Build instance attributes.
 
         Parameters
         ----------
@@ -1505,9 +1504,9 @@ class RTempFile(RBase):
     __call__ = write
 
 
-class RTempFolder(RBase):
+class TempFolder(Base):
     """
-    Rey's `temporary folder` type.
+    Temporary folder type.
     """
 
 
@@ -1516,7 +1515,7 @@ class RTempFolder(RBase):
         dir_: str | None = None
     ) -> None:
         """
-        Build `temporary folder` instance attributes.
+        Build instance attributes.
 
         Parameters
         ----------

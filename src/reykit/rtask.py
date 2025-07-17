@@ -31,24 +31,24 @@ from asyncio import (
 from aiohttp import ClientSession, ClientResponse
 
 from .rexc import throw, check_most_one, check_response_code
-from .rtime import randn, RTimeMark
-from .rtype import T, RBase
+from .rtime import randn, TimeMark
+from .rtype import T, Base
 from .rwrap import wrap_thread
 
 
 __all__ = (
-    'RThreadPool',
+    'ThreadPool',
     'async_run',
     'async_sleep',
     'async_wait',
     'async_request',
-    'RAsyncPool'
+    'AsyncPool'
 )
 
 
-class RThreadPool(RBase):
+class ThreadPool(Base):
     """
-    Rey's `thread pool` type.
+    Thread pool type.
 
     Attributes
     ----------
@@ -68,7 +68,7 @@ class RThreadPool(RBase):
         **kwargs: Any
     ) -> None:
         """
-        Build `thread pool` instance attributes.
+        Build instance attributes.
 
         Parameters
         ----------
@@ -157,7 +157,7 @@ class RThreadPool(RBase):
         >>> b = (3, 4, 5)
         >>> c = (11, 12)
         >>> d = (13, 14, 15)
-        >>> thread_pool = RThreadPool(func, 0, z=0)
+        >>> thread_pool = ThreadPool(func, 0, z=0)
         >>> thread_pool.batch(a, b, c=c, d=d)
         (0, 1, 3) {'z': 0, 'c': 11, 'd': 13}
         (0, 2, 4) {'z': 0, 'c': 12, 'd': 14}
@@ -474,7 +474,7 @@ async def async_wait(
     """
 
     # Set parameter.
-    rtm = RTimeMark()
+    rtm = TimeMark()
     rtm()
 
     # Not set timeout.
@@ -669,9 +669,9 @@ async def async_request(
             return result
 
 
-class RAsyncPool(RBase):
+class AsyncPool(Base):
     """
-    Rey's `asynchronous pool` type.
+    Asynchronous pool type.
 
     Attributes
     ----------
@@ -690,7 +690,7 @@ class RAsyncPool(RBase):
         **kwargs: Any
     ) -> None:
         """
-        Build `asynchronous pool` instance attributes.
+        Build instance attributes.
 
         Parameters
         ----------
@@ -779,7 +779,7 @@ class RAsyncPool(RBase):
         >>> b = (3, 4, 5)
         >>> c = (11, 12)
         >>> d = (13, 14, 15)
-        >>> async_pool = RAsyncPool(func, 0, z=0)
+        >>> async_pool = AsyncPool(func, 0, z=0)
         >>> async_pool.batch(a, b, c=c, d=d)
         (0, 1, 3) {'z': 0, 'c': 11, 'd': 13}
         (0, 2, 4) {'z': 0, 'c': 12, 'd': 14}

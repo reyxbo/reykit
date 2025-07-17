@@ -18,11 +18,11 @@ from os.path import abspath as os_abspath
 
 from .rsys import get_first_notnull, get_name, get_stack_param
 from .rtext import to_text, add_text_frame
-from .rtype import RBase, RConfigMeta
+from .rtype import Base, ConfigMeta
 
 
 __all__ = (
-    'RConfigStdout',
+    'ConfigStdout',
     'beautify_text',
     'echo',
     'rinput',
@@ -34,9 +34,9 @@ __all__ = (
 )
 
 
-class RConfigStdout(RBase, metaclass=RConfigMeta):
+class ConfigStdout(Base, metaclass=ConfigMeta):
     """
-    Rey's `config standard output` type.
+    Config standard output type.
 
     Attributes
     ----------
@@ -81,16 +81,16 @@ def beautify_text(
         - `Literal[False]`: No title.
         - `str`: Use this value as the title.
     width : Text width.
-        - `None`: Use attribute `RConfigStdout.default_width`.
+        - `None`: Use attribute `ConfigStdout.default_width`.
         - `int`: Use this value.
     frame : Text frame type.
         - `Literal['full']`: Add beautiful four side frame and limit length.
-            When attribute `RConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
+            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
             When throw `exception`, then frame is `half` type.
         - `Literal['half']`: Add beautiful top and bottom side frame.
-            When attribute `RConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
+            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
         - `Literal['top']`: Add beautiful top side frame.
-            When attribute `RConfigStdout.is_frame_plain` is True, then frame is `top_plain` type.
+            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `top_plain` type.
         - `Literal['half_plain']`: Add plain top and bottom side frame.
         - `Literal['top_plain']`: Add plain top side frame.
 
@@ -112,10 +112,10 @@ def beautify_text(
         title = None
 
     ## Width.
-    width = get_first_notnull(width, RConfigStdout.default_width, default='exception')
+    width = get_first_notnull(width, ConfigStdout.default_width, default='exception')
 
     ## Frame.
-    if RConfigStdout.is_frame_plain:
+    if ConfigStdout.is_frame_plain:
         match frame:
             case 'full':
                 frame = 'half_plain'
@@ -153,16 +153,16 @@ def echo(
         - `Literal[False]`: No title.
         - `str`: Use this value as the title.
     width : Text width.
-        - `None`: Use attribute `RConfigStdout.default_width`.
+        - `None`: Use attribute `ConfigStdout.default_width`.
         - `int`: Use this value.
     frame : Text frame type.
         - `Literal['full']`: Add beautiful four side frame and limit length.
-            When attribute `RConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
+            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
             When throw `exception`, then frame is `half` type.
         - `Literal['half']`: Add beautiful top and bottom side frame.
-            When attribute `RConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
+            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
         - `Literal['top']`: Add beautiful top side frame.
-            When attribute `RConfigStdout.is_frame_plain` is True, then frame is `top_plain` type.
+            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `top_plain` type.
         - `Literal['half_plain']`: Add plain top and bottom side frame.
         - `Literal['top_plain']`: Add plain top side frame.
 
@@ -198,16 +198,16 @@ def rinput(
         - `Literal[False]`: No title.
         - `str`: Use this value as the title.
     width : Text width.
-        - `None`: Use attribute `RConfigStdout.default_width`.
+        - `None`: Use attribute `ConfigStdout.default_width`.
         - `int`: Use this value.
     frame : Text frame type.
         - `Literal['full']`: Add beautiful four side frame and limit length.
-            When attribute `RConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
+            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
             When throw `exception`, then frame is `half` type.
         - `Literal['half']`: Add beautiful top and bottom side frame.
-            When attribute `RConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
+            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
         - `Literal['top']`: Add beautiful top side frame.
-            When attribute `RConfigStdout.is_frame_plain` is True, then frame is `top_plain` type.
+            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `top_plain` type.
         - `Literal['half_plain']`: Add plain top and bottom side frame.
         - `Literal['top_plain']`: Add plain top side frame.
     extra : Extra print text at the end.
@@ -236,10 +236,10 @@ def stop_print() -> None:
     """
 
     # Stop.
-    sys.stdout = RConfigStdout._io_null
+    sys.stdout = ConfigStdout._io_null
 
     # Update status.
-    RConfigStdout._stoped = True
+    ConfigStdout._stoped = True
 
 
 def start_print() -> None:
@@ -248,13 +248,13 @@ def start_print() -> None:
     """
 
     # Check.
-    if not RConfigStdout._stoped: return
+    if not ConfigStdout._stoped: return
 
     # Start.
-    sys.stdout = RConfigStdout._io_stdout
+    sys.stdout = ConfigStdout._io_stdout
 
     # Update status.
-    RConfigStdout._stoped = False
+    ConfigStdout._stoped = False
 
 
 def modify_print(preprocess: Callable[[str], str] | None) -> None:
@@ -288,15 +288,15 @@ def modify_print(preprocess: Callable[[str], str] | None) -> None:
 
         # Write.
         if type(__s) == str:
-            write_len = RConfigStdout._io_stdout_write(__s)
+            write_len = ConfigStdout._io_stdout_write(__s)
             return write_len
 
 
     # Modify.
-    RConfigStdout._io_stdout.write = write
+    ConfigStdout._io_stdout.write = write
 
     # Update status.
-    RConfigStdout._modified = True
+    ConfigStdout._modified = True
 
 
 def reset_print() -> None:
@@ -305,13 +305,13 @@ def reset_print() -> None:
     """
 
     # Check.
-    if not RConfigStdout._modified: return
+    if not ConfigStdout._modified: return
 
     # Reset.
-    RConfigStdout._io_stdout.write = RConfigStdout._io_stdout_write
+    ConfigStdout._io_stdout.write = ConfigStdout._io_stdout_write
 
     # Update status.
-    RConfigStdout._modified = False
+    ConfigStdout._modified = False
 
 
 def add_print_position() -> None:
@@ -343,7 +343,7 @@ def add_print_position() -> None:
 
         ## Compatible 'echo'.
         if (
-            stack_floor['filename'] == RConfigStdout._path_rstdout
+            stack_floor['filename'] == ConfigStdout._path_rstdout
             and stack_floor['name'] == 'echo'
         ):
             stack_floor = stack_params[-2]

@@ -21,7 +21,7 @@ from contextlib import redirect_stdout
 from .rexc import catch_exc
 from .rstdout import echo
 from .rsys import get_arg_info
-from .rtime import now, time_to, RTimeMark
+from .rtime import now, time_to, TimeMark
 
 
 __all__ = (
@@ -188,7 +188,7 @@ def wrap_runtime(
     """
 
     # Execute function and marking time.
-    rtm = RTimeMark()
+    rtm = TimeMark()
     rtm()
     result = func(*args, **kwargs)
     rtm()

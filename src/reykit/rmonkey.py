@@ -62,6 +62,7 @@ def monkey_patch_sqlalchemy_result_more_fetch():
         to_excel
     )
     from .rtime import time_to
+    from .rtype import Base
 
     # Fetch result as table in 'list[dict]' format.
     CursorResult.fetch_table = to_table
@@ -95,7 +96,7 @@ def monkey_patch_sqlalchemy_result_more_fetch():
 
 
     # Print result.
-    def method_show(self: RResult, limit: int | None = None) -> None:
+    def method_show(self: Result, limit: int | None = None) -> None:
         """
         Print result.
 
@@ -149,7 +150,7 @@ def monkey_patch_sqlalchemy_result_more_fetch():
 
     # Whether is exist.
     @property
-    def method_exist(self: RResult) -> bool:
+    def method_exist(self: Result) -> bool:
         """
         Judge whether is exist row.
 
@@ -169,7 +170,7 @@ def monkey_patch_sqlalchemy_result_more_fetch():
 
     # Whether is empty.
     @property
-    def method_empty(self: RResult) -> bool:
+    def method_empty(self: Result) -> bool:
         """
         Judge whether is empty row.
 
@@ -188,7 +189,7 @@ def monkey_patch_sqlalchemy_result_more_fetch():
 
 
     # Update annotations.
-    class RResult(CursorResult):
+    class Result(Base, CursorResult):
         """
         Update based on `CursorResult` object, for annotation return value.
         """
@@ -212,7 +213,7 @@ def monkey_patch_sqlalchemy_result_more_fetch():
         empty = method_empty
 
 
-    return RResult
+    return Result
 
 
 def monkey_patch_sqlalchemy_row_index_field():
@@ -322,6 +323,7 @@ def monkey_path_pil_image_get_bytes():
 
     from PIL.Image import Image
     from io import BytesIO
+    from reykit.rtype import Base
 
 
     # Define.
@@ -347,7 +349,7 @@ def monkey_path_pil_image_get_bytes():
 
 
     # Update annotations.
-    class RImage(Image):
+    class Image(Base, Image):
         """
         Update based on `Image` object, for annotation return value.
         """
@@ -359,4 +361,4 @@ def monkey_path_pil_image_get_bytes():
         get_bytes = method_get_bytes
 
 
-    return RImage
+    return Image

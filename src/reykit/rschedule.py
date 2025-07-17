@@ -16,17 +16,17 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.job import Job
 
-from .rtype import RBase
+from .rtype import Base
 
 
 __all__ = (
-    'RSchedule',
+    'Schedule',
 )
 
 
-class RSchedule(RBase):
+class Schedule(Base):
     """
-    Rey's `schedule` type.
+    Schedule type.
     """
 
 
@@ -38,7 +38,7 @@ class RSchedule(RBase):
         block: bool = False
     ) -> None:
         """
-        Build `schedule` instance attributes.
+        Build instance attributes.
 
         Parameters
         ----------

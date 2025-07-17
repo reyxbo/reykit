@@ -30,35 +30,35 @@ from logging.handlers import QueueHandler
 from concurrent_log_handler import ConcurrentRotatingFileHandler, ConcurrentTimedRotatingFileHandler
 
 from .rexc import throw, catch_exc
-from .ros import RFile
+from .ros import File
 from .rre import search, sub
-from .rstdout import RConfigStdout, modify_print, reset_print
+from .rstdout import ConfigStdout, modify_print, reset_print
 from .rsys import get_first_notnull, get_stack_param
 from .rtext import to_text
 from .rtime import now, time_to
-from .rtype import RBase, RConfigMeta
+from .rtype import Base, ConfigMeta
 from .rwrap import wrap_thread
 
 
 __all__ = (
-    'RConfigLog',
-    'RLog',
-    'RRecord'
+    'ConfigLog',
+    'Log',
+    'Record'
 )
 
 
-class RConfigLog(object, metaclass=RConfigMeta):
+class ConfigLog(Base, metaclass=ConfigMeta):
     """
-    Rey's `config log` type.
+    Config log type.
     """
 
     # Module path.
     path_rlog: Final[str] = os_abspath(__file__)
 
 
-class RLog(object):
+class Log(Base):
     """
-    Rey's `log` type.
+    Log type.
     """
 
     # Status.
@@ -90,7 +90,7 @@ class RLog(object):
         name: str = 'Log'
     ) -> None:
         """
-        Build `log` instance attributes.
+        Build instance attributes.
 
         Parameters
         ----------
@@ -125,21 +125,21 @@ class RLog(object):
 
         ## Compatible '__call__'.
         if (
-            stack_param['filename'] == RConfigLog.path_rlog
+            stack_param['filename'] == ConfigLog.path_rlog
             and stack_param['name'] in ('debug', 'info', 'warning', 'error', 'critical')
         ):
             stack_param = stack_params[-2]
 
         ## Compatible 'print'.
         if (
-            stack_param['filename'] == RConfigLog.path_rlog
+            stack_param['filename'] == ConfigLog.path_rlog
             and stack_param['name'] == 'preprocess'
         ):
             stack_param = stack_params[-3]
 
         ## Compatible 'echo'.
         if (
-            stack_param['filename'] == RConfigStdout._path_rstdout
+            stack_param['filename'] == ConfigStdout._path_rstdout
             and stack_param['name'] == 'echo'
         ):
             stack_param = stack_params[-4]
@@ -347,7 +347,7 @@ class RLog(object):
     def get_filter(
         self,
         method: Callable[[LogRecord], bool]
-    ) -> Filter:
+    ):
         """
         Get filter.
 
@@ -362,9 +362,9 @@ class RLog(object):
 
 
         # Define.
-        class RFilter(Filter):
+        class _Filter(Base, Filter):
             """
-            Rey's filter type.
+            Filter type.
             """
 
 
@@ -389,7 +389,7 @@ class RLog(object):
                 return result
 
 
-        return RFilter
+        return _Filter
 
 
     def add_print(
@@ -938,9 +938,9 @@ class RLog(object):
     __call__ = log
 
 
-class RRecord(object):
+class Record(Base):
     """
-    Rey's `record` type.
+    Record type.
     """
 
 
@@ -949,7 +949,7 @@ class RRecord(object):
         path: str | None = '_rrecord'
     ) -> None:
         """
-        Build `record` instance attributes.
+        Build instance attributes.
 
         Parameters
         ----------
@@ -982,7 +982,7 @@ class RRecord(object):
 
         # To file.
         else:
-            rfile = RFile(self.path)
+            rfile = File(self.path)
 
             ## Convert.
             if type(value) != str:
@@ -1018,7 +1018,7 @@ class RRecord(object):
 
         # To file.
         else:
-            rfile = RFile(self.path)
+            rfile = File(self.path)
 
             ## Convert.
             if type(value) != str:

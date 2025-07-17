@@ -34,7 +34,7 @@ from .rnum import digits, to_number
 from .rrand import randn
 from .rre import search
 from .rstdout import echo
-from .rtype import T
+from .rtype import T, Base
 
 
 __all__ = (
@@ -44,7 +44,7 @@ __all__ = (
     'to_time',
     'sleep',
     'wait',
-    'RTimeMark'
+    'TimeMark'
 )
 
 
@@ -482,7 +482,7 @@ def wait(
     """
 
     # Set parameter.
-    rtm = RTimeMark()
+    rtm = TimeMark()
     rtm()
 
     # Not set timeout.
@@ -520,15 +520,15 @@ def wait(
     return rtm.total_spend
 
 
-class RTimeMark():
+class TimeMark(Base):
     """
-    Rey`s `time mark` type.
+    Time mark type.
     """
 
 
     def __init__(self) -> None:
         """
-        Build `time mark` instance attributes.
+        Build instance attributes.
         """
 
         # Record table.

@@ -31,9 +31,9 @@ from filetype import guess as filetype_guess
 from datetime import datetime
 
 from .rexc import throw, check_response_code
-from .ros import RFile
+from .ros import File
 from .rre import search
-from .rtype import RBase
+from .rtype import Base
 
 
 __all__ = (
@@ -46,7 +46,7 @@ __all__ = (
     'download',
     'compute_stream_time',
     'listen_socket',
-    'RRequestCache'
+    'RequestCache'
 )
 
 
@@ -276,7 +276,7 @@ def request(
             method = 'post'
     if files is None:
         if type(data) == str:
-            rfile = RFile(data)
+            rfile = File(data)
             data = rfile.bytes
             if 'Content-Disposition' not in headers:
                 file_name = rfile.name_suffix
@@ -291,7 +291,7 @@ def request(
             else:
                 item_data, item_headers = value, {}
             if type(item_data) == str:
-                rfile = RFile(item_data)
+                rfile = File(item_data)
                 data = rfile.bytes
                 item_headers.setdefault('filename', rfile.name_suffix)
             if type(item_data) == bytes:
@@ -381,7 +381,7 @@ def download(url: str, path: str | None = None) -> str:
         path = os_abspath(file_name)
 
     # Save.
-    rfile = RFile(path)
+    rfile = File(path)
     rfile(content)
 
     return path
@@ -410,7 +410,7 @@ def compute_stream_time(
     # Get parameter.
     match file:
         case str():
-            rfile = RFile(file)
+            rfile = File(file)
             file_size = rfile.size
         case bytes() | bytearray():
             file_size = len(file)
@@ -456,9 +456,9 @@ def listen_socket(
         handler(data)
 
 
-class RRequestCache(RBase):
+class RequestCache(Base):
     """
-    Rey's `requests cache` type.
+    Requests cache type.
     """
 
 
@@ -471,7 +471,7 @@ class RRequestCache(RBase):
         judge: Callable[[Response | OriginalResponse | CachedResponse], bool] | None = None
     ) -> None:
         """
-        Build `requests cache` instance attributes.
+        Build instance attributes.
 
         Parameters
         ----------

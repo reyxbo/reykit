@@ -13,7 +13,7 @@ from zipfile import ZipFile, is_zipfile, ZIP_DEFLATED
 from os import getcwd as os_getcwd, walk as os_walk
 from os.path import join as os_join, isfile as os_isfile
 
-from .ros import RFile, RFolder
+from .ros import File, Folder
 
 
 __all__ = (
@@ -41,17 +41,17 @@ def compress(
     """
 
     # Get parameter.
-    build_dir = RFolder(build_dir).path
+    build_dir = Folder(build_dir).path
     if overwrite:
         mode = 'w'
     else:
         mode = 'x'
     is_file = os_isfile(obj_path)
     if is_file:
-        rfile = RFile(obj_path)
+        rfile = File(obj_path)
         obj_name = rfile.name_suffix
     else:
-        rfolder = RFolder(obj_path)
+        rfolder = Folder(obj_path)
         obj_name = rfolder.name
     build_name = obj_name + '.zip'
     build_path = os_join(build_dir, build_name)

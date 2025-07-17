@@ -57,11 +57,11 @@ from tkinter.filedialog import (
 )
 
 from .rexc import throw
-from .rtype import RBase, RConfigMeta
+from .rtype import Base, ConfigMeta
 
 
 __all__ = (
-    'RConfigSystem',
+    'ConfigSystem',
     'add_env_path',
     'reset_env_path',
     'del_modules',
@@ -127,9 +127,9 @@ NetWorkInfo = TypedDict(
 ProcessInfo = TypedDict('ProcessInfo', {'create_time': datetime, 'id': int, 'name': str, 'ports': list[int] | None})
 
 
-class RConfigSystem(RBase, metaclass=RConfigMeta):
+class ConfigSystem(Base, metaclass=ConfigMeta):
     """
-    Rey's `config system` type.
+    Config system type.
     """
 
     # Added environment path.
@@ -153,7 +153,7 @@ def add_env_path(path: str) -> list[str]:
     abs_path = os_abspath(path)
 
     # Add.
-    RConfigSystem._add_env_paths.append(abs_path)
+    ConfigSystem._add_env_paths.append(abs_path)
     sys_path.append(abs_path)
 
     return sys_path
@@ -165,9 +165,9 @@ def reset_env_path() -> None:
     """
 
     # Delete.
-    for path in RConfigSystem._add_env_paths:
+    for path in ConfigSystem._add_env_paths:
         sys_path.remove(path)
-    RConfigSystem._add_env_paths = []
+    ConfigSystem._add_env_paths = []
 
 
 def del_modules(path: str) -> list[str]:

@@ -15,7 +15,7 @@ from os.path import abspath as os_abspath
 from pandas import DataFrame, ExcelWriter, isnull
 from sqlalchemy.engine.cursor import CursorResult
 
-from .ros import RFile
+from .ros import File
 from .rtext import to_json, to_text
 from .rtime import time_to
 
@@ -416,7 +416,7 @@ def to_csv(
 
     # Handle parameter.
     data_df = to_df(data, fields)
-    rfile = RFile(path)
+    rfile = File(path)
     if rfile:
         header = False
     else:

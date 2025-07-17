@@ -16,7 +16,7 @@ from itertools import chain as IChain
 
 from .rexc import check_least_one, check_most_one
 from .rsys import is_iterable
-from .rtype import T, KT, VT, RBase, Null
+from .rtype import T, KT, VT, Base, null
 
 
 __all__ = (
@@ -28,7 +28,7 @@ __all__ = (
     'objs_in',
     'chain',
     'default_dict',
-    'RGenerator'
+    'FunctionGenerator'
 )
 
 
@@ -320,14 +320,14 @@ def chain(*iterables: dict[KT, VT] | Iterable[T]) -> ChainMap[KT, VT] | IChain[T
     return data
 
 
-def default_dict(default: T = Null, data: dict[KT, VT] | None = None) -> Defaultdict[KT, VT | T]:
+def default_dict(default: T = null, data: dict[KT, VT] | None = None) -> Defaultdict[KT, VT | T]:
     """
     Set `dict` instance, default value when key does not exist.
 
     Parameters
     ----------
     default : Default value.
-        - `Literal[Null]`: Nest function self.
+        - `Literal[null]`: Nest function self.
         - `Callable`: Use call return value.
     data : `dict` instance.
         - `None`: Empty `dict`.
@@ -336,7 +336,7 @@ def default_dict(default: T = Null, data: dict[KT, VT] | None = None) -> Default
     # Handle parameter.
 
     ## Null.
-    if default == Null:
+    if default == null:
         default_factory = default_dict
 
     ## Callable.
@@ -356,9 +356,18 @@ def default_dict(default: T = Null, data: dict[KT, VT] | None = None) -> Default
     return dict_set
 
 
-class RGenerator(RBase):
+class FunctionGenerator(Base):
     """
-    Rey's `generator` type.
+    Function generator type.
+
+    Examples
+    --------
+    >>> func = lambda arg1, arg2: arg1 + arg2
+    >>> fgenerator = FunctionGenerator(func, 10)
+    >>> fgenerator.add(1)
+    >>> fgenerator.add(2)
+    >>> list(fgenerator)
+    [11, 12]
     """
 
 
@@ -369,7 +378,7 @@ class RGenerator(RBase):
         **kwargs: Any
     ) -> None:
         """
-        Build `generator` instance attributes.
+        Build instance attributes.
 
         Parameters
         ----------

@@ -17,12 +17,12 @@ from os.path import exists as os_exists
 from traceback import format_exc
 from warnings import warn as warnings_warn
 
-from .rtype import Null
+from .rtype import Base, null
 
 
 __all__ = (
-    'RError',
-    'RActiveError',
+    'Error',
+    'ActiveError',
     'throw',
     'warn',
     'catch_exc',
@@ -34,21 +34,21 @@ __all__ = (
 )
 
 
-class RError(Exception):
+class Error(Base, Exception):
     """
-    Rey `error` type.
+    Error type.
     """
 
 
-class RActiveError(RError):
+class ActiveError(Error):
     """
-    Rey's `active error` type.
+    Active error type.
     """
 
 
 def throw(
     exception: type[BaseException] = AssertionError,
-    value: Any = Null,
+    value: Any = null,
     *values: Any,
     text: str | None = None,
     frame: int = 2
@@ -78,7 +78,7 @@ def throw(
             text = text[0].lower() + text[1:]
 
     ## Value.
-    if value != Null:
+    if value != null:
         values = (value,) + values
 
         ### Name.

@@ -17,12 +17,12 @@ from PIL.Image import open as pil_open, LANCZOS
 from captcha.image import ImageCaptcha
 
 from .rmonkey import monkey_path_pil_image_get_bytes
-from .ros import RFile
+from .ros import File
 from .rrand import randchar
 
 
 __all__ = (
-    'RImage',
+    'Image',
     'encode_qrcode',
     'decode_qrcode',
     'compress_image',
@@ -33,7 +33,7 @@ __all__ = (
 
 # Monkey path.
 monkey_image_type = monkey_path_pil_image_get_bytes()
-RImage = monkey_image_type
+Image = monkey_image_type
 
 
 def encode_qrcode(text: str, path: str | None = None) -> bytes:
@@ -61,7 +61,7 @@ def encode_qrcode(text: str, path: str | None = None) -> bytes:
 
     # Save.
     if path is not None:
-        rfile = RFile(path)
+        rfile = File(path)
         rfile.write(file_bytes)
 
     return file_bytes
@@ -139,7 +139,7 @@ def compress_image(
 
     # Handle parameter.
     if type(input_image) == str:
-        rfile = RFile(input_image)
+        rfile = File(input_image)
         input_image = rfile.str
     now_size = len(input_image)
     if target_size < 1:
@@ -180,11 +180,11 @@ def compress_image(
 
     ## Save file and return path.
     else:
-        rfile = RFile(ouput_image)
+        rfile = File(ouput_image)
         rfile(content)
 
 
-def to_pil_image(source: str | bytes) -> RImage:
+def to_pil_image(source: str | bytes) -> Image:
     """
     Get `Image` instance of `PIL` package.
 
@@ -247,12 +247,12 @@ def generate_captcha_image(
     }
     default_kwargs.update(kwargs)
     icaptcha = ImageCaptcha(**default_kwargs)
-    image: RImage = icaptcha.generate_image(text)
+    image: Image = icaptcha.generate_image(text)
     file_bytes = image.get_bytes()
 
     # Save.
     if path is not None:
-        rfile = RFile(path)
+        rfile = File(path)
         rfile.write(file_bytes)
 
     return file_bytes

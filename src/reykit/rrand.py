@@ -21,12 +21,12 @@ from threading import get_ident as threading_get_ident
 
 from .rexc import throw
 from .rnum import digits
-from .rtype import T, RBase, RConfigMeta
+from .rtype import T, Base, ConfigMeta
 
 
 __all__ = (
-    'RConfigRandom',
-    'RRandomSeed',
+    'ConfigRandom',
+    'RandomSeed',
     'randn',
     'randb',
     'randi',
@@ -35,37 +35,37 @@ __all__ = (
 )
 
 
-class RConfigRandom(RBase, metaclass=RConfigMeta):
+class ConfigRandom(Base, metaclass=ConfigMeta):
     """
-    Rey's `config random` type.
+    Config random type.
     """
 
     # RRandom.
-    _rrandom_dict: dict[int, RRandomSeed] = {}
+    _rrandom_dict: dict[int, RandomSeed] = {}
 
 
-class RRandomSeed(RBase):
+class RandomSeed(Base):
     """
-    Rey's `random seed` type, set random seed.
+    Random seed type. set random seed.
     If set, based on `random` package.
     If not set, based on `secrets` package.
 
     Examples
     --------
     Use active switch.
-    >>> RRandomSeed(seed)
+    >>> RandomSeed(seed)
     >>> randn()
-    >>> RRandomSeed()
+    >>> RandomSeed()
 
     Use `with` syntax.
-    >>> with RRandomSeed(seed):
+    >>> with RandomSeed(seed):
     >>>     randn()
     """
 
 
     def __init__(self, seed: int | float | str | bytes | bytearray | None = None) -> None:
         """
-        Build `random` instance attributes.
+        Build instance attributes.
 
         Parameters
         ----------
@@ -85,7 +85,7 @@ class RRandomSeed(RBase):
 
             ## Record.
             thread_id = threading_get_ident()
-            RConfigRandom._rrandom_dict[thread_id] = self
+            ConfigRandom._rrandom_dict[thread_id] = self
 
 
     def __del__(self) -> None:
@@ -95,8 +95,8 @@ class RRandomSeed(RBase):
 
         # Delete.
         thread_id = threading_get_ident()
-        if thread_id in RConfigRandom._rrandom_dict:
-            del RConfigRandom._rrandom_dict[thread_id]
+        if thread_id in ConfigRandom._rrandom_dict:
+            del ConfigRandom._rrandom_dict[thread_id]
 
 
     def __enter__(self) -> Self:
@@ -221,7 +221,7 @@ def randn(
 
     ## No seed.
     thread_id = threading_get_ident()
-    rrandom = RConfigRandom._rrandom_dict.get(thread_id)
+    rrandom = ConfigRandom._rrandom_dict.get(thread_id)
     if rrandom is None:
         range_ = threshold_high - threshold_low + 1
         number = secrets_randbelow(range_)

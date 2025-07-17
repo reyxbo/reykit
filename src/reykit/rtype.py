@@ -17,12 +17,12 @@ __all__ = (
     'T',
     'KT',
     'VT',
-    'RBase',
-    'RStaticMeta',
-    'RConfigMeta',
-    'RSingleton',
-    'RNull',
-    'Null'
+    'Base',
+    'StaticMeta',
+    'ConfigMeta',
+    'Singleton',
+    'Null',
+    'null'
 )
 
 
@@ -32,15 +32,15 @@ KT = TypeVar('KT') # Any dictionary key.
 VT = TypeVar('VT') # Any dictionary value.
 
 
-class RBase(object):
+class Base(object):
     """
-    Rey's `base` type.
+    Base type.
     """
 
 
-class RStaticMeta(RBase, type):
+class StaticMeta(Base, type):
     """
-    Rey's `static meta` type.
+    Static meta type.
     """
 
 
@@ -53,9 +53,9 @@ class RStaticMeta(RBase, type):
         raise TypeError('static class, no instances allowed.')
 
 
-class RConfigMeta(RStaticMeta):
+class ConfigMeta(StaticMeta):
     """
-    Rey's `config meta` type.
+    Config meta type.
     """
 
 
@@ -91,9 +91,9 @@ class RConfigMeta(RStaticMeta):
         setattr(cls, name, value)
 
 
-class RSingleton(RBase):
+class Singleton(Base):
     """
-    Rey's `singleton` type.
+    Singleton type.
     When instantiated, method `__singleton__` will be called only once, and will accept arguments.
 
     Attributes
@@ -121,10 +121,10 @@ class RSingleton(RBase):
         return self._instance
 
 
-class RNull(RSingleton):
+class Null(Singleton):
     """
-    Rey's `null` type.
+    Null type.
     """
 
 
-Null = RNull()
+null = Null()

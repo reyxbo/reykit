@@ -30,9 +30,8 @@ from asyncio import (
 )
 from aiohttp import ClientSession, ClientResponse
 
-from .rexc import throw, check_most_one, check_response_code
+from .rbase import T, Base, throw, check_most_one, check_response_code
 from .rtime import randn, TimeMark
-from .rtype import T, Base
 from .rwrap import wrap_thread
 
 
@@ -371,48 +370,24 @@ def async_run(
 
 
 @overload
-async def async_sleep(
-    *,
-    precision: None = None
-) -> int: ...
+async def async_sleep() -> int: ...
 
 @overload
-async def async_sleep(
-    second: int,
-    *,
-    precision: None = None
-) -> int: ...
+async def async_sleep(second: int) -> int: ...
 
 @overload
-async def async_sleep(
-    low: int = 0,
-    high: int = 10,
-    *,
-    precision: None = None
-) -> int: ...
+async def async_sleep(low: int = 0, high: int = 10) -> int: ...
 
 @overload
-async def async_sleep(
-    *thresholds: float,
-    precision: None = None
-) -> float: ...
+async def async_sleep(*thresholds: float) -> float: ...
 
 @overload
-async def async_sleep(
-    *thresholds: float,
-    precision: Literal[0] = None
-) -> int: ...
+async def async_sleep(*thresholds: float, precision: Literal[0]) -> int: ...
 
 @overload
-async def async_sleep(
-    *thresholds: float,
-    precision: int = None
-) -> float: ...
+async def async_sleep(*thresholds: float, precision: int) -> float: ...
 
-async def async_sleep(
-    *thresholds: float,
-    precision: int | None = None
-) -> float:
+async def async_sleep(*thresholds: float, precision: int | None = None) -> float:
     """
     Sleep random seconds, in the coroutine.
 

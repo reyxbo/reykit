@@ -167,7 +167,7 @@ def search_batch(
 def search_batch(
     text: str,
     *patterns: str,
-    first: Literal[False] = True
+    first: Literal[False]
 ) -> list[str | tuple[str | None, ...] | None]: ...
 
 def search_batch(

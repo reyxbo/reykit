@@ -19,9 +19,8 @@ from random import Random
 from secrets import randbelow as secrets_randbelow
 from threading import get_ident as threading_get_ident
 
-from .rexc import throw
+from .rbase import T, Base, ConfigMeta, throw
 from .rnum import digits
-from .rtype import T, Base, ConfigMeta
 
 
 __all__ = (
@@ -132,48 +131,24 @@ class RandomSeed(Base):
 
 
 @overload
-def randn(
-    *,
-    precision: None = None
-) -> int: ...
+def randn() -> int: ...
 
 @overload
-def randn(
-    high: int = 10,
-    *,
-    precision: None = None
-) -> int: ...
+def randn(high: int = 10) -> int: ...
 
 @overload
-def randn(
-    low: int = 0,
-    high: int = 10,
-    *,
-    precision: None = None
-) -> int: ...
+def randn(low: int = 0, high: int = 10) -> int: ...
 
 @overload
-def randn(
-    *thresholds: float,
-    precision: None = None
-) -> float: ...
+def randn(*thresholds: float) -> float: ...
 
 @overload
-def randn(
-    *thresholds: float,
-    precision: Literal[0] = None
-) -> int: ...
+def randn(*thresholds: float, precision: Literal[0]) -> int: ...
 
 @overload
-def randn(
-    *thresholds: float,
-    precision: int = None
-) -> float: ...
+def randn(*thresholds: float, precision: int) -> float: ...
 
-def randn(
-    *thresholds: float,
-    precision: int | None = None
-) -> int | float:
+def randn(*thresholds: float, precision: int | None = None) -> int | float:
     """
     Random number.
 
@@ -281,7 +256,7 @@ def randi(
 @overload
 def randi(
     data: Sequence,
-    multi: int = None,
+    multi: int,
     unique: bool = True
 ) -> list[T]: ...
 

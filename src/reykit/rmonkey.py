@@ -48,6 +48,7 @@ def monkey_patch_sqlalchemy_result_more_fetch():
     # Import.
     from sqlalchemy.engine.cursor import CursorResult
     from pandas import DataFrame, NA, concat
+    from .rbase import Base
     from .rstdout import echo
     from .rtable import (
         to_table,
@@ -62,7 +63,6 @@ def monkey_patch_sqlalchemy_result_more_fetch():
         to_excel
     )
     from .rtime import time_to
-    from .rtype import Base
 
     # Fetch result as table in 'list[dict]' format.
     CursorResult.fetch_table = to_table
@@ -323,7 +323,7 @@ def monkey_path_pil_image_get_bytes():
 
     from PIL.Image import Image
     from io import BytesIO
-    from reykit.rtype import Base
+    from reykit.rbase import Base
 
 
     # Define.

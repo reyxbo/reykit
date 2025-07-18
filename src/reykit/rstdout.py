@@ -16,9 +16,8 @@ from io import TextIOWrapper
 from os import devnull as os_devnull
 from os.path import abspath as os_abspath
 
-from .rsys import get_first_notnull, get_name, get_stack_param
+from .rbase import Base, ConfigMeta, get_first_notnone, get_name, get_stack_param
 from .rtext import to_text, add_text_frame
-from .rtype import Base, ConfigMeta
 
 
 __all__ = (
@@ -112,7 +111,7 @@ def beautify_text(
         title = None
 
     ## Width.
-    width = get_first_notnull(width, ConfigStdout.default_width, default='exception')
+    width = get_first_notnone(width, ConfigStdout.default_width)
 
     ## Frame.
     if ConfigStdout.is_frame_plain:

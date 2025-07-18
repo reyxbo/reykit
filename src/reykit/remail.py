@@ -14,10 +14,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 
+from .rbase import Base, throw
 from .rdata import unique
-from .rexc import throw
 from .ros import FileBytes, get_file_bytes
-from .rtype import Base
 
 
 __all__ = (

@@ -51,11 +51,10 @@ from docx.oxml.table import CT_Tbl
 from lxml.etree import ElementChildIterator
 from pdfplumber import open as pdfplumber_open
 
-from .rexc import throw
+from .rbase import Base, throw
 from .rre import search, sub
-from .rsys import dos_command
+from .rsys import run_cmd
 from .rtext import to_json
-from .rtype import Base
 
 
 __all__ = (
@@ -324,14 +323,14 @@ class File(Base):
     @overload
     def open(
         self,
-        mode: OpenTextMode = 'wb+'
-    ) -> TextIO: ...
+        mode: OpenBinaryMode = 'wb+'
+    ) -> BinaryIO: ...
 
     @overload
     def open(
         self,
-        mode: OpenBinaryMode = 'wb+'
-    ) -> BinaryIO: ...
+        mode: OpenTextMode
+    ) -> TextIO: ...
 
     def open(
         self,
@@ -368,22 +367,10 @@ class File(Base):
 
 
     @overload
-    def r(self) -> TextIO: ...
+    def __getattr__(self, name: Literal['r', 'w', 'a']) -> TextIO: ...
 
     @overload
-    def w(self) -> TextIO: ...
-
-    @overload
-    def a(self) -> TextIO: ...
-
-    @overload
-    def rb(self) -> BinaryIO: ...
-
-    @overload
-    def wb(self) -> BinaryIO: ...
-
-    @overload
-    def ab(self) -> BinaryIO: ...
+    def __getattr__(self, name: Literal['rb', 'wb', 'ab']) -> BinaryIO: ...
 
     def __getattr__(self, name: Literal['r', 'w', 'a', 'rb', 'wb', 'ab']) -> TextIO | BinaryIO:
         """
@@ -398,9 +385,13 @@ class File(Base):
         IO object.
         """
 
+        # Open.
         if name in ('r', 'w', 'a', 'rb', 'wb', 'ab'):
             io = self.open(name)
             return io
+
+        # Throw exception.
+        throw(AttributeError, name)
 
 
     @overload
@@ -412,7 +403,7 @@ class File(Base):
     @overload
     def read(
         self,
-        type_: Literal['str'] = 'bytes'
+        type_: Literal['str']
     ) -> str: ...
 
     def read(
@@ -538,7 +529,7 @@ class File(Base):
         # Read only.
         except PermissionError:
             command = f'attrib -r "{self.path}"'
-            dos_command(command)
+            run_cmd(command)
             os_remove(self.path)
 
 
@@ -958,7 +949,8 @@ class Folder(Base):
         self,
         pattern: str,
         recursion: bool = False,
-        all_ : Literal[True] = False
+        *,
+        all_ : Literal[True]
     ) -> list[str]: ...
 
     def search(
@@ -966,7 +958,7 @@ class Folder(Base):
         pattern: str,
         recursion: bool = False,
         all_ : bool = False
-    ) -> str | None:
+    ) -> str | list[str] | None:
         """
         Search file by name.
 
@@ -1452,6 +1444,23 @@ class TempFile(Base):
         return file_md5
 
 
+    @property
+    def toml(self) -> dict[str, Any]:
+        """
+        Read and parse TOML file.
+        Treat nan as a None or null value.
+
+        Returns
+        -------
+        Parameter dictionary.
+        """
+
+        # Read and parse.
+        params = read_toml(self.path)
+
+        return params
+
+
     def __len__(self) -> int:
         """
         Return file byte size.
@@ -1614,7 +1623,8 @@ class TempFolder(Base):
         self,
         pattern: str,
         recursion: bool = False,
-        all_ : Literal[True] = False
+        *,
+        all_ : Literal[True]
     ) -> list[str]: ...
 
     def search(

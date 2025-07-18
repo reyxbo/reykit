@@ -96,15 +96,15 @@ def to_table(
 @overload
 def to_dict(
     data: Table | Iterable[Iterable],
-    key_field: int | str = 0,
-    val_field: None = None
+    key_field: int | str = 0
 ) -> dict[Any, dict]: ...
 
 @overload
 def to_dict(
     data: Table | Iterable[Iterable],
     key_field: int | str = 0,
-    val_field: int | str = None
+    *,
+    val_field: int | str
 ) -> dict: ...
 
 def to_dict(

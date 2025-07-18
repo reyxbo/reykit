@@ -10,8 +10,7 @@
 
 
 from typing import Any, TypedDict, Literal, overload
-from collections.abc import Callable, Iterable, Sequence, Mapping
-from inspect import signature as inspect_signature, _ParameterKind, _empty
+from collections.abc import Iterable, Sequence
 from sys import path as sys_path, modules as sys_modules
 from os import getpid as os_getpid
 from os.path import abspath as os_abspath
@@ -31,14 +30,10 @@ from psutil import (
     pid_exists as psutil_pid_exists,
     Process
 )
-from traceback import format_stack, extract_stack
-from atexit import register as atexit_register
 from subprocess import Popen, PIPE
 from pymem import Pymem
 from argparse import ArgumentParser
-from time import sleep as time_sleep
 from datetime import datetime
-from varname import VarnameRetrievingError, argname
 from webbrowser import open as webbrowser_open
 from tkinter.messagebox import (
     showinfo as tkinter_showinfo,
@@ -56,8 +51,7 @@ from tkinter.filedialog import (
     askdirectory as tkinter_askdirectory
 )
 
-from .rexc import throw
-from .rtype import Base, ConfigMeta
+from .rbase import Base, ConfigMeta, throw
 
 
 __all__ = (
@@ -65,28 +59,18 @@ __all__ = (
     'add_env_path',
     'reset_env_path',
     'del_modules',
-    'dos_command',
-    'dos_command_var',
-    'block',
-    'at_exit',
-    'is_class',
-    'is_instance',
-    'is_iterable',
-    'is_table',
-    'is_number_str',
-    'get_first_notnull',
-    'get_name',
-    'get_stack_text',
-    'get_stack_param',
-    'get_arg_info',
+    'run_cmd',
+    'get_cmd_var',
     'get_computer_info',
     'get_network_table',
     'get_process_table',
     'search_process',
     'kill_process',
-    'stop_process',
-    'start_process',
+    'pause_process',
+    'resume_process',
     'get_idle_port',
+    'memory_read',
+    'memory_write',
     'open_browser',
     'popup_message',
     'popup_ask',
@@ -133,7 +117,7 @@ class ConfigSystem(Base, metaclass=ConfigMeta):
     """
 
     # Added environment path.
-    _add_env_paths: list[str] = []
+    _added_env_paths: list[str] = []
 
 
 def add_env_path(path: str) -> list[str]:
@@ -153,7 +137,7 @@ def add_env_path(path: str) -> list[str]:
     abs_path = os_abspath(path)
 
     # Add.
-    ConfigSystem._add_env_paths.append(abs_path)
+    ConfigSystem._added_env_paths.append(abs_path)
     sys_path.append(abs_path)
 
     return sys_path
@@ -165,9 +149,9 @@ def reset_env_path() -> None:
     """
 
     # Delete.
-    for path in ConfigSystem._add_env_paths:
+    for path in ConfigSystem._added_env_paths:
         sys_path.remove(path)
-    ConfigSystem._add_env_paths = []
+    ConfigSystem._added_env_paths = []
 
 
 def del_modules(path: str) -> list[str]:
@@ -213,12 +197,12 @@ def del_modules(path: str) -> list[str]:
 
 
 @overload
-def dos_command(command: str | Iterable[str], read: Literal[False] = False) -> None: ...
+def run_cmd(command: str | Iterable[str], read: Literal[False] = False) -> None: ...
 
 @overload
-def dos_command(command: str | Iterable[str], read: Literal[True] = False) -> str: ...
+def run_cmd(command: str | Iterable[str], read: Literal[True]) -> str: ...
 
-def dos_command(command: str | Iterable[str], read: bool = False) -> str | None:
+def run_cmd(command: str | Iterable[str], read: bool = False) -> str | None:
     """
     Execute DOS command.
 
@@ -248,9 +232,9 @@ def dos_command(command: str | Iterable[str], read: bool = False) -> str | None:
         return output
 
 
-def dos_command_var(*vars: Any) -> list[Any]:
+def get_cmd_var(*vars: Any) -> list[Any]:
     """
-    Use DOS command to input arguments to variables.
+    Get DOS command input arguments.
     Use DOS command `python file --help` to view help information.
 
     Parameters
@@ -266,7 +250,7 @@ def dos_command_var(*vars: Any) -> list[Any]:
     >>> var1 = 1
     >>> var2 = 2
     >>> var3 = 3
-    >>> var1, var2, var3 = dos_command(var1, var2, var3)
+    >>> var1, var2, var3 = run_cmd(var1, var2, var3)
     >>> print(var1, var2, var3)
     >>> # Use DOS command 'python file.py 10 --var2 20 21'
     10 [20, 21] 3
@@ -333,457 +317,6 @@ def dos_command_var(*vars: Any) -> list[Any]:
         values.append(value)
 
     return values
-
-
-def block() -> None:
-    """
-    Blocking program, can be double press interrupt to end blocking.
-    """
-
-    # Start.
-    print('Start blocking.')
-    while True:
-        try:
-            time_sleep(1)
-        except KeyboardInterrupt:
-
-            # Confirm.
-            try:
-                print('Double press interrupt to end blocking.')
-                time_sleep(1)
-
-            # End.
-            except KeyboardInterrupt:
-                print('End blocking.')
-                break
-
-            except:
-                continue
-
-
-def at_exit(*contents: str | Callable | tuple[Callable, Iterable, Mapping]) -> list[Callable]:
-    """
-    At exiting print text or execute function.
-
-    Parameters
-    ----------
-    contents : execute contents.
-        - `str`: Define the print text function and execute it.
-        - `Callable`: Execute function.
-        - `tuple[Callable, Iterable, Mapping]`: Execute function and position arguments and keyword arguments.
-
-    Returns
-    -------
-    Execute functions.
-    """
-
-    # Register.
-    funcs = []
-    for content in reversed(contents):
-        args = ()
-        kwargs = {}
-        if type(content) == str:
-            func = lambda : print(content)
-        elif callable(content):
-            func = content
-        elif type(content) == tuple:
-            func, args, kwargs = content
-        funcs.append(func)
-        atexit_register(func, *args, **kwargs)
-    funcs = list(reversed(funcs))
-
-    return funcs
-
-
-def is_class(obj: Any) -> bool:
-    """
-    Judge whether it is class.
-
-    Parameters
-    ----------
-    obj : Judge object.
-
-    Returns
-    -------
-    Judgment result.
-    """
-
-    # Judge.
-    judge = isinstance(obj, type)
-
-    return judge
-
-
-def is_instance(obj: Any) -> bool:
-    """
-    Judge whether it is instance.
-
-    Parameters
-    ----------
-    obj : Judge object.
-
-    Returns
-    -------
-    Judgment result.
-    """
-
-    # judge.
-    judge = not is_class(obj)
-
-    return judge
-
-
-def is_iterable(
-    obj: Any,
-    exclude_types: Iterable[type] | None = None
-) -> bool:
-    """
-    Judge whether it is iterable.
-
-    Parameters
-    ----------
-    obj : Judge object.
-    exclude_types : Non iterative types.
-
-    Returns
-    -------
-    Judgment result.
-    """
-
-    # Judge.
-    if (
-        hasattr(obj, '__iter__')
-        and not (
-            exclude_types is not None
-            and type(obj) in exclude_types
-        )
-    ):
-        return True
-
-    return False
-
-
-def is_table(
-    obj: Any,
-    check_fields: bool = True
-) -> bool:
-    """
-    Judge whether it is `list[dict]` table format and keys and keys sort of the dict are the same.
-
-    Parameters
-    ----------
-    obj : Judge object.
-    check_fields : Do you want to check the keys and keys sort of the dict are the same.
-
-    Returns
-    -------
-    Judgment result.
-    """
-
-    # Judge.
-    if type(obj) != list:
-        return False
-    for element in obj:
-        if type(element) != dict:
-            return False
-
-    ## Check fields of table.
-    if check_fields:
-        keys_strs = [
-            ':'.join([str(key) for key in element.keys()])
-            for element in obj
-        ]
-        keys_strs_only = set(keys_strs)
-        if len(keys_strs_only) != 1:
-            return False
-
-    return True
-
-
-def is_number_str(
-    string: str
-) -> bool:
-    """
-    Judge whether it is number string.
-
-    Parameters
-    ----------
-    string : String.
-
-    Returns
-    -------
-    Judgment result.
-    """
-
-    # Judge.
-    try:
-        float(string)
-    except (ValueError, TypeError):
-        return False
-
-    return True
-
-
-def get_first_notnull(
-    *values: Any,
-    default: Any | Literal['exception'] | None = None,
-    nulls: tuple = (None,)) -> Any:
-    """
-    Get the first value that is not null.
-
-    Parameters
-    ----------
-    values : Check values.
-    default : When all are null, then return this is value, or throw exception.
-        - `Any`: Return this is value.
-        - `Literal['exception']`: Throw `exception`.
-    nulls : Range of null values.
-
-    Returns
-    -------
-    Return first not null value, when all are `None`, then return default value.
-    """
-
-    # Get value.
-    for value in values:
-        if value not in nulls:
-            return value
-
-    # Throw exception.
-    if default == 'exception':
-        vars_name = get_name(values)
-        if vars_name is not None:
-            vars_name_de_dup = list(set(vars_name))
-            vars_name_de_dup.sort(key=vars_name.index)
-            vars_name_str = ' ' + ' and '.join([f'"{var_name}"' for var_name in vars_name_de_dup])
-        else:
-            vars_name_str = ''
-        raise ValueError(f'at least one of parameters{vars_name_str} is not None')
-
-    return default
-
-
-@overload
-def get_name(obj: tuple, frame: int = 2) -> tuple[str, ...] | None: ...
-
-@overload
-def get_name(obj: Any, frame: int = 2) -> str | None: ...
-
-def get_name(obj: Any, frame: int = 2) -> str | tuple[str, ...] | None:
-    """
-    Get name of object or variable.
-
-    Parameters
-    ----------
-    obj : Object.
-        - `tuple`: Variable length position parameter of previous layer.
-        - `Any`: Parameter of any layer.
-    frame : Number of code to upper level.
-
-    Returns
-    -------
-    Name or None.
-    """
-
-    # Get name using built in method.
-    if hasattr(obj, '__name__'):
-        name = obj.__name__
-        return name
-
-    # Get name using module method.
-    name = 'obj'
-    for frame_ in range(1, frame + 1):
-        if type(name) != str:
-            return
-        try:
-            name = argname(name, frame=frame_)
-        except VarnameRetrievingError:
-            return
-    if type(name) == tuple:
-        for element in name:
-            if type(element) != str:
-                return
-
-    return name
-
-
-def get_stack_text(format_: Literal['plain', 'full'] = 'plain', limit: int = 2) -> str:
-    """
-    Get code stack text.
-
-    Parameters
-    ----------
-    format_ : Stack text format.
-        - `Literal['plain']`: Floor stack position.
-        - `Literal['full']`: Full stack information.
-    limit : Stack limit level.
-
-    Returns
-    -------
-    Code stack text.
-    """
-
-    # Get.
-    match format_:
-
-        ## Plain.
-        case 'plain':
-            limit += 1
-            stacks = format_stack(limit=limit)
-
-            ### Check.
-            if len(stacks) != limit:
-                throw(value=limit)
-
-            ### Convert.
-            text = stacks[0]
-            index_end = text.find(', in ')
-            text = text[2:index_end]
-
-        ## Full.
-        case 'full':
-            stacks = format_stack()
-            index_limit = len(stacks) - limit
-            stacks = stacks[:index_limit]
-
-            ### Check.
-            if len(stacks) == 0:
-                throw(value=limit)
-
-            ### Convert.
-            stacks = [
-                stack[2:].replace('\n  ', '\n', 1)
-                for stack in stacks
-            ]
-            text = ''.join(stacks)
-            text = text[:-1]
-
-        ## Throw exception.
-        case _:
-            throw(ValueError, format_)
-
-    return text
-
-
-@overload
-def get_stack_param(format_: Literal['floor'] = 'floor', limit: int = 2) -> dict: ...
-
-@overload
-def get_stack_param(format_: Literal['full'] = 'floor', limit: int = 2) -> list[dict]: ...
-
-def get_stack_param(format_: Literal['floor', 'full'] = 'floor', limit: int = 2) -> dict | list[dict]:
-    """
-    Get code stack parameters.
-
-    Parameters
-    ----------
-    format_ : Stack parameters format.
-        - `Literal['floor']`: Floor stack parameters.
-        - `Literal['full']`: Full stack parameters.
-    limit : Stack limit level.
-
-    Returns
-    -------
-    Code stack parameters.
-    """
-
-    # Get.
-    stacks = extract_stack()
-    index_limit = len(stacks) - limit
-    stacks = stacks[:index_limit]
-
-    # Check.
-    if len(stacks) == 0:
-        throw(value=limit)
-
-    # Convert.
-    match format_:
-
-        ## Floor.
-        case 'floor':
-            stack = stacks[-1]
-            params = {
-                'filename': stack.filename,
-                'lineno': stack.lineno,
-                'name': stack.name,
-                'line': stack.line
-            }
-
-        ## Full.
-        case 'full':
-            params = [
-                {
-                    'filename': stack.filename,
-                    'lineno': stack.lineno,
-                    'name': stack.name,
-                    'line': stack.line
-                }
-                for stack in stacks
-            ]
-
-    return params
-
-
-def get_arg_info(func: Callable) -> list[
-    dict[
-        Literal['name', 'type', 'annotation', 'default'],
-        str | None
-    ]
-]:
-    """
-    Get function arguments information.
-
-    Parameters
-    ----------
-    func : Function.
-
-    Returns
-    -------
-    Arguments information.
-        - `Value of key 'name'`: Argument name.
-        - `Value of key 'type'`: Argument bind type.
-            `Literal['position_or_keyword']`: Is positional argument or keyword argument.
-            `Literal['var_position']`: Is variable length positional argument.
-            `Literal['var_keyword']`: Is variable length keyword argument.
-            `Literal['only_position']`: Is positional only argument.
-            `Literal['only_keyword']`: Is keyword only argument.
-        - `Value of key 'annotation'`: Argument annotation.
-        - `Value of key 'default'`: Argument default value.
-    """
-
-    # Get signature.
-    signature = inspect_signature(func)
-
-    # Get information.
-    info = [
-        {
-            'name': name,
-            'type': (
-                'position_or_keyword'
-                if parameter.kind == _ParameterKind.POSITIONAL_OR_KEYWORD
-                else 'var_position'
-                if parameter.kind == _ParameterKind.VAR_POSITIONAL
-                else 'var_keyword'
-                if parameter.kind == _ParameterKind.VAR_KEYWORD
-                else 'only_position'
-                if parameter.kind == _ParameterKind.POSITIONAL_ONLY
-                else 'only_keyword'
-                if parameter.kind == _ParameterKind.KEYWORD_ONLY
-                else None
-            ),
-            'annotation': parameter.annotation,
-            'default': parameter.default
-        }
-        for name, parameter in signature.parameters.items()
-    ]
-
-    # Replace empty.
-    for row in info:
-        for key, value in row.items():
-            if value == _empty:
-                row[key] = None
-
-    return info
 
 
 def get_computer_info() -> ComputerInfo:
@@ -1083,7 +616,7 @@ def kill_process(
     # Search.
     processes = search_process(id_, name, port)
 
-    # Start.
+    # Kill.
     for process in processes:
         with process.oneshot():
 
@@ -1096,13 +629,13 @@ def kill_process(
     return processes
 
 
-def stop_process(
+def pause_process(
     id_: int | Sequence[int] | None = None,
     name: str | Sequence[str] | None = None,
     port: str | int | Sequence[str | int] | None = None,
 ) -> list[Process]:
     """
-    Search and stop process by ID or name or port.
+    Search and pause process by ID or name or port.
 
     Parameters
     ----------
@@ -1121,7 +654,7 @@ def stop_process(
     # Search.
     processes = search_process(id_, name, port)
 
-    # Start.
+    # Pause.
     for process in processes:
         with process.oneshot():
 
@@ -1134,13 +667,13 @@ def stop_process(
     return processes
 
 
-def start_process(
+def resume_process(
     id_: int | Sequence[int] | None = None,
     name: str | Sequence[str] | None = None,
     port: str | int | Sequence[str | int] | None = None,
 ) -> list[Process]:
     """
-    Search and start process by ID or name or port.
+    Search and resume process by ID or name or port.
 
     Parameters
     ----------
@@ -1156,7 +689,7 @@ def start_process(
     # Search.
     processes = search_process(id_, name, port)
 
-    # Start.
+    # Resume.
     for process in processes:
         with process.oneshot():
             process.resume()
@@ -1319,17 +852,17 @@ def popup_message(
 
 @overload
 def popup_ask(
-    style: Literal['yes_no_cancel'] = 'yes_no',
-    message: str | None = None,
-    title: str | None = None
-) -> bool | None: ...
-
-@overload
-def popup_ask(
     style: Literal['yes_no', 'ok_cancel', 'retry_cancel'] = 'yes_no',
     message: str | None = None,
     title: str | None = None
 ) -> bool: ...
+
+@overload
+def popup_ask(
+    style: Literal['yes_no_cancel'],
+    message: str | None = None,
+    title: str | None = None
+) -> bool | None: ...
 
 def popup_ask(
     style: Literal['yes_no', 'ok_cancel', 'retry_cancel', 'yes_no_cancel'] = 'yes_no',
@@ -1387,7 +920,7 @@ def popup_select(
 
 @overload
 def popup_select(
-    style: Literal['files'] = 'file',
+    style: Literal['files'],
     title : str | None = None,
     init_folder : str | None = None,
     init_file : str | None = None,
@@ -1396,7 +929,7 @@ def popup_select(
 
 @overload
 def popup_select(
-    style: Literal['folder'] = 'file',
+    style: Literal['folder'],
     title : str | None = None,
     init_folder : str | None = None
 ) -> str | None: ...

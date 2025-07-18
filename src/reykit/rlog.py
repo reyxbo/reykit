@@ -29,14 +29,12 @@ from logging import (
 from logging.handlers import QueueHandler
 from concurrent_log_handler import ConcurrentRotatingFileHandler, ConcurrentTimedRotatingFileHandler
 
-from .rexc import throw, catch_exc
+from .rbase import Base, ConfigMeta, throw, catch_exc, get_first_notnone, get_stack_param
 from .ros import File
 from .rre import search, sub
 from .rstdout import ConfigStdout, modify_print, reset_print
-from .rsys import get_first_notnull, get_stack_param
 from .rtext import to_text
 from .rtime import now, time_to
-from .rtype import Base, ConfigMeta
 from .rwrap import wrap_thread
 
 
@@ -421,7 +419,7 @@ class Log(Base):
         """
 
         # Get parameter.
-        format_ = get_first_notnull(format_, self.default_format, default='exception')
+        format_ = get_first_notnone(format_, self.default_format)
         filter_ = filter_ or self.get_default_filter_method(format_, 'print')
 
         # Create handler.
@@ -443,7 +441,7 @@ class Log(Base):
         self,
         path: str | None = None,
         mb: float | None = None,
-        time: None = None,
+        *,
         level: int = DEBUG,
         format_: str | None = None,
         filter_: Callable[[LogRecord], bool] | None = None
@@ -453,7 +451,7 @@ class Log(Base):
     def add_file(
         self,
         path: str | None = None,
-        mb: None = None,
+        *,
         time: float | Literal['m', 'w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6'] = None,
         level: int = DEBUG,
         format_: str | None = None,
@@ -500,7 +498,7 @@ class Log(Base):
         """
 
         # Get parameter.
-        format_ = get_first_notnull(format_, self.default_format, default='exception')
+        format_ = get_first_notnone(format_, self.default_format)
         path = path or self.name
         filter_ = filter_ or self.get_default_filter_method(format_, 'file')
 

@@ -30,10 +30,9 @@ from mimetypes import guess_type
 from filetype import guess as filetype_guess
 from datetime import datetime
 
-from .rexc import throw, check_response_code
+from .rbase import Base, throw, check_response_code
 from .ros import File
 from .rre import search
-from .rtype import Base
 
 
 __all__ = (

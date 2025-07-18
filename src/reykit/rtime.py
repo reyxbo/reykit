@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, TypedDict, Literal, overload
+from typing import Any, TypedDict, Literal, NoReturn, overload
 from collections.abc import Callable
 from time import (
     struct_time as StructTime,
@@ -29,12 +29,11 @@ from pandas import (
     Timedelta as PTimedelta
 )
 
-from .rexc import throw
-from .rnum import digits, to_number
+from .rbase import T, Base, throw
+from .rnum import digits
 from .rrand import randn
 from .rre import search
 from .rstdout import echo
-from .rtype import T, Base
 
 
 __all__ = (
@@ -55,16 +54,16 @@ RecordData = TypedDict('RecordData', {'timestamp': int, 'datetime': Datetime, 't
 def now(format_: Literal['datetime'] = 'datetime') -> Datetime: ...
 
 @overload
-def now(format_: Literal['date'] = 'datetime') -> Date: ...
+def now(format_: Literal['date']) -> Date: ...
 
 @overload
-def now(format_: Literal['time'] = 'datetime') -> Time: ...
+def now(format_: Literal['time']) -> Time: ...
 
 @overload
-def now(format_: Literal['datetime_str', 'date_str', 'time_str'] = 'datetime') -> str: ...
+def now(format_: Literal['datetime_str', 'date_str', 'time_str']) -> str: ...
 
 @overload
-def now(format_: Literal['timestamp'] = 'datetime') -> int: ...
+def now(format_: Literal['timestamp']) -> int: ...
 
 def now(
     format_: Literal[
@@ -125,9 +124,16 @@ def time_to(
 
 @overload
 def time_to(
-    obj: T,
+    obj: Any,
     decimal: bool = False,
-    raising: Literal[False] = True
+    raising: Literal[True] = True
+) -> NoReturn: ...
+
+@overload
+def time_to(
+    obj: T,
+    *,
+    raising: Literal[False]
 ) -> T: ...
 
 def time_to(
@@ -301,22 +307,16 @@ def text_to_time(
 
 
 @overload
-def to_time(
-    obj: str,
-    raising: bool = True
-) -> Datetime | Date | Time: ...
+def to_time(obj: str, raising: bool = True) -> Datetime | Date | Time: ...
 
 @overload
-def to_time(
-    obj: StructTime | float,
-    raising: bool = True
-) -> Datetime: ...
+def to_time(obj: StructTime | float, raising: bool = True) -> Datetime: ...
 
 @overload
-def to_time(
-    obj: T,
-    raising: Literal[False] = True
-) -> T: ...
+def to_time(obj: Any, raising: Literal[True] = True) -> NoReturn: ...
+
+@overload
+def to_time(obj: T, raising: Literal[False]) -> T: ...
 
 def to_time(
     obj: Any,
@@ -379,43 +379,22 @@ def to_time(
 
 
 @overload
-def sleep(
-    *,
-    precision: None = None
-) -> int: ...
+def sleep() -> int: ...
 
 @overload
-def sleep(
-    second: int,
-    *,
-    precision: None = None
-) -> int: ...
+def sleep(second: int) -> int: ...
 
 @overload
-def sleep(
-    low: int = 0,
-    high: int = 10,
-    *,
-    precision: None = None
-) -> int: ...
+def sleep(low: int = 0, high: int = 10) -> int: ...
 
 @overload
-def sleep(
-    *thresholds: float,
-    precision: None = None
-) -> float: ...
+def sleep(*thresholds: float) -> float: ...
 
 @overload
-def sleep(
-    *thresholds: float,
-    precision: Literal[0] = None
-) -> int: ...
+def sleep(*thresholds: float, precision: Literal[0]) -> int: ...
 
 @overload
-def sleep(
-    *thresholds: float,
-    precision: int = None
-) -> float: ...
+def sleep(*thresholds: float, precision: int) -> float: ...
 
 def sleep(
     *thresholds: float,

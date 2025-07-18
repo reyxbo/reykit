@@ -16,7 +16,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.job import Job
 
-from .rtype import Base
+from .rbase import Base
 
 
 __all__ = (

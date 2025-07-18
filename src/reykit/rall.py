@@ -9,10 +9,10 @@
 """
 
 
+from .rbase import *
 from .rdata import *
 from .rdll import *
 from .remail import *
-from .rexc import *
 from .rimage import *
 from .rlog import *
 from .rmonkey import *
@@ -28,6 +28,5 @@ from .rtable import *
 from .rtask import *
 from .rtext import *
 from .rtime import *
-from .rtype import *
 from .rwrap import *
 from .rzip import *

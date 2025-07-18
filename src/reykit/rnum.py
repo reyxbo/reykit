@@ -11,10 +11,11 @@
 
 from typing import Any
 
-from .rexc import throw
+from .rbase import throw
 
 
 __all__ = (
+    'is_int',
     'digits',
     'to_number',
     'number_ch'

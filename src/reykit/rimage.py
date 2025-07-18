@@ -32,8 +32,8 @@ __all__ = (
 
 
 # Monkey path.
-monkey_image_type = monkey_path_pil_image_get_bytes()
-Image = monkey_image_type
+Image_ = monkey_path_pil_image_get_bytes()
+Image = Image_
 
 
 def encode_qrcode(text: str, path: str | None = None) -> bytes:

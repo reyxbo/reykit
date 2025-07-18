@@ -10,10 +10,10 @@
 Modules
 -------
 rall : All methods.
+rbase : Base methods.
 rdata : Data methods.
 rdll : DLL file methods.
 remail : E-mail methods.
-rexc : Exception methods.
 rimage : Image methods.
 rlog : Log methods.
 rmonkey : Monkey patch methods.
@@ -29,7 +29,6 @@ rtable : Table methods.
 rtask : Multi task methods.
 rtext : Text methods.
 rtime : Time methods.
-rtype : Type methods.
 rwrap : Decorators.
 rzip : File compress methods.
 """

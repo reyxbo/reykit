@@ -18,9 +18,8 @@ from threading import Thread
 from argparse import ArgumentParser
 from contextlib import redirect_stdout
 
-from .rexc import catch_exc
+from .rbase import catch_exc, get_arg_info
 from .rstdout import echo
-from .rsys import get_arg_info
 from .rtime import now, time_to, TimeMark
 
 
@@ -78,13 +77,13 @@ def wrap_frame(decorator: Callable) -> Callable:
 
     # Decorate Decorator.
     @overload
-    def wrap(func: Callable, /, *args: Any, _execute: None = None, **kwargs: Any) -> Callable | Any: ...
+    def wrap(func: Callable, /, *args: Any, **kwargs: Any) -> Callable | Any: ...
 
     @overload
-    def wrap(func: Callable, /, *args: Any, _execute: Literal[True] = None, **kwargs: Any) -> Any: ...
+    def wrap(func: Callable, /, *args: Any, _execute: Literal[True], **kwargs: Any) -> Any: ...
 
     @overload
-    def wrap(func: Callable, /, *args: Any, _execute: Literal[False] = None, **kwargs: Any) -> Callable: ...
+    def wrap(func: Callable, /, *args: Any, _execute: Literal[False], **kwargs: Any) -> Callable: ...
 
     @functools_wraps(decorator)
     def wrap(func: Callable, /, *args: Any, _execute: bool | None = None, **kwargs: Any) -> Callable | Any:
@@ -160,7 +159,7 @@ def wrap_runtime(
     func: Callable,
     /,
     *args: Any,
-    _return_report: Literal[True] = False,
+    _return_report: Literal[True],
     **kwargs: Any
 ) -> tuple[Any, str]: ...
 

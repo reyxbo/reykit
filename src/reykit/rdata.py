@@ -14,9 +14,7 @@ from collections import defaultdict as Defaultdict, ChainMap
 from collections.abc import Callable, Iterable, Generator
 from itertools import chain as IChain
 
-from .rexc import check_least_one, check_most_one
-from .rsys import is_iterable
-from .rtype import T, KT, VT, Base, null
+from .rbase import T, KT, VT, Base, null, check_least_one, check_most_one, is_iterable
 
 
 __all__ = (
@@ -134,10 +132,10 @@ def flatten(data: Any, *, _flattern_data: list | None = None) -> list:
 
 
 @overload
-def split(data: Iterable[T], share: int = None, bin_size: None = None) -> list[list[T]]: ...
+def split(data: Iterable[T], share: int) -> list[list[T]]: ...
 
 @overload
-def split(data: Iterable[T], share: None = None, bin_size: int = None) -> list[list[T]]: ...
+def split(data: Iterable[T], *, bin_size: int) -> list[list[T]]: ...
 
 def split(data: Iterable[T], share: int | None = None, bin_size: int | None = None) -> list[list[T]]:
     """

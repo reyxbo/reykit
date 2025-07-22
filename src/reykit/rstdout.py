@@ -10,21 +10,20 @@
 
 
 from typing import Any, Literal, Final
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 import sys
 from io import TextIOWrapper
-from os import devnull as os_devnull
+from os import devnull as os_devnull, isatty as os_isatty, get_terminal_size as os_get_terminal_size
 from os.path import abspath as os_abspath
 
-from .rbase import Base, ConfigMeta, get_first_notnone, get_name, get_stack_param
-from .rtext import to_text, add_text_frame
+from .rbase import T, Base, ConfigMeta, get_stack_param, get_varname
 
 
 __all__ = (
     'ConfigStdout',
-    'beautify_text',
+    'get_terminal_size',
     'echo',
-    'rinput',
+    'ask',
     'stop_print',
     'start_print',
     'modify_print',
@@ -39,9 +38,7 @@ class ConfigStdout(Base, metaclass=ConfigMeta):
 
     Attributes
     ----------
-        is_frame_plain : Whehter global use plain text frame type.
-            - `Literal[True]`: 'full' to 'half_plain', 'half' to 'half_plain', 'top' to 'top_plain', Other unchanged.
-        default_width : Global default text width.
+    force_print_ascii : Whether force methods print frame use ascii border.
     """
 
     # Module path.
@@ -56,177 +53,165 @@ class ConfigStdout(Base, metaclass=ConfigMeta):
     _io_stdout: TextIOWrapper = sys.stdout
     _io_stdout_write: Callable[[str], int] = sys.stdout.write
 
-    # Is the print frame plain.
-    is_frame_plain: bool = False
+    # Force print ascii.
+    force_print_ascii: bool = False
 
-    # print default width.
-    default_width: int = 100
+    # Added print position.
+    _added_print_position: set = set()
 
 
-def beautify_text(
-    data: tuple[Any],
-    title: bool | str = True,
-    width: int | None = None,
-    frame: Literal['full', 'half', 'top', 'half_plain', 'top_plain'] | None = 'full'
-) -> str:
+def get_terminal_size(
+    stream: Literal['stdin', 'stdout', 'stderr'] = 'stdout',
+    default: T = (80, 24)
+) -> tuple[int, int] | T:
     """
-    Beautify data to text.
+    Get terminal display character size.
 
     Parameters
     ----------
-    data : Text data.
-    title : Text title.
-        - `Literal[True]`: Automatic get data variable name.
-        - `Literal[False]`: No title.
-        - `str`: Use this value as the title.
-    width : Text width.
-        - `None`: Use attribute `ConfigStdout.default_width`.
-        - `int`: Use this value.
-    frame : Text frame type.
-        - `Literal['full']`: Add beautiful four side frame and limit length.
-            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
-            When throw `exception`, then frame is `half` type.
-        - `Literal['half']`: Add beautiful top and bottom side frame.
-            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
-        - `Literal['top']`: Add beautiful top side frame.
-            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `top_plain` type.
-        - `Literal['half_plain']`: Add plain top and bottom side frame.
-        - `Literal['top_plain']`: Add plain top side frame.
+    stream : Standard stream type.
 
     Returns
     -------
-    Beautify text.
+    Column and line display character count.
     """
 
-    # Get parameter.
+    # Handle parameter.
+    match stream:
+        case 'stdin':
+            stream = 0
+        case 'stdout':
+            stream = 1
+        case 'stderr':
+            stream = 2
 
-    ## Title.
-    if title is True:
-        titles = get_name(data, 3)
-        if titles is not None:
-            titles = [title if not title.startswith('`') else '' for title in titles]
-            if set(titles) != {''}:
-                title = ' │ '.join(titles)
-    if type(title) != str:
-        title = None
+    # Get.
+    exist = os_isatty(stream)
+    if exist:
+        terminal_size = os_get_terminal_size(stream)
+        terminal_size = tuple(terminal_size)
+    else:
+        terminal_size = default
 
-    ## Width.
-    width = get_first_notnone(width, ConfigStdout.default_width)
-
-    ## Frame.
-    if ConfigStdout.is_frame_plain:
-        match frame:
-            case 'full':
-                frame = 'half_plain'
-            case 'half':
-                frame = 'half_plain'
-            case 'top':
-                frame = 'top_plain'
-
-    # To text.
-    text_list = [
-        to_text(content, width=width)
-        for content in data
-    ]
-
-    # Add frame.
-    text = add_text_frame(*text_list, title=title, width=width, frame=frame)
-
-    return text
+    return terminal_size
 
 
 def echo(
     *data: Any,
-    title: bool | str = True,
+    title: str | Iterable[str] | None = None,
     width: int | None = None,
-    frame: Literal['full', 'half', 'top', 'half_plain', 'top_plain'] | None = 'full'
-) -> str:
+    frame: Literal['left', 'top', 'box'] = 'box',
+    border: Literal['ascii', 'thick', 'double'] = 'double',
+    extra: str | None = None
+) -> None:
     """
-    Beautify data to text, and print.
+    Frame data and print.
 
     Parameters
     ----------
-    data : Text data.
-    title : Text title.
-        - `Literal[True]`: Automatic get data variable name.
-        - `Literal[False]`: No title.
-        - `str`: Use this value as the title.
-    width : Text width.
-        - `None`: Use attribute `ConfigStdout.default_width`.
-        - `int`: Use this value.
-    frame : Text frame type.
-        - `Literal['full']`: Add beautiful four side frame and limit length.
-            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
-            When throw `exception`, then frame is `half` type.
-        - `Literal['half']`: Add beautiful top and bottom side frame.
-            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
-        - `Literal['top']`: Add beautiful top side frame.
-            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `top_plain` type.
-        - `Literal['half_plain']`: Add plain top and bottom side frame.
-        - `Literal['top_plain']`: Add plain top side frame.
-
-    Returns
-    -------
-    Beautify text.
+    data : Print data.
+    title : Print title.
+        - `None`: Use variable name of argument `data`.
+        - `str` : Use this value.
+        - `Iterable[str]` : Connect this values and use.
+    width : Frame width.
+        - `None` : Use terminal display character size.
+    frame : Frame type.
+        - `Literal[`left`]`: Line beginning add character column.
+        - `Literal[`top`]`: Line head add character line, with title.
+        - `Literal[`box`]`: Add four borders, with title, automatic newline.
+    border : Border type.
+        - `Literal['ascii']`: Use ASCII character.
+        - `Literal['thick']`: Use thick line character.
+        - `Literal['double']`: Use double line character.
+    extra : Extra print text.
     """
 
-    # Beautify.
-    text = beautify_text(data, title=title, width=width, frame=frame)
+    # Import.
+    from .rtext import frame_data
+
+    # Handle parameter.
+    if title is None:
+        title = get_varname('data')
+    if ConfigStdout.force_print_ascii:
+        border = 'ascii'
+
+    # Frame.
+    text = frame_data(
+        *data,
+        title=title,
+        width=width,
+        frame=frame,
+        border=border
+    )
+
+    # Extra.
+    if extra is not None:
+        text = f'{text}\n{extra}'
 
     # Print.
     print(text)
 
-    return text
 
-
-def rinput(
+def ask(
     *data: Any,
-    title: bool | str = True,
+    title: str | Iterable[str] | None = None,
     width: int | None = None,
-    frame: Literal['full', 'half', 'top', 'half_plain', 'top_plain'] | None = 'full',
+    frame: Literal['left', 'top', 'box'] = 'box',
+    border: Literal['ascii', 'thick', 'double'] = 'double',
     extra: str | None = None
 ) -> str:
     """
-    Beautify data to text, and print data, and read string from standard input.
+    Frame data and print and read string from standard input.
 
     Parameters
     ----------
-    data : Text data.
-    title : Text title.
-        - `Literal[True]`: Automatic get data variable name.
-        - `Literal[False]`: No title.
-        - `str`: Use this value as the title.
-    width : Text width.
-        - `None`: Use attribute `ConfigStdout.default_width`.
-        - `int`: Use this value.
-    frame : Text frame type.
-        - `Literal['full']`: Add beautiful four side frame and limit length.
-            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
-            When throw `exception`, then frame is `half` type.
-        - `Literal['half']`: Add beautiful top and bottom side frame.
-            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `half_plain` type.
-        - `Literal['top']`: Add beautiful top side frame.
-            When attribute `ConfigStdout.is_frame_plain` is True, then frame is `top_plain` type.
-        - `Literal['half_plain']`: Add plain top and bottom side frame.
-        - `Literal['top_plain']`: Add plain top side frame.
-    extra : Extra print text at the end.
+    data : Print data.
+    title : Print title.
+        - `None`: Use variable name of argument `data`.
+        - `str` : Use this value.
+        - `Iterable[str]` : Connect this values and use.
+    width : Frame width.
+        - `None` : Use terminal display character size.
+    frame : Frame type.
+        - `Literal[`left`]`: Line beginning add character column.
+        - `Literal[`top`]`: Line head add character line, with title.
+        - `Literal[`box`]`: Add four borders, with title, automatic newline.
+    border : Border type.
+        - `Literal['ascii']`: Use ASCII character.
+        - `Literal['thick']`: Use thick line character.
+        - `Literal['double']`: Use double line character.
+    extra : Extra print text.
 
     Returns
     -------
     Standard input string.
     """
 
-    # Beautify.
-    text = beautify_text(data, title=title, width=width, frame=frame)
+    # Import.
+    from .rtext import frame_data
+
+    # Handle parameter.
+    if ConfigStdout.force_print_ascii:
+        border = 'ascii'
+
+    # Frame.
+    text = frame_data(
+        *data,
+        title=title,
+        width=width,
+        frame=frame,
+        border=border
+    )
 
     # Extra.
     if extra is not None:
-        text += extra
+        text = f'{text}\n{extra}'
 
-    # Print.
-    stdin = input(text)
+    # Input.
+    string = input(text)
 
-    return stdin
+    return string
 
 
 def stop_print() -> None:
@@ -333,9 +318,6 @@ def add_print_position() -> None:
         Preprocessed text.
         """
 
-        # Break.
-        if __s in ('\n', ' ', '[0m'): return __s
-
         # Get parameter.
         stack_params = get_stack_param('full', 3)
         stack_floor = stack_params[-1]
@@ -348,11 +330,14 @@ def add_print_position() -> None:
             stack_floor = stack_params[-2]
 
         # Add.
-        __s = 'File "%s", line %s\n%s' % (
-            stack_floor['filename'],
-            stack_floor['lineno'],
-            __s
-        )
+        position = 'File "%s", line %s' % (stack_floor['filename'], stack_floor['lineno'])
+
+        # Added.
+        if position in ConfigStdout._added_print_position:
+            return __s
+
+        ConfigStdout._added_print_position.add(position)
+        __s = '%s\n%s' % (position, __s)
 
         return __s
 

@@ -11,7 +11,7 @@
 
 from typing import Any, Literal, Self, TypeVar, NoReturn, overload
 from types import TracebackType
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Callable, Iterable, Container, Mapping
 from sys import exc_info as sys_exc_info
 from os.path import exists as os_exists
 from traceback import format_exc
@@ -20,7 +20,8 @@ from traceback import format_stack, extract_stack
 from atexit import register as atexit_register
 from time import sleep as time_sleep
 from inspect import signature as inspect_signature, _ParameterKind, _empty
-from varname import VarnameRetrievingError, argname
+from ast import Starred
+from varname import VarnameException, argname as varname_argname
 
 
 __all__ = (
@@ -55,7 +56,7 @@ __all__ = (
     'get_stack_text',
     'get_stack_param',
     'get_arg_info',
-    'get_name',
+    'get_varname',
     'block',
     'at_exit'
 )
@@ -231,11 +232,9 @@ class Error(BaseError):
 
 
 def throw(
-    exception: type[BaseException] = AssertionError,
-    value: Any = null,
+    exception: type[BaseException],
     *values: Any,
-    text: str | None = None,
-    frame: int = 2
+    text: str | None = None
 ) -> NoReturn:
     """
     Throw exception.
@@ -243,10 +242,8 @@ def throw(
     Parameters
     ----------
     exception : Exception Type.
-    value : Exception value.
     values : Exception values.
     text : Exception text.
-    frame : Number of code to upper level.
     """
 
     # Text.
@@ -262,33 +259,27 @@ def throw(
             text = text[0].lower() + text[1:]
 
     ## Value.
-    if value != null:
-        values = (value,) + values
+    if values != ():
 
         ### Name.
-        name = get_name(value, frame)
-        names = (name,)
-        if values != ():
-            names_values = get_name(values)
-            if names_values is not None:
-                names += names_values
+        names = get_varname('values')
 
         ### Convert.
-        match exception:
-            case TypeError():
-                values = [
-                    type(value)
-                    for value in values
-                    if value is not None
-                ]
-            case TimeoutError():
-                values = [
-                    int(value)
-                    if value % 1 == 0
-                    else round(value, 3)
-                    for value in values
-                    if type(value) == float
-                ]
+        if exception == TypeError:
+            print(11111)
+            values = [
+                type(value)
+                for value in values
+                if value is not None
+            ]
+        elif exception == TimeoutError:
+            values = [
+                int(value)
+                if value % 1 == 0
+                else round(value, 3)
+                for value in values
+                if type(value) == float
+            ]
         values = [
             repr(value)
             for value in values
@@ -406,7 +397,7 @@ def check_least_one(*values: Any) -> None:
             return
 
     # Throw exception.
-    vars_name = get_name(values)
+    vars_name: list[str] = get_varname('values')
     if vars_name is not None:
         vars_name_de_dup = list(set(vars_name))
         vars_name_de_dup.sort(key=vars_name.index)
@@ -432,7 +423,7 @@ def check_most_one(*values: Any) -> None:
             if exist is True:
 
                 # Throw exception.
-                vars_name = get_name(values)
+                vars_name: list[str] = get_varname('values')
                 if vars_name is not None:
                     vars_name_de_dup = list(set(vars_name))
                     vars_name_de_dup.sort(key=vars_name.index)
@@ -511,7 +502,7 @@ def check_response_code(
 
     # Throw exception.
     if not result:
-        throw(value=code)
+        throw(AssertionError, code)
 
     return result
 
@@ -556,7 +547,7 @@ def is_instance(obj: Any) -> bool:
 
 def is_iterable(
     obj: Any,
-    exclude_types: Iterable[type] | None = None
+    exclude_types: Container[type] | None = None
 ) -> bool:
     """
     Judge whether it is iterable.
@@ -564,7 +555,7 @@ def is_iterable(
     Parameters
     ----------
     obj : Judge object.
-    exclude_types : Non iterative types.
+    exclude_types : Exclude types.
 
     Returns
     -------
@@ -604,15 +595,15 @@ def is_table(
     # Judge.
     if type(obj) != list:
         return False
-    for element in obj:
-        if type(element) != dict:
+    for elem in obj:
+        if type(elem) != dict:
             return False
 
     ## Check fields of table.
     if check_fields:
         keys_strs = [
-            ':'.join([str(key) for key in element.keys()])
-            for element in obj
+            ':'.join([str(key) for key in elem.keys()])
+            for elem in obj
         ]
         keys_strs_only = set(keys_strs)
         if len(keys_strs_only) != 1:
@@ -677,7 +668,7 @@ def get_first_notnone(*values: T, default: U = null) -> T | U:
 
     # Throw exception.
     if default == null:
-        vars_name = get_name(values)
+        vars_name: list[str] = get_varname('values')
         if vars_name is not None:
             vars_name_de_dup = list(set(vars_name))
             vars_name_de_dup.sort(key=vars_name.index)
@@ -716,7 +707,7 @@ def get_stack_text(format_: Literal['plain', 'full'] = 'plain', limit: int = 2) 
 
             ### Check.
             if len(stacks) != limit:
-                throw(value=limit)
+                throw(AssertionError, limit)
 
             ### Convert.
             text = stacks[0]
@@ -731,7 +722,7 @@ def get_stack_text(format_: Literal['plain', 'full'] = 'plain', limit: int = 2) 
 
             ### Check.
             if len(stacks) == 0:
-                throw(value=limit)
+                throw(AssertionError, limit)
 
             ### Convert.
             stacks = [
@@ -777,7 +768,7 @@ def get_stack_param(format_: Literal['floor', 'full'] = 'floor', limit: int = 2)
 
     # Check.
     if len(stacks) == 0:
-        throw(value=limit)
+        throw(AssertionError, limit)
 
     # Convert.
     match format_:
@@ -869,48 +860,49 @@ def get_arg_info(func: Callable) -> list[
     return info
 
 
-@overload
-def get_name(obj: tuple, frame: int = 2) -> tuple[str, ...] | None: ...
-
-@overload
-def get_name(obj: Any, frame: int = 2) -> str | None: ...
-
-def get_name(obj: Any, frame: int = 2) -> str | tuple[str, ...] | None:
+def get_varname(argname: str, level: int = 1) -> str | list[str] | None:
     """
-    Get name of object or variable.
+    Get variable name of function input argument, can backtrack.
 
     Parameters
     ----------
-    obj : Object.
-        - `tuple`: Variable length position parameter of previous layer.
-        - `Any`: Parameter of any layer.
-    frame : Number of code to upper level.
+    argname : Function argument name, the `*` symbol can be omitted.
+    level : Backtrack level count.
+        - `Literal[1]`: In the function that calls function `get_varname`.
 
     Returns
     -------
-    Name or None.
+    Variable name.
+        - `General argument`: Return `str`.
+        - `Variable length argument`: Return `list[str]`.
+        - `Throw VarnameException`: Return `None`.
     """
 
-    # Get name using built in method.
-    if hasattr(obj, '__name__'):
-        name = obj.__name__
-        return name
+    # Handle parameter.
+    level += 1
 
-    # Get name using module method.
-    name = 'obj'
-    for frame_ in range(1, frame + 1):
-        if type(name) != str:
-            return
-        try:
-            name = argname(name, frame=frame_)
-        except VarnameRetrievingError:
-            return
-    if type(name) == tuple:
-        for element in name:
-            if type(element) != str:
-                return
+    # Get.
+    try:
+        result = varname_argname(argname, frame=level)
+    except VarnameException:
+        return
 
-    return name
+    # Convert.
+    if type(result) != tuple:
+        result = (result,)
+    varnames: list[str] = [
+        name
+        for elem in result
+        for name in (
+            (elem.value.id,)
+            if type(elem) == Starred
+            else tuple(elem.values())
+            if type(elem) == dict
+            else (elem,)
+        )
+    ]
+
+    return varnames
 
 
 def block() -> None:

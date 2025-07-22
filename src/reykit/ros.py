@@ -1999,6 +1999,6 @@ def extract_file_content(path: str) -> str:
 
         ## Throw exception.
         case _:
-            throw(value=suffix)
+            throw(AssertionError, suffix)
 
     return content

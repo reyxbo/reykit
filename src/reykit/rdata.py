@@ -10,7 +10,7 @@
 
 
 from typing import Any, TypedDict, Literal, overload
-from collections import defaultdict as Defaultdict, ChainMap
+from collections import Counter, defaultdict as Defaultdict, ChainMap
 from collections.abc import Callable, Iterable, Generator
 from itertools import chain as IChain
 
@@ -30,20 +30,16 @@ __all__ = (
 )
 
 
-CountResult = TypedDict('CountResult', {'value': Any, 'count': int})
+CountResult = TypedDict('CountResult', {'element': Any, 'number': int})
 
 
-def count(
-    data: Iterable,
-    ascend: bool = False
-) -> list[CountResult]:
+def count(data: Iterable) -> list[CountResult]:
     """
     Group count data element value.
 
     Parameters
     ----------
     data : Data.
-    ascend : Whether ascending by count, otherwise descending order.
 
     Returns
     -------
@@ -51,40 +47,18 @@ def count(
 
     Examples
     --------
-    >>> count([1, True, 1, '1', (2, 3)])
-    [{'value': 1, 'count': 2}, {'value': True, 'count': 1}, {'value': '1', 'count': 1}, {'value': (2, 3), 'count': 1}]
+    >>> count([1, True, False, 0, (2, 3)])
+    [{'element': 1, 'number': 2}, {'element': False, 'number': 2}, {'element': (2, 3), 'number': 1}]
     """
 
-    # Set parameter.
-    value_list = []
-    count_list = []
-
     # Count.
-    for element in data:
-        for index, value in enumerate(value_list):
-            element_str = str(element)
-            value_str = str(value)
-            if element_str == value_str:
-                count_list[index] += 1
-                break
-        else:
-            value_list.append(element)
-            count_list.append(1)
+    counter = Counter(data)
 
     # Convert.
     result = [
-        {
-            'value': value,
-            'count': count
-        }
-        for value, count in zip(value_list, count_list)
+        {'element': elem, 'number': num}
+        for elem, num in counter.items()
     ]
-
-    # Sort.
-    result.sort(
-        key=lambda info: info['count'],
-        reverse=not ascend
-    )
 
     return result
 
@@ -110,17 +84,17 @@ def flatten(data: Any, *, _flattern_data: list | None = None) -> list:
 
     ## Recursion dict object.
     if type(data) == dict:
-        for element in data.values():
+        for elem in data.values():
             _flattern_data = flatten(
-                element,
+                elem,
                 _flattern_data = _flattern_data
             )
 
     ## Recursion iterator.
     elif is_iterable(data, (str, bytes)):
-        for element in data:
+        for elem in data:
             _flattern_data = flatten(
-                element,
+                elem,
                 _flattern_data = _flattern_data
             )
 

@@ -51,7 +51,7 @@ from tkinter.filedialog import (
     askdirectory as tkinter_askdirectory
 )
 
-from .rbase import Base, ConfigMeta, throw
+from .rbase import Base, ConfigMeta, throw, get_varname
 
 
 __all__ = (
@@ -257,7 +257,7 @@ def get_cmd_var(*vars: Any) -> list[Any]:
     """
 
     # Get parameter.
-    vars_name = get_name(vars)
+    vars_name = get_varname('vars')
     vars_info = tuple(zip(vars_name, vars))
 
     # Set DOS command.
@@ -753,7 +753,7 @@ def memory_read(
 
     ## Throw exception.
     else:
-        throw(value=dll_address)
+        throw(AssertionError, dll_address)
 
     # Get memory address.
     memory_address = dll_address + offset

@@ -9,25 +9,27 @@
 """
 
 
-from typing import Any, Literal
+from typing import Any, Literal, overload
 from collections.abc import Iterable
 from decimal import Decimal
 from pprint import pformat as pprint_pformat
 from json import dumps as json_dumps
 
-from .rbase import throw
+from .rbase import throw, is_iterable, get_varname
 from .rmonkey import monkey_patch_pprint_modify_width_judgment
+from .rstdout import get_terminal_size
 
 
 __all__ = (
+    'to_json',
+    'to_text',
     'split_text',
     'get_width',
     'fill_width',
+    'frame_text',
+    'frame_data',
     'join_data_text',
-    'join_filter_text',
-    'add_text_frame',
-    'to_json',
-    'to_text'
+    'join_filter_text'
 )
 
 
@@ -35,14 +37,96 @@ __all__ = (
 monkey_patch_pprint_modify_width_judgment()
 
 
-def split_text(text: str, man_len: int, by_width: bool = False) -> list[str]:
+def to_json(
+    data: Any,
+    compact: bool = True
+) -> str:
+    """
+    Convert data to JSON format string.
+
+    Parameters
+    ----------
+    data : Data.
+    compact : Whether compact content.
+
+    Returns
+    -------
+    JSON format string.
+    """
+
+    # Get parameter.
+    if compact:
+        indent = None
+        separators = (',', ':')
+    else:
+        indent = 4
+        separators = None
+
+    # Convert.
+    default = lambda value: (
+        value.__float__()
+        if type(value) == Decimal
+        else repr(value)
+    )
+    string = json_dumps(
+        data,
+        ensure_ascii=False,
+        indent=indent,
+        separators=separators,
+        default=default
+    )
+
+    return string
+
+
+def to_text(
+    data: Any,
+    width: int | None = None
+) -> str:
+    """
+    Format data to text.
+
+    Parameters
+    ----------
+    data : Data.
+    width : Format width.
+        - `None` : Use terminal display character size.
+
+    Returns
+    -------
+    Formatted text.
+    """
+
+    # Handle parameter.
+    if width is None:
+        width, _ = get_terminal_size()
+
+    # Format.
+    match data:
+
+        ## Replace tab.
+        case str():
+            text = data.replace('\t', '    ')
+
+        ## Format contents.
+        case list() | tuple() | dict() | set():
+            text = pprint_pformat(data, width=width, sort_dicts=False)
+
+        ## Other.
+        case _:
+            text = str(data)
+
+    return text
+
+
+def split_text(text: str, max_len: int, by_width: bool = False) -> list[str]:
     """
     Split text by max length or not greater than display width.
 
     Parameters
     ----------
     text : Text.
-    man_len : max length.
+    max_len : max length.
     by_width : Whether by char displayed width count length.
 
     Returns
@@ -60,7 +144,7 @@ def split_text(text: str, man_len: int, by_width: bool = False) -> list[str]:
         for char in text:
             char_width = get_width(char)
             str_width += char_width
-            if str_width > man_len:
+            if str_width > max_len:
                 string = ''.join(str_group)
                 texts.append(string)
                 str_group = [char]
@@ -73,12 +157,12 @@ def split_text(text: str, man_len: int, by_width: bool = False) -> list[str]:
     ## By char number.
     else:
         test_len = len(text)
-        split_n = test_len // man_len
-        if test_len % man_len:
+        split_n = test_len // max_len
+        if test_len % max_len:
             split_n += 1
         for n in range(split_n):
-            start_indxe = man_len * n
-            end_index = man_len * (n + 1)
+            start_indxe = max_len * n
+            end_index = max_len * (n + 1)
             text_group = text[start_indxe:end_index]
             texts.append(text_group)
 
@@ -204,6 +288,213 @@ def fill_width(text: str, char: str, width: int, align: Literal['left', 'right',
     return new_text
 
 
+@overload
+def frame_text(
+    *texts: Iterable[str],
+    title: str | Iterable[str] | None = None,
+    width: int | None = None,
+    frame: Literal['top', 'box'] = 'box',
+    border: Literal['ascii', 'thick', 'double'] = 'double'
+) -> str: ...
+
+@overload
+def frame_text(
+    *texts: Iterable[str],
+    width: int | None = None,
+    frame: Literal['left'],
+    border: Literal['ascii', 'thick', 'double'] = 'double'
+) -> str: ...
+
+def frame_text(
+    *texts: Iterable[str],
+    title: str | Iterable[str] | None = None,
+    width: int | None = None,
+    frame: Literal['left', 'top', 'box'] = 'box',
+    border: Literal['ascii', 'thick', 'double'] = 'double'
+) -> str:
+    """
+    Frame text.
+
+    Parameters
+    ----------
+    texts : Texts.
+    title : Frame title.
+        - `None`: No title.
+        - `str` : Use this value.
+        - `Iterable[str]` : Connect this values and use.
+    width : Frame width.
+        - `None` : Use terminal display character size.
+    frame : Frame type.
+        - `Literal[`left`]`: Line beginning add character column.
+        - `Literal[`top`]`: Line head add character line, with title.
+        - `Literal[`box`]`: Add four borders, with title, automatic newline.
+    border : Border type.
+        - `Literal['ascii']`: Use ASCII character.
+        - `Literal['thick']`: Use thick line character.
+        - `Literal['double']`: Use double line character.
+
+    Returns
+    -------
+    Added frame text.
+    """
+
+    # Handle parameter.
+    if width is None:
+        width, _ = get_terminal_size()
+    line_chars_dict = {
+        'double': '║═╔╗╚╝╡│╞╟─╢╓╙╒╕╶╴',
+        'thick': '┃━┏┓┗┛┥│┝┠─┨┎┖┍┑╶╴',
+        'ascii': '|-++++|||+-+/\\/\\  '
+    }
+    (
+        char_v,
+        char_h,
+        char_to_l,
+        char_to_r,
+        char_bo_l,
+        char_bo_r,
+        char_ti_l,
+        char_ti_c,
+        char_ti_r,
+        char_sp_l,
+        char_sp_c,
+        char_sp_r,
+        char_le_t_e,
+        char_le_b_e,
+        char_to_l_e,
+        char_to_r_e,
+        char_sp_l_e,
+        char_sp_r_e
+    ) = line_chars_dict[border]
+    if frame == 'top':
+        char_v = ' '
+        char_to_l = char_to_l_e
+        char_to_r = char_to_r_e
+        char_sp_l = char_sp_l_e
+        char_sp_r = char_sp_r_e
+
+    # Lines.
+    parts = []
+
+    ## Top.
+    match frame:
+        case 'left':
+            part_top = char_le_t_e
+        case 'top' | 'box':
+            if is_iterable(title, (str,)):
+                title = f' {char_ti_c} '.join(title)
+            if (
+                title is not None
+                and len(title) > width - 4
+            ):
+                title = None
+            if title is None:
+                part_top = char_h * (width - 2)
+            else:
+                part_top = f'{char_ti_l} {title} {char_ti_r}'
+                part_top = fill_width(part_top, char_h, width - 2, 'center')
+            part_top = f'{char_to_l}{part_top}{char_to_r}'
+    parts.append(part_top)
+
+    ## Content.
+    match frame:
+        case 'left':
+            char_v_l = char_v
+            char_v_r = ''
+            width_content = width - 1
+            line_split = char_sp_l
+        case 'top' | 'box':
+            char_v_l = char_v_r = char_v
+            width_content = width - 2
+            line_split = f'{char_sp_l}{char_sp_c * (width - 2)}{char_sp_r}'
+    part_content = f'\n{line_split}\n'.join(
+        [
+            '\n'.join(
+                [
+                    f'{char_v_l}{fill_width(text_line_width, ' ', width_content)}{char_v_r}'
+                    for text_line in text.split('\n')
+                    for text_line_width in split_text(text_line, width_content, True)
+                ]
+            )
+            for text in texts
+        ]
+    )
+    parts.append(part_content)
+
+    ## Bottom.
+    match frame:
+        case 'left':
+            parts.append(char_le_b_e)
+        case 'top':
+            pass
+        case 'box':
+            part_bottom = f'{char_bo_l}{char_h * (width - 2)}{char_bo_r}'
+            parts.append(part_bottom)
+
+    # Join.
+    result = '\n'.join(parts)
+    return result
+
+
+def frame_data(
+    *data: Any,
+    title: str | Iterable[str] | None = None,
+    width: int | None = None,
+    frame: Literal['left', 'top', 'box'] = 'box',
+    border: Literal['ascii', 'thick', 'double'] = 'double'
+) -> str:
+    """
+    Frame text.
+
+    Parameters
+    ----------
+    data : Data.
+    title : Frame title.
+        - `None`: Use variable name of argument `data`.
+        - `str` : Use this value.
+        - `Iterable[str]` : Connect this values and use.
+    width : Frame width.
+        - `None` : Use terminal display character size.
+    frame : Frame type.
+        - `Literal[`left`]`: Line beginning add character column.
+        - `Literal[`top`]`: Line head add character line, with title.
+        - `Literal[`box`]`: Add four borders, with title, automatic newline.
+    border : Border type.
+        - `Literal['ascii']`: Use ASCII character.
+        - `Literal['thick']`: Use thick line character.
+        - `Literal['double']`: Use double line character.
+
+    Returns
+    -------
+    Added frame text.
+    """
+
+    # handle parameter.
+    if title is None:
+        title = get_varname('data')
+    if width is None:
+        width, _ = get_terminal_size()
+    if frame == 'left':
+        width_text = width - 1
+    else:
+        width_text = width - 2
+    texts = [
+        to_text(elem, width_text)
+        for elem in data
+    ]
+
+    # Frame.
+    text = frame_text(
+        *texts,
+        title=title,
+        width=width,
+        frame=frame,
+        border=border
+    )
+
+    return text
+
+
 def join_data_text(data: Iterable) -> str:
     """
     Join data to text.
@@ -237,8 +528,8 @@ def join_data_text(data: Iterable) -> str:
     else:
         text = '\n'.join(
             [
-                str(element)
-                for element in data
+                str(elem)
+                for elem in data
             ]
         )
 
@@ -264,194 +555,12 @@ def join_filter_text(data: Iterable, char: str = ',', filter_: tuple = (None, ''
 
     # Filter and convert.
     data = [
-        str(element)
-        for element in data
-        if element not in filter_
+        str(elem)
+        for elem in data
+        if elem not in filter_
     ]
 
     # Join.
     text = char.join(data)
-
-    return text
-
-
-def add_text_frame(
-    *texts: str,
-    title: str | None,
-    width: int,
-    frame: Literal['full', 'half', 'top', 'half_plain', 'top_plain']
-) -> str:
-    """
-    Add text frame.
-
-    Parameters
-    ----------
-    texts : Texts.
-    title : Frame title.
-        - `None | Literal['']`: No title.
-        - `str`: Use this value as the title.
-    width : Frame width.
-    frame : Frame type.
-        - `Literal[`full`]`: Add beautiful four side frame and limit length.
-            When throw `exception`, then frame is `half` type.
-        - `Literal[`half`]`: Add beautiful top and bottom side frame.
-        - `Literal[`top`]`: Add beautiful top side frame.
-        - `Literal[`half_plain`]`: Add plain top and bottom side frame.
-        - `Literal[`top_plain`]`: Add plain top side frame.
-
-    Returns
-    -------
-    Added frame text.
-    """
-
-    # Handle parameter.
-    if title is None or len(title) > width - 6:
-        title = ''
-
-    # Generate frame.
-    match frame:
-
-        ## Full type.
-        case 'full':
-            if title != '':
-                title = f'╡ {title} ╞'
-            width_in = width - 2
-            _contents = []
-            try:
-                for content in texts:
-                    content_str = str(content)
-                    pieces_str = content_str.split('\n')
-                    content_str = [
-                        '║%s║' % fill_width(line_str, ' ', width_in)
-                        for piece_str in pieces_str
-                        for line_str in split_text(piece_str, width_in, True)
-                    ]
-                    content = '\n'.join(content_str)
-                    _contents.append(content)
-            except:
-                frame_top = fill_width(title, '═', width, 'center')
-                frame_split = '─' * width
-                frame_bottom = '═' * width
-                _contents = texts
-            else:
-                frame_top = '╔%s╗' % fill_width(title, '═', width_in, 'center')
-                frame_split = '╟%s╢' % ('─' * width_in)
-                frame_bottom = '╚%s╝' % ('═' * width_in)
-
-        ## Half type.
-        case 'half' | 'top':
-            if title != '':
-                title = f'╡ {title} ╞'
-            frame_top = fill_width(title, '═', width, 'center')
-            frame_split = '─' * width
-            match frame:
-                case 'half':
-                    frame_bottom = '═' * width
-                case 'top':
-                    frame_bottom = None
-            _contents = texts
-
-        ## Plain type.
-        case 'half_plain' | 'top_plain':
-            if title != '':
-                title = f'| {title} |'
-            frame_top = fill_width(title, '=', width, 'center')
-            frame_split = '-' * width
-            match frame:
-                case 'half_plain':
-                    frame_bottom = '=' * width
-                case 'top_plain':
-                    frame_bottom = None
-            _contents = texts
-
-        ## Throw exception.
-        case _:
-            throw(ValueError, frame)
-
-    # Join.
-    texts = [frame_top]
-    for index, content in enumerate(_contents):
-        if index != 0:
-            texts.append(frame_split)
-        texts.append(content)
-    texts.append(frame_bottom)
-    text = join_filter_text(texts, '\n')
-
-    return text
-
-
-def to_json(
-    data: Any,
-    compact: bool = True
-) -> str:
-    """
-    Convert data to JSON format string.
-
-    Parameters
-    ----------
-    data : Data.
-    compact : Whether compact content.
-
-    Returns
-    -------
-    JSON format string.
-    """
-
-    # Get parameter.
-    if compact:
-        indent = None
-        separators = (',', ':')
-    else:
-        indent = 4
-        separators = None
-
-    # Convert.
-    default = lambda value: (
-        value.__float__()
-        if type(value) == Decimal
-        else repr(value)
-    )
-    string = json_dumps(
-        data,
-        ensure_ascii=False,
-        indent=indent,
-        separators=separators,
-        default=default
-    )
-
-    return string
-
-
-def to_text(
-    data: Any,
-    width: int = 100
-) -> str:
-    """
-    Format data to text.
-
-    Parameters
-    ----------
-    data : Data.
-    width : Format width.
-
-    Returns
-    -------
-    Formatted text.
-    """
-
-    # Format.
-    match data:
-
-        ## Replace tab.
-        case str():
-            text = data.replace('\t', '    ')
-
-        ## Format contents.
-        case list() | tuple() | dict() | set():
-            text = pprint_pformat(data, width=width, sort_dicts=False)
-
-        ## Other.
-        case _:
-            text = str(data)
 
     return text

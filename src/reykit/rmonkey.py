@@ -323,7 +323,7 @@ def monkey_path_pil_image_get_bytes():
 
     from PIL.Image import Image
     from io import BytesIO
-    from reykit.rbase import Base
+    from .rbase import Base
 
 
     # Define.

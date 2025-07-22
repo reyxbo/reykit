@@ -262,7 +262,7 @@ def throw(
     if values != ():
 
         ### Name.
-        names = get_varname('values')
+        names: list[str] = get_varname('values')
 
         ### Convert.
         if exception == TypeError:

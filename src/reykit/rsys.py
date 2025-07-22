@@ -257,7 +257,7 @@ def get_cmd_var(*vars: Any) -> list[Any]:
     """
 
     # Get parameter.
-    vars_name = get_varname('vars')
+    vars_name: list[str] = get_varname('vars')
     vars_info = tuple(zip(vars_name, vars))
 
     # Set DOS command.

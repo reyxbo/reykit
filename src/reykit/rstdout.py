@@ -132,7 +132,7 @@ def echo(
 
     # Handle parameter.
     if title is None:
-        title = get_varname('data')
+        title: list[str] = get_varname('data')
     if ConfigStdout.force_print_ascii:
         border = 'ascii'
 

@@ -471,7 +471,7 @@ def frame_data(
 
     # handle parameter.
     if title is None:
-        title = get_varname('data')
+        title: list[str] = get_varname('data')
     if width is None:
         width, _ = get_terminal_size()
     if frame == 'left':

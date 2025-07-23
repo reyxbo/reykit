@@ -917,7 +917,7 @@ def get_varname(argname: str, level: int = 1) -> str | list[str] | None:
 
     # Get.
     try:
-        varnames = varname_argname(argname, frame=level)
+        varnames: str | AST | tuple[str | AST, ...] = varname_argname(argname, frame=level)
     except VarnameException:
         return
 
@@ -925,12 +925,12 @@ def get_varname(argname: str, level: int = 1) -> str | list[str] | None:
     if type(varnames) == tuple:
         varnames = [
             get_astname(varname)
-            if isinstance(varnames, AST)
+            if type(varnames) != str
             else varname
             for varname in varnames
         ]
     else:
-        if isinstance(varnames, AST):
+        if type(varnames) != str:
             varnames = get_astname(varnames)
 
     return varnames

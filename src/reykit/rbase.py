@@ -20,7 +20,7 @@ from traceback import format_stack, extract_stack
 from atexit import register as atexit_register
 from time import sleep as time_sleep
 from inspect import signature as inspect_signature, _ParameterKind, _empty
-from ast import Starred
+from ast import AST, Name, Attribute, Call, Starred, keyword, dump as ast_dump
 from varname import VarnameException, argname as varname_argname
 
 
@@ -56,6 +56,7 @@ __all__ = (
     'get_stack_text',
     'get_stack_param',
     'get_arg_info',
+    'get_astname',
     'get_varname',
     'block',
     'at_exit'
@@ -860,6 +861,39 @@ def get_arg_info(func: Callable) -> list[
     return info
 
 
+def get_astname(obj: AST) -> str:
+    """
+    Get object mapping name of `ast` package.
+
+    Parameters
+    ----------
+    obj : `AST` object.
+
+    Returns
+    -------
+    Mapping name.
+    """
+
+    # Get.
+    match obj:
+        case Name():
+            name = obj.id
+        case Attribute():
+            name = obj.attr
+        case Call():
+            name = obj.func
+        case Starred() | keyword():
+            name = obj.value
+        case _:
+            name = ast_dump(obj)
+
+    # Again.
+    if type(name) != str:
+        name = get_astname(name)
+
+    return name
+
+
 def get_varname(argname: str, level: int = 1) -> str | list[str] | None:
     """
     Get variable name of function input argument, can backtrack.
@@ -883,24 +917,21 @@ def get_varname(argname: str, level: int = 1) -> str | list[str] | None:
 
     # Get.
     try:
-        result = varname_argname(argname, frame=level)
+        varnames = varname_argname(argname, frame=level)
     except VarnameException:
         return
 
-    # Convert.
-    if type(result) != tuple:
-        result = (result,)
-    varnames: list[str] = [
-        name
-        for elem in result
-        for name in (
-            (elem.value.id,)
-            if type(elem) == Starred
-            else tuple(elem.values())
-            if type(elem) == dict
-            else (elem,)
-        )
-    ]
+    # Handle type AST.
+    if type(varnames) == tuple:
+        varnames = [
+            get_astname(varname)
+            if isinstance(varnames, AST)
+            else varname
+            for varname in varnames
+        ]
+    else:
+        if isinstance(varnames, AST):
+            varnames = get_astname(varnames)
 
     return varnames
 

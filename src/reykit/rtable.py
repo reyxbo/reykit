@@ -9,503 +9,509 @@
 """
 
 
-from typing import Any, TypedDict, overload
-from collections.abc import Iterable
+from typing import Any, TypedDict, Literal, overload
+from collections.abc import Collection, MutableMapping
 from os.path import abspath as os_abspath
-from pandas import DataFrame, ExcelWriter, isnull
-from sqlalchemy.engine.cursor import CursorResult
+from sqlalchemy.engine.cursor import CursorResult, Row as CursorRow
+from pandas import DataFrame, Series, ExcelWriter
 
+from .rbase import Base, throw
+from .rdata import to_json
 from .ros import File
-from .rtext import to_json, to_text
+from .rtext import to_text
 from .rtime import time_to
 
 
 __all__ = (
-    'to_table',
-    'to_dict',
-    'to_list',
-    'to_df',
-    'to_json',
-    'to_text',
-    'to_sql',
-    'to_html',
-    'to_csv',
-    'to_excel'
+    'is_row',
+    'is_table',
+    'Table'
 )
 
 
-type Table = list[dict] | dict | CursorResult | DataFrame
+type RowData = MutableMapping | CursorRow | Series
+type TableData = Collection[MutableMapping] | RowData | CursorResult | DataFrame
 SheetSet = TypedDict('SheetsSet', {'name': str, 'index': int, 'fields': str | list[str]})
 
 
-def to_table(
-    data: Table | Iterable[Iterable],
-    fields: Iterable | None = None
-) -> list[dict]:
+@overload
+def is_row(obj: RowData) -> Literal[True]: ...
+
+@overload
+def is_row(obj: Any) -> Literal[False]: ...
+
+def is_row(obj: Any) -> bool:
     """
-    Convert data to table in `list[dict]` format, keys and keys sort of the dictionary are the same.
+    Judge whether it is row format.
 
     Parameters
     ----------
-    data : Table format data.
-    fields : Table fields.
-        - `None`: Infer.
-        - `Iterable`: Use values in Iterable.
+    obj : Ojbect.
 
     Returns
     -------
-    Table in `list[dict]` format.
+    Judgment result.
     """
 
-    # Convert.
-    match data:
+    # Judge.
+    result = isinstance(obj, (MutableMapping, CursorRow, Series))
 
-        ## From CursorResult object.
-        case CursorResult():
-            fields = fields or data.keys()
-            data_table = [
-                dict(zip(fields, row))
+    return result
+
+
+@overload
+def is_table(obj: TableData) -> bool: ...
+
+@overload
+def is_table(obj: Any) -> Literal[False]: ...
+
+def is_table(obj: Any) -> bool:
+    """
+    Judge whether it is table format, and keys sort of the row are the same.
+
+    Parameters
+    ----------
+    obj : Ojbect.
+
+    Returns
+    -------
+    Judgment result.
+    """
+
+    # Judge.
+    if is_row(obj):
+        return True
+    if isinstance(obj, (CursorResult, DataFrame)):
+        return True
+    if isinstance(obj, Collection):
+        keys_strs = []
+        for row in obj:
+            if not isinstance(row, MutableMapping):
+                break
+            keys_str = ':'.join(row.keys())
+            keys_strs.append(keys_str)
+        keys_strs = set(keys_strs)
+        if len(keys_strs) == 1:
+            return True
+
+    return False
+
+
+class Table(Base):
+    """
+    Table type.
+    """
+
+
+    def __init__(self, data: TableData) -> None:
+        """
+        Build instance attributes.
+
+        Parameters
+        ----------
+        data : Data.
+        """
+
+        # Set parameter.
+        self.data = data
+
+
+    def to_row(self) -> dict:
+        """
+        Convert data to `dict` format.
+
+        Returns
+        -------
+        Converted data.
+        """
+
+        # Convert.
+        match self.data:
+            case MutableMapping():
+                result = [dict(self.data)]
+            case CursorRow():
+                result = [dict(self.data._mapping)]
+            case Series():
+                result = [dict(self.data.items())]
+
+        return result
+
+
+    def to_table(self) -> list[dict]:
+        """
+        Convert data to `list[dict]` format.
+
+        Returns
+        -------
+        Converted data.
+        """
+
+        # Convert.
+        match self.data:
+            case MutableMapping() | CursorRow() | Series():
+                result = [self.to_row()]
+            case CursorResult():
+                result = [
+                    dict(row)
+                    for row in self.data.mappings()
+                ]
+            case DataFrame():
+                result = self.data.to_dict('records')
+            case Collection():
+                if not is_table(self.data):
+                    text = 'is not table format, or keys sort of the row are the not same'
+                    throw(TypeError, text=text)
+                result = [
+                    dict(row)
+                    for row in self.data
+                ]
+
+        return result
+
+
+    @overload
+    def to_dict(
+        self,
+        key_field: int | str = 0
+    ) -> dict[Any, dict]: ...
+
+    @overload
+    def to_dict(
+        self,
+        key_field: int | str = 0,
+        *,
+        val_field: int | str
+    ) -> dict: ...
+
+    def to_dict(
+        self,
+        key_field: int | str = 0,
+        val_field: int | str | None = None
+    ) -> dict[Any, dict] | dict:
+        """
+        Convert data as dictionary.
+
+        Parameters
+        ----------
+        key_field : Key field of dictionary.
+            - `int`: Subscript index.
+            - `str`: Name index.
+        val_field : Value field of dictionary.
+            - `None`: All fields except key.
+            - `int`: Subscript index.
+            - `str`: Name index.
+
+        Returns
+        -------
+        Dictionary.
+        """
+
+        # Get parameter.
+        data = self.to_table()
+
+        # Check.
+        if len(data) == 0:
+            return {}
+
+        # Get fields.
+        fields = list(data[0].keys())
+        if type(key_field) == int:
+            key_field = fields[key_field]
+        if type(val_field) == int:
+            val_field = fields[val_field]
+
+        # Convert.
+
+        ## Value is all fields except key.
+        if val_field is None:
+            data_dict = {
+                row[key_field]: {
+                    key: value
+                    for key, value in row.items()
+                    if key != key_field
+                }
                 for row in data
-            ]
+            }
 
-        ## From DataFrame object.
-        case DataFrame():
-            data_df = to_df(data, fields)
-            fields = data_df.columns
-            data_table = [
-                dict(zip(
-                    fields,
-                    [
-                        None
-                        if (type(value) != list and isnull(value))
-                        else value
-                        for value in row
-                    ]
-                ))
-                for row in data_df.values
-            ]
+        ## Value is one field.
+        else:
+            data_dict = {
+                row[key_field]: row[val_field]
+                for row in data
+            }
 
-        ## From other object.
-        case _:
-            data_df = to_df(data, fields)
-            data_table = to_table(data_df)
-
-    return data_table
+        return data_dict
 
 
-@overload
-def to_dict(
-    data: Table | Iterable[Iterable],
-    key_field: int | str = 0
-) -> dict[Any, dict]: ...
+    def to_list(self, field: int | str = 0) -> list:
+        """
+        Convert data as list.
 
-@overload
-def to_dict(
-    data: Table | Iterable[Iterable],
-    key_field: int | str = 0,
-    *,
-    val_field: int | str
-) -> dict: ...
+        Parameters
+        ----------
+        field : Field of value.
+            - `int`: Subscript index.
+            - `str`: Name index.
 
-def to_dict(
-    data: Table | Iterable[Iterable],
-    key_field: int | str = 0,
-    val_field: int | str | None = None
-) -> dict[Any, dict] | dict:
-    """
-    Convert data as dictionary.
+        Returns
+        -------
+        List.
+        """
 
-    Parameters
-    ----------
-    data : Table format data.
-    key_field : Key field of dictionary.
-        - `int`: Subscript index.
-        - `str`: Name index.
-    val_field : Value field of dictionary.
-        - `None`: All fields except key.
-        - `int`: Subscript index.
-        - `str`: Name index.
+        # Get parameter.
+        data = self.to_table()
 
-    Returns
-    -------
-    Dictionary.
-    """
+        # Check.
+        if len(data) == 0:
+            return []
 
-    # Handle parameter.
-    data = to_table(data)
+        # Get fields.
+        fields = list(data[0].keys())
+        if type(field) == int:
+            field = fields[field]
 
-    ## Check parameter.
-    if len(data) == 0:
-        return {}
+        # Convert.
+        data_list = [
+            row[field]
+            for row in data
+        ]
 
-    # Get fields.
-    fields = list(data[0].keys())
-    if type(key_field) == int:
-        key_field = fields[key_field]
-    if type(val_field) == int:
-        val_field = fields[val_field]
+        return data_list
 
-    # Convert.
 
-    ## Value is all fields except key.
-    if val_field is None:
-        data_dict = {
-            row[key_field]: {
-                key: value
+    def to_text(self, width: int | None = None) -> str:
+        """
+        Convert data to text.
+
+        Parameters
+        ----------
+        width : Format width.
+            - `None` : Use terminal display character size.
+
+        Returns
+        -------
+        Formatted text.
+        """
+
+        # Get parameter.
+        data = self.to_table()
+
+        # Convert.
+        text = to_text(data, width)
+
+        return text
+
+
+    def to_json(self, compact: bool = True) -> str:
+        """
+        Convert data to JSON string.
+
+        Parameters
+        ----------
+        compact : Whether compact content.
+
+        Returns
+        -------
+        JSON string.
+        """
+
+        # Get parameter.
+        data = self.to_table()
+
+        # Convert.
+        string = to_json(data, compact)
+
+        return string
+
+
+    def to_sql(self) -> str:
+        """
+        Convert data to SQL string.
+
+        Returns
+        -------
+        SQL string.
+        """
+
+        # Get parameter.
+        data = self.to_table()
+        data = [
+            {
+                key : (
+                    repr(time_to(value, raising=False))
+                    if bool(value)
+                    else 'NULL'
+                )
                 for key, value in row.items()
-                if key != key_field
             }
             for row in data
-        }
-
-    ## Value is one field.
-    else:
-        data_dict = {
-            row[key_field]: row[val_field]
-            for row in data
-        }
-
-    return data_dict
-
-
-def to_list(
-    data: Table | Iterable[Iterable],
-    field: int | str = 0,
-) -> list:
-    """
-    Convert data as list.
-
-    Parameters
-    ----------
-    data : Table format data.
-    field : Field of value.
-        - `int`: Subscript index.
-        - `str`: Name index.
-
-    Returns
-    -------
-    List.
-    """
-
-    # Handle parameter.
-    data = to_table(data)
-
-    ## Check parameter.
-    if len(data) == 0:
-        return []
-
-    # Get fields.
-    fields = list(data[0].keys())
-    if type(field) == int:
-        field = fields[field]
-
-    # Convert.
-    data_list = [
-        row[field]
-        for row in data
-    ]
-
-    return data_list
-
-
-def to_df(
-    data: Table | Iterable[Iterable],
-    fields: Iterable | None = None
-) -> DataFrame:
-    """
-    Convert data to table of `DataFrame` object.
-
-    Parameters
-    ----------
-    data : Table format data.
-    fields : Table fields.
-        - `None`: Infer.
-        - `Iterable`: Use values in Iterable.
-
-    Returns
-    -------
-    DataFrame object.
-    """
-
-    # Convert.
-    match data:
-
-        ## From CursorResult object.
-        case CursorResult():
-            fields = fields or data.keys()
-            data_df = DataFrame(data, columns=fields)
-            data_df = data_df.convert_dtypes()
-
-        ## From DataFrame object.
-        case DataFrame():
-            data_df = data.convert_dtypes()
-            if fields is not None:
-                data_df.columns = fields
-
-        ## From other object.
-        case _:
-            if type(data) == dict:
-                data = [data]
-            data_df = DataFrame(data, columns=fields)
-            data_df = data_df.convert_dtypes()
-
-    return data_df
-
-
-def to_json(
-    data: Table | Iterable[Iterable],
-    fields: Iterable | None = None,
-    compact: bool = True
-) -> str:
-    """
-    Convert data to JSON string.
-
-    Parameters
-    ----------
-    data : Table format data.
-    fields : Table fields.
-        - `None`: Infer.
-        - `Iterable`: Use values in Iterable.
-    compact : Whether compact content.
-
-    Returns
-    -------
-    JSON string.
-    """
-
-    # Handle parameter.
-    data = to_table(data, fields)
-
-    # Convert.
-    string = to_json(data, compact)
-
-    return string
-
-
-def to_text(
-    data: Table | Iterable[Iterable],
-    fields: Iterable | None = None,
-    width: int = 100
-) -> str:
-    """
-    Convert data to text.
-
-    Parameters
-    ----------
-    data : Table format data.
-    fields : Table fields.
-        - `None`: Infer.
-        - `Iterable`: Use values in Iterable.
-    width : Format width.
-
-    Returns
-    -------
-    Formatted text.
-    """
-
-    # Handle parameter.
-    data = to_table(data, fields)
-
-    # Convert.
-    text = to_text(data, width)
-
-    return text
-
-
-def to_sql(
-    data: Table | Iterable[Iterable],
-    fields: Iterable | None = None
-) -> str:
-    """
-    Convert data to SQL string.
-
-    Parameters
-    ----------
-    data : Table format data.
-    fields : Table fields.
-        - `None`: Infer.
-        - `Iterable`: Use values in Iterable.
-
-    Returns
-    -------
-    SQL string.
-    """
-
-    # Get fields of table.
-    if isinstance(data, CursorResult):
-        fields = fields or data.keys()
-    else:
-        data = to_table(data, fields)
-        fields = data[0].keys()
-
-    # Generate SQL.
-    sql_rows_values = [
-        [
-            repr(time_to(value, raising=False))
-            if value is not None
-            else 'NULL'
-            for value in row
         ]
-        for row in data
-    ]
-    sql_rows = [
-        'SELECT ' + ','.join(row_values)
-        for row_values in sql_rows_values
-    ]
-    sql_row_first = 'SELECT ' + ','.join(
-        [
-            f'{value} AS `{key}`'
-            for key, value in list(zip(fields, sql_rows_values[0]))
+
+        # Check.
+        if len(data) == 0:
+            throw(ValueError, data)
+
+        # Generate SQL.
+        sql_rows = [
+            'SELECT ' + ','.join(row.values())
+            for row in data[1:]
         ]
-    )
-    sql_rows[0] = sql_row_first
-    data_sql = ' UNION ALL '.join(sql_rows)
+        sql_row_first = 'SELECT ' + ','.join(
+            [
+                f'{value} AS `{key}`'
+                for key, value in data[0].items()
+            ]
+        )
+        sql_rows.insert(0, sql_row_first)
+        data_sql = ' UNION ALL '.join(sql_rows)
 
-    return data_sql
-
-
-def to_html(
-    data: Table | Iterable[Iterable],
-    fields: Iterable | None = None
-) -> str:
-    """
-    Convert data to HTML string.
-
-    Parameters
-    ----------
-    data : Table format data.
-    fields : Table fields.
-        - `None`: Infer.
-        - `Iterable`: Use values in Iterable.
-
-    Returns
-    -------
-    HTML string.
-    """
-
-    # Handle parameter.
-    data_df = to_df(data, fields)
-
-    # Convert.
-    data_html = data_df.to_html(col_space=50, index=False, justify='center')
-
-    return data_html
+        return data_sql
 
 
-def to_csv(
-    data: Table | Iterable[Iterable],
-    path: str = 'data.csv',
-    fields: Iterable | None = None
-) -> str:
-    """
-    Convert data to save CSV format file.
-    When file exist, then append data.
+    def to_df(self) -> DataFrame:
+        """
+        Convert data to table of `DataFrame` object.
 
-    Parameters
-    ----------
-    data : Table format data.
-    path : File save path.
-    fields : Table fields.
-        - `None`: Infer.
-        - `Iterable`: Use values in Iterable.
+        Returns
+        -------
+        DataFrame object.
+        """
 
-    Returns
-    -------
-    File absolute path.
-    """
+        # Check.
+        if type(self.data) == DataFrame:
+            return self.data
 
-    # Handle parameter.
-    data_df = to_df(data, fields)
-    rfile = File(path)
-    if rfile:
-        header = False
-    else:
-        header = True
+        # Get parameter.
+        data = self.to_table()
 
-    # Save file.
-    data_df.to_csv(rfile.path, header=header, index=False, mode='a')
+        # Convert.
+        result = DataFrame(data)
 
-    return rfile.path
+        return result
 
 
-def to_excel(
-    data: Table | Iterable[Iterable],
-    path: str = 'data.xlsx',
-    group_field: str | None = None,
-    sheets_set: dict[str | int, SheetSet] = {}
-) -> str:
-    """
-    Convert data to save Excel format file and return sheet name and sheet data.
-    When file exist, then rebuild file.
+    def to_html(self) -> str:
+        """
+        Convert data to HTML string.
 
-    Parameters
-    ----------
-    data : Table format data.
-    path : File save path.
-    group_field : Group filed.
-    sheets_set : Set sheet new name and sort sheet and filter sheet fields,
-        key is old name or index, value is set parameters.
-        - Parameter `name` : Set sheet new name.
-        - Parameter `index` : Sort sheet.
-        - Parameter `fields` : Filter sheet fields.
+        Returns
+        -------
+        HTML string.
+        """
 
-    Returns
-    -------
-    File absolute path.
+        # Get parameter.
+        data = self.to_df()
 
-    Examples
-    --------
-    >>> data = [
-    ...     {'id': 1, 'age': 21, 'group': 'one'},
-    ...     {'id': 2, 'age': 22, 'group': 'one'},
-    ...     {'id': 3, 'age': 23, 'group': 'two'}
-    ... ]
-    >>> sheets_set = {
-    ...     'one': {'name': 'age', 'index': 2, 'fields': ['id', 'age']},
-    ...     'two': {'name': 'id', 'index': 1, 'fields': 'id'}
-    ... }
-    >>> to_excel(data, 'file.xlsx', 'group', sheets_set)
-    """
+        # Convert.
+        result = data.to_html(col_space=50, index=False, justify='center')
 
-    # Handle parameter.
-    if type(data) != DataFrame:
-        data = to_df(data)
-    path = os_abspath(path)
+        return result
 
-    # Generate sheets.
-    if group_field is None:
-        data_group = (('Sheet1', data),)
-    else:
-        data_group = data.groupby(group_field)
-    sheets_table_before = []
-    sheets_table_after = []
-    for index, sheet_table in enumerate(data_group):
-        sheet_name, sheet_df = sheet_table
-        if group_field is not None:
-            del sheet_df[group_field]
-        if sheet_name in sheets_set:
-            sheet_set = sheets_set[sheet_name]
-        elif index in sheets_set:
-            sheet_set = sheets_set[index]
+
+    def to_csv(self, path: str = 'data.csv') -> str:
+        """
+        Convert data to save CSV format file.
+        When file exist, then append data.
+
+        Parameters
+        ----------
+        path : File save path.
+
+        Returns
+        -------
+        File absolute path.
+        """
+
+        # Get parameter.
+        data = self.to_df()
+        rfile = File(path)
+        if rfile:
+            header = False
         else:
-            sheets_table_after.append((sheet_name, sheet_df))
-            continue
-        if 'name' in sheet_set:
-            sheet_name = sheet_set['name']
-        if 'fields' in sheet_set:
-            sheet_df = sheet_df[sheet_set['fields']]
-        if 'index' in sheet_set:
-            sheets_table_before.append((sheet_set['index'], (sheet_name, sheet_df)))
+            header = True
+
+        # Save file.
+        data.to_csv(rfile.path, header=header, index=False, mode='a')
+
+        return rfile.path
+
+
+    def to_excel(
+        self,
+        path: str = 'data.xlsx',
+        group_field: str | None = None,
+        sheets_set: dict[str | int, SheetSet] = {}
+    ) -> str:
+        """
+        Convert data to save Excel format file and return sheet name and sheet data.
+        When file exist, then rebuild file.
+
+        Parameters
+        ----------
+        path : File save path.
+        group_field : Group filed.
+        sheets_set : Set sheet new name and sort sheet and filter sheet fields,
+            key is old name or index, value is set parameters.
+            - Parameter `name` : Set sheet new name.
+            - Parameter `index` : Sort sheet.
+            - Parameter `fields` : Filter sheet fields.
+
+        Returns
+        -------
+        File absolute path.
+
+        Examples
+        --------
+        >>> data = [
+        ...     {'id': 1, 'age': 21, 'group': 'one'},
+        ...     {'id': 2, 'age': 22, 'group': 'one'},
+        ...     {'id': 3, 'age': 23, 'group': 'two'}
+        ... ]
+        >>> sheets_set = {
+        ...     'one': {'name': 'age', 'index': 2, 'fields': ['id', 'age']},
+        ...     'two': {'name': 'id', 'index': 1, 'fields': 'id'}
+        ... }
+        >>> to_excel(data, 'file.xlsx', 'group', sheets_set)
+        """
+
+        # Get parameter.
+        data = self.to_df()
+        path = os_abspath(path)
+
+        # Generate sheets.
+        if group_field is None:
+            data_group = (('Sheet1', data),)
         else:
-            sheets_table_after.append((sheet_name, sheet_df))
-    sort_func = lambda item: item[0]
-    sheets_table_before.sort(key=sort_func)
-    sheets_table = [sheet_table for sheet_index, sheet_table in sheets_table_before] + sheets_table_after
+            data_group = data.groupby(group_field)
+        sheets_table_before = []
+        sheets_table_after = []
+        for index, sheet_table in enumerate(data_group):
+            sheet_name, sheet_df = sheet_table
+            if group_field is not None:
+                del sheet_df[group_field]
+            if sheet_name in sheets_set:
+                sheet_set = sheets_set[sheet_name]
+            elif index in sheets_set:
+                sheet_set = sheets_set[index]
+            else:
+                sheets_table_after.append((sheet_name, sheet_df))
+                continue
+            if 'name' in sheet_set:
+                sheet_name = sheet_set['name']
+            if 'fields' in sheet_set:
+                sheet_df = sheet_df[sheet_set['fields']]
+            if 'index' in sheet_set:
+                sheets_table_before.append((sheet_set['index'], (sheet_name, sheet_df)))
+            else:
+                sheets_table_after.append((sheet_name, sheet_df))
+        sort_func = lambda item: item[0]
+        sheets_table_before.sort(key=sort_func)
+        sheets_table = [sheet_table for sheet_index, sheet_table in sheets_table_before] + sheets_table_after
 
-    # Save file.
-    excel = ExcelWriter(path)
-    for sheet_name, sheet_df in sheets_table:
-        sheet_df.to_excel(excel, sheet_name, index=False)
-    excel.close()
+        # Save file.
+        excel = ExcelWriter(path)
+        for sheet_name, sheet_df in sheets_table:
+            sheet_df.to_excel(excel, sheet_name, index=False)
+        excel.close()
 
-    return path
+        return path

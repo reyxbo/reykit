@@ -11,9 +11,7 @@
 
 from typing import Any, Literal, overload
 from collections.abc import Iterable
-from decimal import Decimal
 from pprint import pformat as pprint_pformat
-from json import dumps as json_dumps
 
 from .rbase import throw, is_iterable, get_varname
 from .rmonkey import monkey_patch_pprint_modify_width_judgment
@@ -21,7 +19,6 @@ from .rstdout import get_terminal_size
 
 
 __all__ = (
-    'to_json',
     'to_text',
     'split_text',
     'get_width',
@@ -37,52 +34,7 @@ __all__ = (
 monkey_patch_pprint_modify_width_judgment()
 
 
-def to_json(
-    data: Any,
-    compact: bool = True
-) -> str:
-    """
-    Convert data to JSON format string.
-
-    Parameters
-    ----------
-    data : Data.
-    compact : Whether compact content.
-
-    Returns
-    -------
-    JSON format string.
-    """
-
-    # Get parameter.
-    if compact:
-        indent = None
-        separators = (',', ':')
-    else:
-        indent = 4
-        separators = None
-
-    # Convert.
-    default = lambda value: (
-        value.__float__()
-        if type(value) == Decimal
-        else repr(value)
-    )
-    string = json_dumps(
-        data,
-        ensure_ascii=False,
-        indent=indent,
-        separators=separators,
-        default=default
-    )
-
-    return string
-
-
-def to_text(
-    data: Any,
-    width: int | None = None
-) -> str:
+def to_text(data: Any, width: int | None = None) -> str:
     """
     Format data to text.
 

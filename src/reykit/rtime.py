@@ -23,11 +23,6 @@ from datetime import (
     time as Time,
     timedelta as Timedelta
 )
-from pandas import (
-    DataFrame,
-    Timestamp as PTimestamp,
-    Timedelta as PTimedelta
-)
 
 from .rbase import T, Base, throw
 from .rnum import digits
@@ -117,7 +112,7 @@ def now(
 
 @overload
 def time_to(
-    obj: Datetime | Date | Time | Timedelta | StructTime | PTimestamp | PTimedelta,
+    obj: Datetime | Date | Time | Timedelta | StructTime,
     decimal: bool = False,
     raising: bool = True
 ) -> str: ...
@@ -163,7 +158,7 @@ def time_to(
     match obj:
 
         ## Type 'datetime'.
-        case Datetime() | PTimestamp():
+        case Datetime():
             if decimal:
                 format_ = '%Y-%m-%d %H:%M:%S.%f'
             else:
@@ -183,7 +178,7 @@ def time_to(
             text = obj.strftime(format_)
 
         ## Type 'timedelta'.
-        case Timedelta() | PTimedelta():
+        case Timedelta():
             timestamp = obj.seconds + obj.microseconds / 1000_000
             if timestamp >= 0:
                 timestamp += 57600
@@ -470,7 +465,8 @@ def wait(
         ## Wait.
         while True:
             success = func(*args, **kwargs)
-            if success: break
+            if success:
+                break
             sleep(_interval)
 
     # Set timeout.
@@ -479,7 +475,8 @@ def wait(
         ## Wait.
         while True:
             success = func(*args, **kwargs)
-            if success: break
+            if success:
+                break
 
             ## Timeout.
             rtm()
@@ -552,7 +549,7 @@ class TimeMark(Base):
         return index
 
 
-    def report(self, title: str | None = None) -> DataFrame:
+    def report(self, title: str | None = None):
         """
         Print and return time mark information table.
 
@@ -566,6 +563,9 @@ class TimeMark(Base):
         -------
         Time mark information table
         """
+
+        # Import.
+        from pandas import DataFrame
 
         # Get parameter.
         record_len = len(self.record)
@@ -636,7 +636,8 @@ class TimeMark(Base):
         """
 
         # Break.
-        if len(self.record) <= 1: return 0.0
+        if len(self.record) <= 1:
+            return 0.0
 
         # Get parameter.
         first_timestamp = self.record[0]['timestamp']

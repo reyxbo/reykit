@@ -50,7 +50,6 @@ __all__ = (
     'is_class',
     'is_instance',
     'is_iterable',
-    'is_table',
     'is_num_str',
     'get_first_notnone',
     'get_stack_text',
@@ -514,7 +513,7 @@ def is_class(obj: Any) -> bool:
 
     Parameters
     ----------
-    obj : Judge object.
+    obj : Ojbect.
 
     Returns
     -------
@@ -533,7 +532,7 @@ def is_instance(obj: Any) -> bool:
 
     Parameters
     ----------
-    obj : Judge object.
+    obj : Ojbect.
 
     Returns
     -------
@@ -555,7 +554,7 @@ def is_iterable(
 
     Parameters
     ----------
-    obj : Judge object.
+    obj : Ojbect.
     exclude_types : Exclude types.
 
     Returns
@@ -574,43 +573,6 @@ def is_iterable(
         return True
 
     return False
-
-
-def is_table(
-    obj: Any,
-    check_fields: bool = True
-) -> bool:
-    """
-    Judge whether it is `list[dict]` table format and keys and keys sort of the dict are the same.
-
-    Parameters
-    ----------
-    obj : Judge object.
-    check_fields : Do you want to check the keys and keys sort of the dict are the same.
-
-    Returns
-    -------
-    Judgment result.
-    """
-
-    # Judge.
-    if type(obj) != list:
-        return False
-    for elem in obj:
-        if type(elem) != dict:
-            return False
-
-    ## Check fields of table.
-    if check_fields:
-        keys_strs = [
-            ':'.join([str(key) for key in elem.keys()])
-            for elem in obj
-        ]
-        keys_strs_only = set(keys_strs)
-        if len(keys_strs_only) != 1:
-            return False
-
-    return True
 
 
 def is_num_str(

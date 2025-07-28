@@ -458,7 +458,8 @@ async def async_wait(
         ## Wait.
         while True:
             success = func(*args, **kwargs)
-            if success: break
+            if success:
+                break
             await async_sleep(_interval)
 
     # Set timeout.
@@ -467,7 +468,8 @@ async def async_wait(
         ## Wait.
         while True:
             success = func(*args, **kwargs)
-            if success: break
+            if success:
+                break
 
             ## Timeout.
             rtm()

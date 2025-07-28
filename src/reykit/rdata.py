@@ -13,11 +13,14 @@ from typing import Any, TypedDict, Literal, overload
 from collections import Counter, defaultdict as Defaultdict, ChainMap
 from collections.abc import Callable, Iterable, Generator
 from itertools import chain as IChain
+from decimal import Decimal
+from json import dumps as json_dumps
 
 from .rbase import T, KT, VT, Base, null, check_least_one, check_most_one, is_iterable
 
 
 __all__ = (
+    'to_json',
     'count',
     'flatten',
     'split',
@@ -31,6 +34,48 @@ __all__ = (
 
 
 CountResult = TypedDict('CountResult', {'element': Any, 'number': int})
+
+
+def to_json(
+    data: Any,
+    compact: bool = True
+) -> str:
+    """
+    Convert data to JSON format string.
+
+    Parameters
+    ----------
+    data : Data.
+    compact : Whether compact content.
+
+    Returns
+    -------
+    JSON format string.
+    """
+
+    # Get parameter.
+    if compact:
+        indent = None
+        separators = (',', ':')
+    else:
+        indent = 4
+        separators = None
+
+    # Convert.
+    default = lambda value: (
+        value.__float__()
+        if type(value) == Decimal
+        else repr(value)
+    )
+    string = json_dumps(
+        data,
+        ensure_ascii=False,
+        indent=indent,
+        separators=separators,
+        default=default
+    )
+
+    return string
 
 
 def count(data: Iterable) -> list[CountResult]:

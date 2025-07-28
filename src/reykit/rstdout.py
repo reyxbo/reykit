@@ -232,7 +232,8 @@ def start_print() -> None:
     """
 
     # Check.
-    if not ConfigStdout._stoped: return
+    if not ConfigStdout._stoped:
+        return
 
     # Start.
     sys.stdout = ConfigStdout._io_stdout
@@ -289,7 +290,8 @@ def reset_print() -> None:
     """
 
     # Check.
-    if not ConfigStdout._modified: return
+    if not ConfigStdout._modified:
+        return
 
     # Reset.
     ConfigStdout._io_stdout.write = ConfigStdout._io_stdout_write

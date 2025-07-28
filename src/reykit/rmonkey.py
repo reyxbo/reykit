@@ -30,72 +30,59 @@ def monkey_patch_sqlalchemy_result_more_fetch():
     Examples
     --------
     >>> result = connection.execute(sql)
-    >>> result.fetch_table()
-    >>> result.fetch_dict()
-    >>> result.fetch_list()
-    >>> result.fetch_df()
-    >>> result.fetch_json()
-    >>> result.fetch_text()
-    >>> result.fetch_sql()
-    >>> result.fetch_html()
-    >>> result.fetch_csv()
-    >>> result.fetch_excel()
+    >>> result.to_table()
+    >>> result.to_dict()
+    >>> result.to_list()
+    >>> result.to_df()
+    >>> result.to_json()
+    >>> result.to_text()
+    >>> result.to_sql()
+    >>> result.to_html()
+    >>> result.to_csv()
+    >>> result.to_excel()
     >>> result.show()
     >>> result.exist
     >>> result.empty
     """
 
     # Import.
+    from typing import Self
+    from types import MethodType
     from sqlalchemy.engine.cursor import CursorResult
     from pandas import DataFrame, NA, concat
     from .rbase import Base
     from .rstdout import echo
-    from .rtable import (
-        to_table,
-        to_dict,
-        to_list,
-        to_df,
-        to_json,
-        to_text,
-        to_sql,
-        to_html,
-        to_csv,
-        to_excel
-    )
+    from .rtable import Table
     from .rtime import time_to
 
-    # Fetch result as table in 'list[dict]' format.
-    CursorResult.fetch_table = to_table
 
-    # Fetch result as dictionary.
-    CursorResult.fetch_dict = to_dict
+    # Add.
+    @property
+    def method_data(self: Result) -> Self:
+        """
+        Get Data.
 
-    # Fetch result as list.
-    CursorResult.fetch_list = to_list
+        Returns
+        -------
+        Self.
+        """
 
-    # Fetch result as DataFrame object.
-    CursorResult.fetch_df = to_df
-
-    # Fetch result as JSON string.
-    CursorResult.fetch_json = to_json
-
-    # Fetch result as text.
-    CursorResult.fetch_text = to_text
-
-    # Fetch result as SQL string.
-    CursorResult.fetch_sql = to_sql
-
-    # Fetch result as HTML string.
-    CursorResult.fetch_html = to_html
-
-    # Fetch result as save csv format file.
-    CursorResult.fetch_csv = to_csv
-
-    # Fetch result as save excel file.
-    CursorResult.fetch_excel = to_excel
+        return self
 
 
-    # Print result.
+    CursorResult.data = method_data
+    CursorResult.to_table = Table.to_table
+    CursorResult.to_dict = Table.to_dict
+    CursorResult.to_list = Table.to_list
+    CursorResult.to_text = Table.to_text
+    CursorResult.to_json = Table.to_json
+    CursorResult.to_sql = Table.to_sql
+    CursorResult.to_df = Table.to_df
+    CursorResult.to_html = Table.to_html
+    CursorResult.to_csv = Table.to_csv
+    CursorResult.to_excel = Table.to_excel
+
+
     def method_show(self: Result, limit: int | None = None) -> None:
         """
         Print result.
@@ -112,7 +99,7 @@ def monkey_patch_sqlalchemy_result_more_fetch():
             limit = 0
 
         # Convert.
-        df: DataFrame = self.fetch_df()
+        df: DataFrame = self.to_df()
         df = df.map(time_to, raising=False)
         df = df.astype(str)
         df.replace(['NaT', '<NA>'], 'None', inplace=True)
@@ -148,7 +135,6 @@ def monkey_patch_sqlalchemy_result_more_fetch():
     CursorResult.show = method_show
 
 
-    # Whether is exist.
     @property
     def method_exist(self: Result) -> bool:
         """
@@ -168,7 +154,6 @@ def monkey_patch_sqlalchemy_result_more_fetch():
     CursorResult.exist = method_exist
 
 
-    # Whether is empty.
     @property
     def method_empty(self: Result) -> bool:
         """
@@ -198,19 +183,19 @@ def monkey_patch_sqlalchemy_result_more_fetch():
         __doc__ = CursorResult.__doc__
 
         # Add method.
-        fetch_table = to_table
-        fetch_dict = to_dict
-        fetch_list = to_list
-        fetch_df = to_df
-        fetch_json = to_json
-        fetch_text = to_text
-        fetch_sql = to_sql
-        fetch_html = to_html
-        fetch_csv = to_csv
-        fetch_excel = to_excel
-        show = method_show
-        exist = method_exist
-        empty = method_empty
+        to_table: MethodType = Table.to_table
+        to_dict: MethodType = Table.to_dict
+        to_list: MethodType = Table.to_list
+        to_text: MethodType = Table.to_text
+        to_json: MethodType = Table.to_json
+        to_sql: MethodType = Table.to_sql
+        to_df: MethodType = Table.to_df
+        to_html: MethodType = Table.to_html
+        to_csv: MethodType = Table.to_csv
+        to_excel: MethodType = Table.to_excel
+        show: MethodType = method_show
+        exist: MethodType = method_exist
+        empty: MethodType = method_empty
 
 
     return Result

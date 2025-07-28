@@ -230,12 +230,14 @@ class Log(Base):
         # Break.
 
         ## Switch.
-        if not self.print_colour: return
+        if not self.print_colour:
+            return
 
         ## Added.
         pattern = '\033\\[[\\d;]+?m'
         result = search(pattern, format_)
-        if result is not None: return
+        if result is not None:
+            return
 
         # 'format_time'.
         if '%(format_time)s' in format_:
@@ -733,7 +735,8 @@ class Log(Base):
         """
 
         # Break.
-        if not self.print_replaced: return
+        if not self.print_replaced:
+            return
 
         # Reset.
         reset_print()

@@ -52,9 +52,9 @@ from lxml.etree import ElementChildIterator
 from pdfplumber import open as pdfplumber_open
 
 from .rbase import Base, throw
+from .rdata import to_json
 from .rre import search, sub
 from .rsys import run_cmd
-from .rtext import to_json
 
 
 __all__ = (

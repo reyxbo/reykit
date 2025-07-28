@@ -42,14 +42,6 @@ from json import JSONDecodeError
 from tomllib import loads as tomllib_loads
 from hashlib import md5 as hashlib_md5
 from tempfile import TemporaryFile, TemporaryDirectory
-from docx import Document as docx_document
-from docx.document import Document
-from docx.text.paragraph import Paragraph
-from docx.table import Table
-from docx.oxml.text.paragraph import CT_P
-from docx.oxml.table import CT_Tbl
-from lxml.etree import ElementChildIterator
-from pdfplumber import open as pdfplumber_open
 
 from .rbase import Base, throw
 from .rdata import to_json
@@ -1900,6 +1892,15 @@ def extract_docx_content(path: str) -> str:
     Content.
     """
 
+    # Import.
+    from docx import Document as docx_document
+    from docx.document import Document
+    from docx.text.paragraph import Paragraph
+    from docx.table import Table
+    from docx.oxml.text.paragraph import CT_P
+    from docx.oxml.table import CT_Tbl
+    from lxml.etree import ElementChildIterator
+
     # Extract.
     document: Document = docx_document(path)
     childs_iter: ElementChildIterator = document.element.body.iterchildren()
@@ -1951,6 +1952,9 @@ def extract_pdf_content(path: str) -> str:
     -------
     Content.
     """
+
+    # Import.
+    from pdfplumber import open as pdfplumber_open
 
     # Extract.
     document = pdfplumber_open(path)

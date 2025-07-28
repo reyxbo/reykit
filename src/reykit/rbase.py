@@ -887,7 +887,7 @@ def get_varname(argname: str, level: int = 1) -> str | list[str] | None:
     if type(varnames) == tuple:
         varnames = [
             get_astname(varname)
-            if type(varnames) != str
+            if type(varname) != str
             else varname
             for varname in varnames
         ]

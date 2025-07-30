@@ -480,7 +480,7 @@ def wait(
 
             ## Timeout.
             rtm()
-            if rtm.total_spend > _timeout:
+            if rtm.__total_spend > _timeout:
 
                 ### Throw exception.
                 if _raising:
@@ -493,12 +493,20 @@ def wait(
 
     ## Return.
     rtm()
-    return rtm.total_spend
+    return rtm.__total_spend
 
 
 class TimeMark(Base):
     """
     Time mark type.
+
+    Examples
+    --------
+    >>> timemark = TimeMark()
+    >>> timemark('one')
+    >>> timemark['two']
+    >>> timemark.three
+    >>> print(timemark)
     """
 
 
@@ -511,7 +519,7 @@ class TimeMark(Base):
         self.record: dict[int, RecordData] = {}
 
 
-    def mark(self, note: str | None = None) -> int:
+    def __mark(self, note: str | None = None) -> int:
         """
         Marking now time.
 
@@ -549,9 +557,9 @@ class TimeMark(Base):
         return index
 
 
-    def report(self, title: str | None = None):
+    def __get_report(self, title: str | None = None):
         """
-        Print and return time mark information table.
+        Return time mark report table.
 
         Parameters
         ----------
@@ -561,7 +569,7 @@ class TimeMark(Base):
 
         Returns
         -------
-        Time mark information table
+        Time mark report table.
         """
 
         # Import.
@@ -618,15 +626,11 @@ class TimeMark(Base):
         df_info = DataFrame(data, index=indexes)
         df_info.fillna('-', inplace=True)
 
-        # Print.
-        if title is not None:
-            echo(df_info, title=title)
-
         return df_info
 
 
     @property
-    def total_spend(self) -> float:
+    def __total_spend(self) -> float:
         """
         Get total spend seconds.
 
@@ -660,7 +664,7 @@ class TimeMark(Base):
         """
 
         # Get.
-        report = self.report()
+        report = self.__get_report()
 
         # Convert.
         string = str(report)
@@ -668,4 +672,6 @@ class TimeMark(Base):
         return string
 
 
-    __call__ = mark
+    __call__ = __getitem__ = __getattr__ = __mark
+
+    __float__ = __total_spend

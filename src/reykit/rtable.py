@@ -116,9 +116,9 @@ class Table(Base):
         self.data = data
 
 
-    def to_row(self) -> dict:
+    def to_table(self) -> list[dict]:
         """
-        Convert data to `dict` format.
+        Convert data to `list[dict]` format.
 
         Returns
         -------
@@ -133,23 +133,6 @@ class Table(Base):
                 result = [dict(self.data._mapping)]
             case Series():
                 result = [dict(self.data.items())]
-
-        return result
-
-
-    def to_table(self) -> list[dict]:
-        """
-        Convert data to `list[dict]` format.
-
-        Returns
-        -------
-        Converted data.
-        """
-
-        # Convert.
-        match self.data:
-            case MutableMapping() | CursorRow() | Series():
-                result = [self.to_row()]
             case CursorResult():
                 result = [
                     dict(row)

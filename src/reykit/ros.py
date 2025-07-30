@@ -74,33 +74,25 @@ type FileStr = FilePath | FileText | TextIOBase
 type FileBytes = FilePath | FileData | BufferedIOBase
 
 
-def get_md5(file: str | bytes) -> str:
+def get_md5(data: str | bytes) -> str:
     """
-    Get file MD5.
+    Get MD5 value.
 
     Parameters
     ----------
-    file : File path or file bytes.
+    data : Data.
 
     Returns
     -------
-    File MD5.
+    MD5 value.
     """
 
-    # Get bytes.
-    match file:
+    # Handle parameter.
+    if type(data) == str:
+        data = data.encode()
 
-        ## Path.
-        case str():
-            rfile = File(file)
-            file_bytes = rfile.bytes
-
-        ## Bytes.
-        case bytes() | bytearray():
-            file_bytes = file
-
-    # Calculate.
-    hash = hashlib_md5(file_bytes)
+    # Get.
+    hash = hashlib_md5(data)
     md5 = hash.hexdigest()
 
     return md5
@@ -712,7 +704,8 @@ class File(Base):
         """
 
         # Get.
-        file_md5 = get_md5(self.path)
+        file_bytes = self.bytes
+        file_md5 = get_md5(file_bytes)
 
         return file_md5
 
@@ -1431,7 +1424,8 @@ class TempFile(Base):
         """
 
         # Get.
-        file_md5 = get_md5(self.path)
+        file_bytes = self.read()
+        file_md5 = get_md5(file_bytes)
 
         return file_md5
 

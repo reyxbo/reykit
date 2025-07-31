@@ -684,11 +684,11 @@ class AsyncPool(Base):
         self.futures: list[AFuture] = []
 
         # Start.
-        self._start_loop()
+        self.__start_loop()
 
 
     @wrap_thread
-    def _start_loop(self) -> None:
+    def __start_loop(self) -> None:
         """
         Start event loop.
         """

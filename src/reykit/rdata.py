@@ -409,10 +409,10 @@ class FunctionGenerator(Base):
         self.args = args
         self.kwargs = kwargs
         self.params: list[tuple[tuple, dict]] = []
-        self.generator = self._generator()
+        self.generator = self.__generator()
 
 
-    def _generator(self) -> Generator[Any, Any, None]:
+    def __generator(self) -> Generator[Any, Any, None]:
         """
         Create generator.
 

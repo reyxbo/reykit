@@ -259,7 +259,7 @@ def monkey_patch_pprint_modify_width_judgment() -> None:
 
 
     # Define.
-    def _format(_self, obj, stream, indent, allowance, context, level):
+    def __format(_self, obj, stream, indent, allowance, context, level):
 
         from .rtext import get_width
 
@@ -289,7 +289,7 @@ def monkey_patch_pprint_modify_width_judgment() -> None:
 
 
     # Modify.
-    PrettyPrinter._format = _format
+    PrettyPrinter.__format = __format
 
 
 def monkey_path_pil_image_get_bytes():

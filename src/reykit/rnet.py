@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, Literal, TypedDict, NotRequired
+from typing import Any, Literal, TypedDict, NotRequired, overload
 from collections.abc import Callable, Iterable
 from warnings import filterwarnings
 from os.path import abspath as os_abspath, isfile as os_isfile
@@ -205,6 +205,67 @@ def get_content_type(file: str | bytes) -> str | None:
 
     return file_type
 
+
+@overload
+def request(
+    url: str,
+    params: dict | None = None,
+    *,
+    headers: dict[str, str] = {},
+    timeout: float | None = None,
+    proxies: dict[str, str] = {},
+    stream: bool = False,
+    verify: bool = False,
+    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] = Literal['get'],
+    check: bool | int | Iterable[int] = False
+) -> Response: ...
+
+@overload
+def request(
+    url: str,
+    params: dict | None = None,
+    *,
+    data: dict | str | bytes,
+    files: dict[str, str | bytes | tuple[str | bytes, dict]] | None = None,
+    headers: dict[str, str] = {},
+    timeout: float | None = None,
+    proxies: dict[str, str] = {},
+    stream: bool = False,
+    verify: bool = False,
+    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = Literal['post'],
+    check: bool | int | Iterable[int] = False
+) -> Response: ...
+
+@overload
+def request(
+    url: str,
+    params: dict | None = None,
+    *,
+    data: dict | str | bytes | None = None,
+    files: dict[str, str | bytes | tuple[str | bytes, dict]],
+    headers: dict[str, str] = {},
+    timeout: float | None = None,
+    proxies: dict[str, str] = {},
+    stream: bool = False,
+    verify: bool = False,
+    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = Literal['post'],
+    check: bool | int | Iterable[int] = False
+) -> Response: ...
+
+@overload
+def request(
+    url: str,
+    params: dict | None = None,
+    *,
+    json: dict,
+    headers: dict[str, str] = {},
+    timeout: float | None = None,
+    proxies: dict[str, str] = {},
+    stream: bool = False,
+    verify: bool = False,
+    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = Literal['post'],
+    check: bool | int | Iterable[int] = False
+) -> Response: ...
 
 def request(
     url: str,
@@ -498,7 +559,7 @@ class RequestCache(Base):
 
 
     @property
-    def _start_params(self) -> RequestCacheParameters:
+    def __start_params(self) -> RequestCacheParameters:
         """
         Get cache start parameters.
 
@@ -537,7 +598,7 @@ class RequestCache(Base):
         """
 
         # Start.
-        requests_cache_install_cache(**self._start_params)
+        requests_cache_install_cache(**self.__start_params)
 
 
     def stop(self) -> None:

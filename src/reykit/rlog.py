@@ -106,7 +106,7 @@ class Log(Base):
         self.logger.setLevel(self.DEBUG)
 
 
-    def _get_message_stack(self) -> dict:
+    def __get_message_stack(self) -> dict:
         """
         Get message stack parameters.
 
@@ -145,7 +145,7 @@ class Log(Base):
         return stack_param
 
 
-    def _supply_format_standard(
+    def __supply_format_standard(
         self,
         format_: str,
         record: LogRecord
@@ -171,7 +171,7 @@ class Log(Base):
 
         # Format 'format_path'.
         if '%(format_path)s' in format_:
-            message_stack = self._get_message_stack()
+            message_stack = self.__get_message_stack()
             record.format_path = '%s:%s' % (
                 message_stack['filename'],
                 message_stack['lineno']
@@ -213,7 +213,7 @@ class Log(Base):
         return color_code
 
 
-    def _supply_format_print(
+    def __supply_format_print(
         self,
         format_: str,
         record: LogRecord
@@ -267,7 +267,7 @@ class Log(Base):
             )
 
 
-    def _supply_format_file(
+    def __supply_format_file(
         self,
         format_: str,
         record: LogRecord
@@ -326,17 +326,17 @@ class Log(Base):
             """
 
             # Format standard.
-            self._supply_format_standard(format_, record)
+            self.__supply_format_standard(format_, record)
 
             match mode:
 
                 # Format print.
                 case 'print':
-                    self._supply_format_print(format_, record)
+                    self.__supply_format_print(format_, record)
 
                 # Format file.
                 case 'file':
-                    self._supply_format_file(format_, record)
+                    self.__supply_format_file(format_, record)
 
             return True
 

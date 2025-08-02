@@ -20,7 +20,7 @@ from threading import Thread
 from argparse import ArgumentParser
 from contextlib import redirect_stdout
 
-from .rbase import T, U, V, catch_exc, get_arg_info
+from .rbase import T, catch_exc, get_arg_info
 from .rstdout import echo
 from .rtime import now, time_to, TimeMark
 

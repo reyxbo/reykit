@@ -10,21 +10,23 @@
 
 
 from typing import Any, Literal, overload
+from types import TracebackType
 from collections.abc import Callable
 from io import IOBase, StringIO
-from inspect import getdoc
-from functools import wraps as functools_wraps
+from inspect import getdoc as inspect_getdoc
+from functools import wraps as functools_wraps, partial as functools_partial
+from datetime import datetime as Datetime, timedelta as Timedelta
 from threading import Thread
 from argparse import ArgumentParser
 from contextlib import redirect_stdout
 
-from .rbase import catch_exc, get_arg_info
+from .rbase import T, U, V, catch_exc, get_arg_info
 from .rstdout import echo
 from .rtime import now, time_to, TimeMark
 
 
 __all__ = (
-    'wrap_frame',
+    'wrap_wrap',
     'wrap_runtime',
     'wrap_thread',
     'wrap_exc',
@@ -36,13 +38,17 @@ __all__ = (
 )
 
 
-def wrap_frame(decorator: Callable) -> Callable:
+type Decorated = Callable
+type Decorator = Callable[..., Decorated]
+
+
+def wrap_wrap(decorator: Decorator) -> Decorator:
     """
-    Decorative frame.
+    Decorate decorator.
 
     Parameters
     ----------
-    decorator : Decorator function.
+    decorator : Decorator.
 
     Retuens
     -------
@@ -50,140 +56,138 @@ def wrap_frame(decorator: Callable) -> Callable:
 
     Examples
     --------
-    Decoration function method one.
+    >>> @wrap_wrap
+    >>> def wrap_func(func, args, kwargs, **wrap_kwargs): ...
+
+    Method one.
     >>> @wrap_func
-    >>> def func(): ...
-    >>> result = func(param_a, param_b, param_c=1, param_d=2)
+    >>> def func(*args, **kwargs): ...
 
-    Decoration function method two.
-    >>> def func(): ...
-    >>> result = wrap_func(func, param_a, param_b, param_c=1, param_d=2)
+    Method two.
+    >>> @wrap_func(**wrap_kwargs)
+    >>> def func(*args, **kwargs): ...
 
-    Decoration function method three.
-    >>> def func(): ...
-    >>> result = wrap_func(func, _execute=True)
-    
-    Decoration function method four.
-    >>> def func(): ...
+    Method three.
+    >>> def func(*args, **kwargs): ...
+    >>> func = wrap_func(func, **wrap_kwargs)
+
+    Method four.
+    >>> def func(*args, **kwargs): ...
+    >>> wrap_func = wrap_func(**wrap_kwargs)
     >>> func = wrap_func(func)
-    >>> result = func(param_a, param_b, param_c=1, param_d=2)
 
-    Decoration function method five.
-    >>> def func(): ...
-    >>> func = wrap_func(func, param_a, param_c=1, _execute=False)
-    >>> result = func(param_b, param_d=2)
+    >>> func(*args, **kwargs)
     """
 
 
     # Decorate Decorator.
     @overload
-    def wrap(func: Callable, /, *args: Any, **kwargs: Any) -> Callable | Any: ...
+    def _wrap(func: Callable, **wrap_kwargs: Any) -> Decorated: ...
 
     @overload
-    def wrap(func: Callable, /, *args: Any, _execute: Literal[True], **kwargs: Any) -> Any: ...
-
-    @overload
-    def wrap(func: Callable, /, *args: Any, _execute: Literal[False], **kwargs: Any) -> Callable: ...
+    def _wrap(**wrap_kwargs: Any) -> Decorator: ...
 
     @functools_wraps(decorator)
-    def wrap(func: Callable, /, *args: Any, _execute: bool | None = None, **kwargs: Any) -> Callable | Any:
+    def _wrap(func: Callable | None = None, **wrap_kwargs: Any) -> Decorated | Decorator:
         """
-        Decorative shell.
+        Decorated decorator.
 
         Parameters
         ----------
         func : Function.
-        args : Position arguments of function.
-        _execute : Whether execute function, otherwise decorate function.
-            - `None`, When parameter `args` or `kwargs`: have values, then True, otherwise False.
-            - `bool`: Use this value.
-        kwargs : Keyword arguments of function.
+        wrap_kwargs : Keyword arguments of decorator.
 
         Returns
         -------
-        Decorated function or function return.
+        Decorated function or decorated self.
         """
 
-        # Handle parameter.
-        if _execute is None:
-            if args != () or kwargs != {}:
-                _execute = True
-            else:
-                _execute = False
-
-        # Direct execution.
-        if _execute:
-            result = decorator(func, *args, **kwargs)
-            return result
+        # Method one and three.
+        if func is not None:
 
 
-        # Decorate function.
-        @functools_wraps(func)
-        def wrap_sub(*_args: Any, **_kwargs: Any) -> Any:
-            """
-            Decorative sub shell.
+            @functools_wraps(func)
+            def _func(*args: Any, **kwargs: Any) -> Any:
+                """
+                Decorated function.
 
-            Parameters
-            ----------
-            args : Position arguments of function.
-            kwargs : Keyword arguments of function.
+                Parameters
+                ----------
+                args : Position arguments of function.
+                kwargs : Keyword arguments of function.
 
-            Returns
-            -------
-            Function return.
-            """
+                Returns
+                -------
+                Function return.
+                """
 
-            # Decorate function.
-            result = decorator(func, *args, *_args, **kwargs, **_kwargs)
+                # Decorate function.
+                result = decorator(func, args, kwargs, **wrap_kwargs)
 
-            return result
-
-
-        return wrap_sub
+                return result
 
 
-    return wrap
+            return _func
+
+
+        # Method two and four.
+        else:
+            __wrap = functools_partial(_wrap, **wrap_kwargs)
+            return __wrap
+
+
+    return _wrap
 
 
 @overload
 def wrap_runtime(
-    func: Callable,
-    /,
-    *args: Any,
-    _return_report: Literal[False] = False,
-    **kwargs: Any
-) -> Any: ...
+    func: Callable[..., T],
+    *,
+    to_print: bool = True
+) -> Callable[..., T]: ...
 
 @overload
 def wrap_runtime(
-    func: Callable,
-    /,
-    *args: Any,
-    _return_report: Literal[True],
-    **kwargs: Any
-) -> tuple[Any, str]: ...
+    func: Callable[..., T],
+    to_return: Literal[True],
+    to_print: bool = True
+) -> Callable[..., tuple[T, str, Datetime, Timedelta, Datetime]]: ...
 
-@wrap_frame
+@overload
 def wrap_runtime(
-    func: Callable,
-    /,
-    *args: Any,
-    _return_report: bool = False,
-    **kwargs: Any
-) -> Any | tuple[Any, str]:
+    *,
+    to_print: bool = True
+) -> Callable[[Callable[..., T]], T]: ...
+
+@overload
+def wrap_runtime(
+    *,
+    to_return: Literal[True],
+    to_print: bool = True
+) -> Callable[[Callable[..., T]], tuple[T, str, Datetime, Timedelta, Datetime]]: ...
+
+@wrap_wrap
+def wrap_runtime(
+    func: Callable[..., T],
+    args: Any,
+    kwargs: Any,
+    to_return: bool = False,
+    to_print: bool = True
+) -> T | tuple[T, str, Datetime, Timedelta, Datetime]:
     """
-    Decorator, print or return runtime report of the function.
+    Decorator, print or return runtime data of the function.
 
     Parameters
     ----------
-    func : Function to be decorated.
-    args : Position arguments of decorated function.
-    _return_report : Whether return report, otherwise print report.
-    kwargs : Keyword arguments of decorated function.
+    func : Function.
+    args : Position arguments of function.
+    kwargs : Keyword arguments of function.
+    to_print : Whether to print runtime.
+    to_return : Whether to return runtime.
 
     Returns
     -------
-    Function execution result and runtime report.
+    Function return or runtime data.
     """
 
     # Execute function and marking time.
@@ -194,7 +198,7 @@ def wrap_runtime(
 
     # Generate report.
     start_time = rtm.record[0]['datetime']
-    spend_time = rtm.record[1]['timedelta']
+    spend_time: Timedelta = rtm.record[1]['timedelta']
     end_time = rtm.record[1]['datetime']
     start_str = time_to(start_time, True)[:-3]
     spend_str = time_to(spend_time, True)[:-3]
@@ -206,12 +210,13 @@ def wrap_runtime(
     )
     title = func.__name__
 
-    # Return report.
-    if _return_report:
-        return result, report
+    # Print.
+    if to_print:
+        echo(report, title=title)
 
-    # Print report.
-    echo(report, title=title)
+    # Return.
+    if to_return:
+        return result, report, start_time, spend_time, end_time
 
     return result
 
@@ -219,33 +224,35 @@ def wrap_runtime(
 @overload
 def wrap_thread(
     func: Callable,
-    /,
-    *args: Any,
-    _daemon: bool = True,
-    **kwargs: Any
-) -> Thread: ...
+    daemon: bool = True
+) -> Callable[..., Thread]: ...
 
-@wrap_frame
+@overload
+def wrap_thread(
+    *,
+    daemon: bool = True
+) -> Callable[[Callable], Thread]: ...
+
+@wrap_wrap
 def wrap_thread(
     func: Callable,
-    /,
-    *args: Any,
-    _daemon: bool = True,
-    **kwargs: Any
+    args: Any,
+    kwargs: Any,
+    daemon: bool = True
 ) -> Thread:
     """
     Decorator, function start in thread.
 
     Parameters
     ----------
-    func : Function to be decorated.
-    args : Position arguments of decorated function.
-    _daemon : Whether it is a daemon thread.
-    kwargs : Keyword arguments of decorated function.
+    func : Function.
+    args : Position arguments of function.
+    kwargs : Keyword arguments of function.
+    daemon : Whether it is a daemon thread.
 
     Returns
     -------
-    Thread object.
+    Thread instance.
     """
 
     # Handle parameter.
@@ -253,7 +260,7 @@ def wrap_thread(
 
     # Create thread.
     thread = Thread(target=func, name=thread_name, args=args, kwargs=kwargs)
-    thread.daemon = _daemon
+    thread.daemon = daemon
 
     # Start thread.
     thread.start()
@@ -263,37 +270,40 @@ def wrap_thread(
 
 @overload
 def wrap_exc(
-    func: Callable,
-    /,
-    *args: Any,
-    _exception: BaseException | tuple[BaseException, ...] = BaseException,
-    _handler: Callable | None = None,
-    **kwargs: Any
-) -> Any | None: ...
+    func: Callable[..., T],
+    handler: Callable[[tuple[str, type[BaseException], BaseException, TracebackType]], Any],
+    exception: BaseException | tuple[BaseException, ...] | None = BaseException
+) -> Callable[..., T | None]: ...
 
-@wrap_frame
+@overload
 def wrap_exc(
-    func: Callable,
-    /,
-    *args: Any,
-    _exception: BaseException | tuple[BaseException, ...] = BaseException,
-    _handler: Callable | None = None,
-    **kwargs: Any
-) -> Any | None:
+    *,
+    handler: Callable[[tuple[str, type[BaseException], BaseException, TracebackType]], Any],
+    exception: BaseException | tuple[BaseException, ...] | None = BaseException
+) -> Callable[[Callable[..., T]], T | None]: ...
+
+@wrap_wrap
+def wrap_exc(
+    func: Callable[..., T],
+    args: Any,
+    kwargs: Any,
+    handler: Callable[[tuple[str, type[BaseException], BaseException, TracebackType]], Any],
+    exception: BaseException | tuple[BaseException, ...] | None = BaseException
+) -> T | None:
     """
-    Decorator, execute function with `try` and `except` syntax.
+    Decorator, execute function with `try` syntax and handle exception.
 
     Parameters
     ----------
-    func : Function to be decorated.
-    args : Position arguments of decorated function.
-    _exception : Catch exception types.
-    _handler : Exception handler, will return value.
-    kwargs : Keyword arguments of decorated function.
+    func : Function.
+    args : Position arguments of function.
+    kwargs : Keyword arguments of function.
+    handler : Exception handler.
+    exception : Catch exception type.
 
     Returns
     -------
-    Execution result of function or exception handle method.
+    Function return.
     """
 
     # Execute function.
@@ -301,130 +311,112 @@ def wrap_exc(
         result = func(*args, **kwargs)
 
     # Handle exception.
-    except _exception:
-        if _handler is not None:
-            result = _handler()
-        else:
-            result = None
+    except exception:
+        exc_report, exc_type, exc_instance, exc_traceback = catch_exc()
+        handler(exc_report, exc_type, exc_instance, exc_traceback)
 
-    return result
+    else:
+        return result
 
 
 @overload
 def wrap_retry(
-    func: Callable,
-    /,
-    *args: Any,
-    _report: str | None = None,
-    _exception: BaseException | tuple[BaseException, ...] = BaseException,
-    _try_total: int = 1,
-    _try_count: int = 0,
-    **kwargs: Any
-) -> Any: ...
+    func: Callable[..., T],
+    total: int = 1,
+    handler: Callable[[tuple[str, type[BaseException], BaseException, TracebackType]], Any] | None = None,
+    exception: BaseException | tuple[BaseException, ...] = BaseException
+) -> Callable[..., T]: ...
 
-@wrap_frame
+@overload
 def wrap_retry(
-    func: Callable,
-    /,
-    *args: Any,
-    _report: str | None = None,
-    _exception: BaseException | tuple[BaseException, ...] = BaseException,
-    _try_total: int = 1,
-    _try_count: int = 0,
-    **kwargs: Any
-) -> Any:
+    *,
+    total: int = 1,
+    handler: Callable[[tuple[str, type[BaseException], BaseException, TracebackType]], Any] | None = None,
+    exception: BaseException | tuple[BaseException, ...] = BaseException
+) -> Callable[[Callable[..., T]], T]: ...
+
+@wrap_wrap
+def wrap_retry(
+    func: Callable[..., T],
+    args: Any,
+    kwargs: Any,
+    total: int = 2,
+    handler: Callable[[tuple[str, type[BaseException], BaseException, TracebackType]], Any] | None = None,
+    exception: BaseException | tuple[BaseException, ...] = BaseException
+) -> T:
     """
-    Decorator, try again.
+    Decorator, try again and handle exception.
 
     Parameters
     ----------
-    func : Function to be decorated.
-    args : Position arguments of decorated function.
-    _report : Print report title.
-        - `None`: Not print.
-        - `str`: Print and use this title.
-    _exception : Catch exception types.
-    _try_total : Retry total.
-    _try_count : Retry count.
-    kwargs : Keyword arguments of decorated function.
+    func : Function.
+    args : Position arguments of function.
+    kwargs : Keyword arguments of function.
+    total : Retry total.
+    handler : Exception handler.
+    exception : Catch exception type.
 
     Returns
     -------
-    Function execution result.
+    Function return.
     """
 
-    # Try count not full.
-    if _try_count < _try_total:
+    # Loop.
+    for _ in range(0, total - 1):
 
-        ## Try.
+        # Try.
         try:
             result = func(*args, **kwargs)
-        except _exception:
 
-            ## Report.
-            if _report is not None:
-                exc_report, *_ = catch_exc()
-                echo(
-                    exc_report,
-                    'Retrying...',
-                    title=_report,
-                    frame='half'
-                )
+        ## Handle.
+        except exception:
+            if handler is not None:
+                exc_report, exc_type, exc_instance, exc_traceback = catch_exc()
+                handler(exc_report, exc_type, exc_instance, exc_traceback)
 
-            ### Retry.
-            _try_count += 1
-            result = wrap_retry(
-                func,
-                *args,
-                _report=_report,
-                _exception=_exception,
-                _try_total=_try_total,
-                _try_count=_try_count,
-                **kwargs
-            )
+        else:
+            return result
 
-    # Try count full.
-    else:
-        result = func(*args, **kwargs)
+    # Last.
+    result = func(*args, **kwargs)
 
     return result
 
 
 @overload
 def wrap_dos_command(
-    func: Callable,
-    /,
-    *args: Any,
-    **kwargs: Any
-) -> Any: ...
+    func: Callable[..., T]
+) -> Callable[..., T]: ...
 
-@wrap_frame
+@overload
+def wrap_dos_command() -> Callable[[Callable[..., T]], T]: ...
+
+@wrap_wrap
 def wrap_dos_command(
-    func: Callable,
-    /,
-    *args: Any,
-    **kwargs: Any
-) -> Any:
+    func: Callable[..., T],
+    args: Any,
+    kwargs: Any,
+) -> T:
     """
     Decorator, use DOS command to input arguments to function.
     Use DOS command `python file --help` to view help information.
 
     Parameters
     ----------
-    func : Function to be decorated.
-    args : Position arguments of decorated function.
-    kwargs : Keyword arguments of decorated function.
+    func : Function.
+    args : Position arguments of function.
+    kwargs : Keyword arguments of function.
 
     Returns
     -------
-    Function execution result.
+    Function return.
     """
 
     # Get parameter.
     arg_info = get_arg_info(func)
 
     # Set DOS command.
-    usage = getdoc(func)
+    usage = inspect_getdoc(func)
     if usage is not None:
         usage = 'input arguments to function "%s"\n\n%s' % (func.__name__, usage)
     parser = ArgumentParser(usage=usage)
@@ -519,21 +511,23 @@ wrap_cache_data: dict[Callable, list[tuple[Any, Any, Any]]] = {}
 
 @overload
 def wrap_cache(
-    func: Callable,
-    /,
-    *args: Any,
-    _overwrite: bool = False,
-    **kwargs: Any
-) -> Any: ...
+    func: Callable[..., T],
+    overwrite: bool = False
+) -> Callable[..., T]: ...
 
-@wrap_frame
+@overload
 def wrap_cache(
-    func: Callable,
-    /,
-    *args: Any,
-    _overwrite: bool = False,
-    **kwargs: Any
-) -> Any:
+    *,
+    overwrite: bool = False
+) -> Callable[[Callable[..., T]], T]: ...
+
+@wrap_wrap
+def wrap_cache(
+    func: Callable[..., T],
+    args: Any,
+    kwargs: Any,
+    overwrite: bool = False
+) -> T:
     """
     Decorator, Cache the return result of function input.
     if no cache, cache it.
@@ -541,14 +535,14 @@ def wrap_cache(
 
     Parameters
     ----------
-    func : Function to be decorated.
-    args : Position arguments of decorated function.
-    _overwrite : Whether to overwrite cache.
-    kwargs : Keyword arguments of decorated function.
+    func : Function.
+    args : Position arguments of function.
+    kwargs : Keyword arguments of function.
+    overwrite : Whether to overwrite cache.
 
     Returns
     -------
-    Function execution result.
+    Function return.
     """
 
     # Index.
@@ -559,7 +553,7 @@ def wrap_cache(
             cache_args == args
             and cache_kwargs == kwargs
         ):
-            if _overwrite:
+            if overwrite:
                 cache_index = index
                 break
             else:
@@ -580,39 +574,42 @@ def wrap_cache(
 
 @overload
 def wrap_redirect_stdout(
-    func: Callable,
-    /,
-    *args: Any,
-    _redirect: list | IOBase | None = None,
-    **kwargs: Any
-) -> Any: ...
+    func: Callable[..., T],
+    *,
+    redirect: list | IOBase | None = None
+) -> Callable[..., T]: ...
 
-@wrap_frame
+@overload
 def wrap_redirect_stdout(
-    func: Callable,
-    /,
-    *args: Any,
-    _redirect: list | IOBase | None = None,
-    **kwargs: Any
-) -> Any:
+    *,
+    redirect: list | IOBase | None = None
+) -> Callable[[Callable[..., T]], T]: ...
+
+@wrap_wrap
+def wrap_redirect_stdout(
+    func: Callable[..., T],
+    args: Any,
+    kwargs: Any,
+    redirect: list | IOBase | None = None
+) -> T:
     """
     Redirect standard output.
 
     Parameters
     ----------
-    func : Function to be decorated.
-    args : Position arguments of decorated function.
-    _redirect : Redirect output list or IO object.
-    kwargs : Keyword arguments of decorated function.
+    func : Function.
+    args : Position arguments of function.
+    kwargs : Keyword arguments of function.
+    redirect : Redirect output list or IO object.
 
     Returns
     -------
-    Function execution result.
+    Function return.
     """
 
     # Get parameter.
-    if isinstance(_redirect, IOBase):
-        str_io = _redirect
+    if isinstance(redirect, IOBase):
+        str_io = redirect
     else:
         str_io = StringIO()
 
@@ -621,8 +618,8 @@ def wrap_redirect_stdout(
         result = func(*args, **kwargs)
 
     # Save.
-    if type(_redirect) == list:
+    if type(redirect) == list:
         value = str_io.getvalue()
-        _redirect.append(value)
+        redirect.append(value)
 
     return result

@@ -946,7 +946,7 @@ def at_exit(*contents: str | Callable | tuple[Callable, Iterable, Mapping]) -> l
         args = ()
         kwargs = {}
         if type(content) == str:
-            func = lambda : print(content)
+            func = lambda: print(content)
         elif callable(content):
             func = content
         elif type(content) == tuple:

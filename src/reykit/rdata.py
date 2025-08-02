@@ -362,7 +362,7 @@ def default_dict(default: T = null, data: dict[KT, VT] | None = None) -> Default
 
     ## Not callable.
     else:
-        default_factory = lambda : default
+        default_factory = lambda: default
 
     if data is None:
         data = {}

@@ -13,13 +13,13 @@ from __future__ import annotations
 
 
 __all__ = (
-    'monkey_patch_sqlalchemy_result_more_fetch',
-    'monkey_patch_sqlalchemy_row_index_field',
-    'monkey_patch_pprint_modify_width_judgment'
+    'monkey_sqlalchemy_result_more_fetch',
+    'monkey_sqlalchemy_row_index_field',
+    'monkey_pprint_modify_width_judgment'
 )
 
 
-def monkey_patch_sqlalchemy_result_more_fetch():
+def monkey_sqlalchemy_result_more_fetch():
     """
     Monkey patch of package `sqlalchemy`, add more fetch methods to `CursorResult` object.
 
@@ -201,7 +201,7 @@ def monkey_patch_sqlalchemy_result_more_fetch():
     return Result
 
 
-def monkey_patch_sqlalchemy_row_index_field():
+def monkey_sqlalchemy_row_index_field():
     """
     Monkey patch of package `sqlalchemy`, add index by field method to `Row` object.
 
@@ -249,7 +249,7 @@ def monkey_patch_sqlalchemy_row_index_field():
     Row.__getitem__ = __getitem__
 
 
-def monkey_patch_pprint_modify_width_judgment() -> None:
+def monkey_pprint_modify_width_judgment() -> None:
     """
     Monkey patch of package `pprint`, modify the chinese width judgment.
     """

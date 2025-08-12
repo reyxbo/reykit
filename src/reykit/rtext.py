@@ -14,7 +14,7 @@ from collections.abc import Iterable
 from pprint import pformat as pprint_pformat
 
 from .rbase import throw, is_iterable, get_varname
-from .rmonkey import monkey_patch_pprint_modify_width_judgment
+from .rmonkey import monkey_pprint_modify_width_judgment
 from .rstdout import get_terminal_size
 
 
@@ -31,7 +31,7 @@ __all__ = (
 
 
 # Monkey path.
-monkey_patch_pprint_modify_width_judgment()
+monkey_pprint_modify_width_judgment()
 
 
 def to_text(data: Any, width: int | None = None) -> str:

@@ -479,7 +479,7 @@ def check_response_code(
     Parameters
     ----------
     code : Response code.
-    range_ : Pass the code range.
+    range\_ : Pass the code range.
         - `None`: Check if is between 200 and 299.
         - `int`: Check if is this value.
         - `Iterable`: Check if is in sequence.
@@ -650,7 +650,7 @@ def get_stack_text(format_: Literal['plain', 'full'] = 'plain', limit: int = 2) 
 
     Parameters
     ----------
-    format_ : Stack text format.
+    format\_ : Stack text format.
         - `Literal['plain']`: Floor stack position.
         - `Literal['full']`: Full stack information.
     limit : Stack limit level.
@@ -714,7 +714,7 @@ def get_stack_param(format_: Literal['floor', 'full'] = 'floor', limit: int = 2)
 
     Parameters
     ----------
-    format_ : Stack parameters format.
+    format\_ : Stack parameters format.
         - `Literal['floor']`: Floor stack parameters.
         - `Literal['full']`: Full stack parameters.
     limit : Stack limit level.

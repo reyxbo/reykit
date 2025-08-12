@@ -51,7 +51,7 @@ from .rsys import run_cmd
 
 __all__ = (
     'get_md5',
-    'create_folder',
+    'make_dir',
     'find_relpath',
     'get_file_str',
     'get_file_bytes',
@@ -98,9 +98,9 @@ def get_md5(data: str | bytes) -> str:
     return md5
 
 
-def create_folder(*paths: str, report: bool = False) -> None:
+def make_dir(*paths: str, report: bool = False) -> None:
     """
-    Create folders.
+    Make directorys.
 
     Parameters
     ----------
@@ -288,10 +288,7 @@ class File(Base):
     """
 
 
-    def __init__(
-        self,
-        path: str
-    ) -> None:
+    def __init__(self, path: str) -> None:
         """
         Build instance attributes.
 
@@ -305,21 +302,12 @@ class File(Base):
 
 
     @overload
-    def open(
-        self,
-        mode: OpenBinaryMode = 'wb+'
-    ) -> BinaryIO: ...
+    def open(self, mode: OpenBinaryMode = 'wb+') -> BinaryIO: ...
 
     @overload
-    def open(
-        self,
-        mode: OpenTextMode
-    ) -> TextIO: ...
+    def open(self, mode: OpenTextMode) -> TextIO: ...
 
-    def open(
-        self,
-        mode: OpenTextMode | OpenBinaryMode = 'wb+'
-    ) -> TextIO | BinaryIO:
+    def open(self, mode: OpenTextMode | OpenBinaryMode = 'wb+') -> TextIO | BinaryIO:
         """
         Open file.
 
@@ -379,27 +367,18 @@ class File(Base):
 
 
     @overload
-    def read(
-        self,
-        type_: Literal['bytes'] = 'bytes'
-    ) -> bytes: ...
+    def read(self, type_: Literal['bytes'] = 'bytes') -> bytes: ...
 
     @overload
-    def read(
-        self,
-        type_: Literal['str']
-    ) -> str: ...
+    def read(self, type_: Literal['str']) -> str: ...
 
-    def read(
-        self,
-        type_: Literal['str', 'bytes'] = 'bytes'
-    ) -> bytes | str:
+    def read(self, type_: Literal['str', 'bytes'] = 'bytes') -> bytes | str:
         """
         Read file data.
 
         Parameters
         ----------
-        type_ : File data type.
+        type\_ : File data type.
             - `Literal['bytes']`: Return file bytes data.
             - `Literal['str']`: Return file string data.
 
@@ -461,10 +440,7 @@ class File(Base):
             file.write(data)
 
 
-    def copy(
-        self,
-        path: str
-    ) -> None:
+    def copy(self, path: str) -> None:
         """
         Copy file to path.
 
@@ -480,10 +456,7 @@ class File(Base):
         )
 
 
-    def move(
-        self,
-        path: str
-    ) -> None:
+    def move(self, path: str) -> None:
         """
         Move file to path.
 
@@ -499,9 +472,29 @@ class File(Base):
         )
 
 
-    def remove(
-        self
-    ) -> None:
+    def rename(self, name: str) -> str:
+        """
+        Rename file name.
+
+        Parameters
+        ----------
+        name : New file name.
+
+        Returns
+        -------
+        New file path.
+        """
+
+        # Get parameter.
+        move_path = os_join(self.dir, name)
+
+        # Move.
+        self.move(move_path)
+
+        return move_path
+
+
+    def remove(self) -> None:
         """
         Remove file.
         """
@@ -787,10 +780,7 @@ class File(Base):
         return file_bytes
 
 
-    def __contains__(
-        self,
-        value: str | bytes
-    ) -> bool:
+    def __contains__(self, value: str | bytes) -> bool:
         """
         Judge if file text contain value.
 
@@ -827,10 +817,7 @@ class Folder(Base):
     """
 
 
-    def __init__(
-        self,
-        path: str | None = None
-    ) -> None:
+    def __init__(self, path: str | None = None) -> None:
         """
         Build instance attributes.
 
@@ -951,7 +938,7 @@ class Folder(Base):
         ----------
         pattern : Match file name pattern.
         recursion : Is recursion directory.
-        all_ : Whether return all match file path, otherwise return first match file path.
+        all\_ : Whether return all match file path, otherwise return first match file path.
 
         Returns
         -------
@@ -980,10 +967,7 @@ class Folder(Base):
                     return path
 
 
-    def create(
-        self,
-        report: bool = False
-    ) -> None:
+    def create(self, report: bool = False) -> None:
         """
         Create folders.
 
@@ -1007,10 +991,7 @@ class Folder(Base):
             print(text)
 
 
-    def move(
-        self,
-        path: str
-    ) -> None:
+    def move(self, path: str) -> None:
         """
         Move folder to path.
 
@@ -1024,6 +1005,28 @@ class Folder(Base):
             self.path,
             path
         )
+
+
+    def rename(self, name: str) -> str:
+        """
+        Rename folder name.
+
+        Parameters
+        ----------
+        name : New folder name.
+
+        Returns
+        -------
+        New folder path.
+        """
+
+        # Get parameter.
+        move_path = os_join(self.dir, name)
+
+        # Move.
+        self.move(move_path)
+
+        return move_path
 
 
     @property
@@ -1202,8 +1205,7 @@ class TempFile(Base):
     """
 
 
-    def __init__(
-        self,
+    def __init__(self,
         dir_: str | None = None,
         suffix: str | None = None,
         type_: Literal['str', 'bytes'] = 'bytes'
@@ -1213,9 +1215,9 @@ class TempFile(Base):
 
         Parameters
         ----------
-        dir_ : Directory path.
+        dir\_ : Directory path.
         suffix : File suffix.
-        type_ : File data type.
+        type\_ : File data type.
         """
 
         # Get parameter.
@@ -1252,10 +1254,7 @@ class TempFile(Base):
         return content
 
 
-    def write(
-        self,
-        data: str | bytes
-    ) -> None:
+    def write(self, data: str | bytes) -> None:
         """
         Write file data.
 
@@ -1462,10 +1461,7 @@ class TempFile(Base):
         return file_size
 
 
-    def __contains__(
-        self,
-        value: str | bytes
-    ) -> bool:
+    def __contains__(self, value: str | bytes) -> bool:
         """
         Judge if file text contain value.
 
@@ -1505,10 +1501,7 @@ class TempFolder(Base):
     """
 
 
-    def __init__(
-        self,
-        dir_: str | None = None
-    ) -> None:
+    def __init__(self, dir_: str | None = None) -> None:
         """
         Build instance attributes.
 
@@ -1626,7 +1619,7 @@ class TempFolder(Base):
         ----------
         pattern : Match file name pattern.
         recursion : Is recursion directory.
-        all_ : Whether return all match file path, otherwise return first match file path.
+        all\_ : Whether return all match file path, otherwise return first match file path.
 
         Returns
         -------
@@ -1834,10 +1827,7 @@ class TempFolder(Base):
     __call__ = paths
 
 
-def doc_to_docx(
-    path: str,
-    save_path: str | None = None
-) -> str:
+def doc_to_docx(path: str, save_path: str | None = None) -> str:
     """
     Convert `DOC` file to `DOCX` file.
 

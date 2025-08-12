@@ -155,7 +155,7 @@ class Log(Base):
 
         Parameters
         ----------
-        format_ : Record format.
+        format\_ : Record format.
         record : Log record instance.
         """
 
@@ -223,7 +223,7 @@ class Log(Base):
 
         Parameters
         ----------
-        format_ : Record format.
+        format\_ : Record format.
         record : Log record instance.
         """
 
@@ -277,7 +277,7 @@ class Log(Base):
 
         Parameters
         ----------
-        format_ : Record format.
+        format\_ : Record format.
         record : Log record instance.
         """
 
@@ -297,7 +297,7 @@ class Log(Base):
 
         Parameters
         ----------
-        format_ : Record format.
+        format\_ : Record format.
         mode : Handler mode.
             - `None`: Standard filter method.
             - `Literal['print']`: Print handler filter method.
@@ -404,14 +404,14 @@ class Log(Base):
         Parameters
         ----------
         level : Handler level.
-        format_ : Record format.
+        format\_ : Record format.
             - `None`: Use attribute `default_format`.
             - `str`: Use this value. 
                 `Contain 'format_time'`: Date and time and millisecond, print output with color.
                 `Contain 'format_levelname'`: Level name and fixed width, print output with color.
                 `Contain 'format_path'`: Record code path, print output with color.
                 `Contain 'format_message'`: message content, file output delete ANSI code, print outputwith color.
-        filter_ : Filter method. The parameter is the `LogRecord` instance, return is `bool`.
+        filter\_ : Filter method. The parameter is the `LogRecord` instance, return is `bool`.
             - `None`: Use default filter method.
             - `Callable`: Use this method.
 
@@ -483,14 +483,14 @@ class Log(Base):
             - `Literal['m']`: Everyday midnight.
             - `Literal['w0', 'w1', 'w2', 'w3', 'w4', 'w5', 'w6']`: Weekly midnight, 'w0' is monday, 'w6' is sunday, and so on.
         level : Handler level.
-        format_ : Record format.
+        format\_ : Record format.
             - `None`: Use attribute `default_format`.
             - `str`: Use this value.
                 `Contain 'format_time'`: Date and time and millisecond, print output with color.
                 `Contain 'format_levelname'`: Level name and fixed width, print output with color.
                 `Contain 'format_path'`: Record code path, print output with color.
                 `Contain 'format_message'`: message content, file output delete ANSI code, print outputwith color.
-        filter_ : Filter method. The parameter is the `LogRecord` instance, return is `bool`.
+        filter\_ : Filter method. The parameter is the `LogRecord` instance, return is `bool`.
             - `None`: Use default filter method.
             - `Callable`: Use this method.
 
@@ -602,7 +602,7 @@ class Log(Base):
             - `None`: Create queue and use.
             - `Queue`: Use this queue.
         level : Handler level.
-        filter_ : Filter method. The parameter is the `LogRecord` instance, return is `bool`.
+        filter\_ : Filter method. The parameter is the `LogRecord` instance, return is `bool`.
 
         Returns
         -------
@@ -640,7 +640,7 @@ class Log(Base):
         ----------
         method : Handler method. The parameter is the `LogRecord` instance.
         level : Handler level.
-        filter_ : Filter method. The parameter is the `LogRecord` instance, return is `bool`.
+        filter\_ : Filter method. The parameter is the `LogRecord` instance, return is `bool`.
         """
 
         # Add queue out.

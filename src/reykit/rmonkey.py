@@ -183,19 +183,19 @@ def monkey_patch_sqlalchemy_result_more_fetch():
         __doc__ = CursorResult.__doc__
 
         # Add method.
-        to_table: MethodType = Table.to_table
-        to_dict: MethodType = Table.to_dict
-        to_list: MethodType = Table.to_list
-        to_text: MethodType = Table.to_text
-        to_json: MethodType = Table.to_json
-        to_sql: MethodType = Table.to_sql
-        to_df: MethodType = Table.to_df
-        to_html: MethodType = Table.to_html
-        to_csv: MethodType = Table.to_csv
-        to_excel: MethodType = Table.to_excel
-        show: MethodType = method_show
-        exist: MethodType = method_exist
-        empty: MethodType = method_empty
+        to_table = Table.to_table
+        to_dict = Table.to_dict
+        to_list = Table.to_list
+        to_text = Table.to_text
+        to_json = Table.to_json
+        to_sql = Table.to_sql
+        to_df = Table.to_df
+        to_html = Table.to_html
+        to_csv = Table.to_csv
+        to_excel = Table.to_excel
+        show = method_show
+        exist = method_exist
+        empty = method_empty
 
 
     return Result

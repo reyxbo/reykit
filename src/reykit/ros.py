@@ -378,7 +378,7 @@ class File(Base):
 
         Parameters
         ----------
-        type\_ : File data type.
+        type\\_ : File data type.
             - `Literal['bytes']`: Return file bytes data.
             - `Literal['str']`: Return file string data.
 
@@ -938,7 +938,7 @@ class Folder(Base):
         ----------
         pattern : Match file name pattern.
         recursion : Is recursion directory.
-        all\_ : Whether return all match file path, otherwise return first match file path.
+        all\\_ : Whether return all match file path, otherwise return first match file path.
 
         Returns
         -------
@@ -1215,9 +1215,9 @@ class TempFile(Base):
 
         Parameters
         ----------
-        dir\_ : Directory path.
+        dir\\_ : Directory path.
         suffix : File suffix.
-        type\_ : File data type.
+        type\\_ : File data type.
         """
 
         # Get parameter.
@@ -1619,7 +1619,7 @@ class TempFolder(Base):
         ----------
         pattern : Match file name pattern.
         recursion : Is recursion directory.
-        all\_ : Whether return all match file path, otherwise return first match file path.
+        all\\_ : Whether return all match file path, otherwise return first match file path.
 
         Returns
         -------

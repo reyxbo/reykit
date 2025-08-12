@@ -76,7 +76,7 @@ def now(
 
     Parameters
     ----------
-    format\_ : Format type.
+    format\\_ : Format type.
         - `Literal['datetime']`: Return datetime object of datetime package.
         - `Literal['date']`: Return date object of datetime package.
         - `Literal['time']`: Return time object of datetime package.

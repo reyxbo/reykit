@@ -27,7 +27,7 @@ def inject_dll(
 
     Parameters
     ----------
-    id\_ : Process ID.
+    id\\_ : Process ID.
     path : DLL file path.
     """
 

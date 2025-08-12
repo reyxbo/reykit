@@ -515,7 +515,7 @@ def search_process(
 
     Parameters
     ----------
-    id\_ : Search condition, a value or sequence of process ID.
+    id\\_ : Search condition, a value or sequence of process ID.
     name : Search condition, a value or sequence of process name.
     port : Search condition, a value or sequence of process port.
 
@@ -601,7 +601,7 @@ def kill_process(
 
     Parameters
     ----------
-    id\_ : Search condition, a value or sequence of process ID.
+    id\\_ : Search condition, a value or sequence of process ID.
     name : Search condition, a value or sequence of process name.
     port : Search condition, a value or sequence of process port.
 
@@ -639,7 +639,7 @@ def pause_process(
 
     Parameters
     ----------
-    id\_ : Search condition, a value or sequence of process ID.
+    id\\_ : Search condition, a value or sequence of process ID.
     name : Search condition, a value or sequence of process name.
     port : Search condition, a value or sequence of process port.
 
@@ -677,7 +677,7 @@ def resume_process(
 
     Parameters
     ----------
-    id\_ : Search condition, a value or sequence of process ID.
+    id\\_ : Search condition, a value or sequence of process ID.
     name : Search condition, a value or sequence of process name.
     port : Search condition, a value or sequence of process port.
 

@@ -498,7 +498,7 @@ def join_filter_text(data: Iterable, char: str = ',', filter_: tuple = (None, ''
         - `Element is 'str'`: Join.
         - `Element is 'Any'`: Convert to string and join.
     char : Join character.
-    filter\_ : Filter elements.
+    filter\\_ : Filter elements.
 
     Returns
     -------

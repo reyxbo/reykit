@@ -1196,7 +1196,7 @@ class Folder(Base):
         """
 
         # Judge.
-        result = self.search(pattern, True)
+        result = self.search(pattern)
         judge = result is not None
 
         return judge
@@ -1821,7 +1821,7 @@ class TempFolder(Base):
         """
 
         # Judge.
-        result = self.search(pattern, True)
+        result = self.search(pattern)
         judge = result is not None
 
         return judge

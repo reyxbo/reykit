@@ -191,15 +191,15 @@ def wrap_runtime(
     """
 
     # Execute function and marking time.
-    rtm = TimeMark()
-    rtm()
+    tm = TimeMark()
+    tm()
     result = func(*args, **kwargs)
-    rtm()
+    tm()
 
     # Generate report.
-    start_time = rtm.record[0]['datetime']
-    spend_time: Timedelta = rtm.record[1]['timedelta']
-    end_time = rtm.record[1]['datetime']
+    start_time = tm.record[0]['datetime']
+    spend_time: Timedelta = tm.record[1]['timedelta']
+    end_time = tm.record[1]['datetime']
     start_str = time_to(start_time, True)[:-3]
     spend_str = time_to(spend_time, True)[:-3]
     end_str = time_to(end_time, True)[:-3]

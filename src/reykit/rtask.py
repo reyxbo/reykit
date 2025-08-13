@@ -449,8 +449,8 @@ async def async_wait(
     """
 
     # Set parameter.
-    rtm = TimeMark()
-    rtm()
+    tm = TimeMark()
+    tm()
 
     # Not set timeout.
     if _timeout is None:
@@ -472,8 +472,8 @@ async def async_wait(
                 break
 
             ## Timeout.
-            rtm()
-            if rtm.total_spend > _timeout:
+            tm()
+            if tm.total_spend > _timeout:
 
                 ### Throw exception.
                 if _raising:
@@ -485,8 +485,8 @@ async def async_wait(
             await async_sleep(_interval)
 
     ## Return.
-    rtm()
-    return rtm.total_spend
+    tm()
+    return tm.total_spend
 
 
 async def async_request(

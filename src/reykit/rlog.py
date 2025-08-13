@@ -983,18 +983,18 @@ class Record(Base):
 
         # To file.
         else:
-            rfile = File(self.path)
+            file = File(self.path)
 
             ## Convert.
             if type(value) != str:
                 value = str(value)
-            if rfile:
+            if file:
                 value += ':'
             else:
                 value = ':%s:' % value
 
             ## Record.
-            rfile(value, True)
+            file(value, True)
 
 
     def is_recorded(
@@ -1019,7 +1019,7 @@ class Record(Base):
 
         # To file.
         else:
-            rfile = File(self.path)
+            file = File(self.path)
 
             ## Convert.
             if type(value) != str:
@@ -1027,7 +1027,7 @@ class Record(Base):
             value = ':%s:' % value
 
             ## Judge.
-            judge = value in rfile
+            judge = value in file
 
         return judge
 

@@ -407,16 +407,16 @@ class Table(Base):
 
         # Get parameter.
         data = self.to_df()
-        rfile = File(path)
-        if rfile:
+        file = File(path)
+        if file:
             header = False
         else:
             header = True
 
         # Save file.
-        data.to_csv(rfile.path, header=header, index=False, mode='a')
+        data.to_csv(file.path, header=header, index=False, mode='a')
 
-        return rfile.path
+        return file.path
 
 
     def to_excel(

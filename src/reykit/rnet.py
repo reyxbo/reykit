@@ -336,10 +336,10 @@ def request(
             method = 'post'
     if files is None:
         if type(data) == str:
-            rfile = File(data)
-            data = rfile.bytes
+            file = File(data)
+            data = file.bytes
             if 'Content-Disposition' not in headers:
-                file_name = rfile.name_suffix
+                file_name = file.name_suffix
                 headers['Content-Disposition'] = f'attachment; filename={file_name}'
         if type(data) == bytes:
             if 'Content-Type' not in headers:
@@ -351,9 +351,9 @@ def request(
             else:
                 item_data, item_headers = value, {}
             if type(item_data) == str:
-                rfile = File(item_data)
-                data = rfile.bytes
-                item_headers.setdefault('filename', rfile.name_suffix)
+                file = File(item_data)
+                data = file.bytes
+                item_headers.setdefault('filename', file.name_suffix)
             if type(item_data) == bytes:
                 if 'Content-Type' not in item_headers:
                     item_headers['Content-Type'] = get_content_type(item_data)
@@ -441,14 +441,14 @@ def download(url: str, path: str | None = None) -> str:
         path = os_abspath(file_name)
 
     # Save.
-    rfile = File(path)
-    rfile(content)
+    file = File(path)
+    file(content)
 
     return path
 
 
 def compute_stream_time(
-    file: str | bytes | int,
+    source: str | bytes | int,
     bandwidth: float
 ) -> float:
     """
@@ -456,7 +456,7 @@ def compute_stream_time(
 
     Parameters
     ----------
-    file : File data.
+    source : File data.
         - `str`: File path.
         - `bytes`: File bytes data.
         - `int`: File bytes size.
@@ -468,16 +468,16 @@ def compute_stream_time(
     """
 
     # Get parameter.
-    match file:
+    match source:
         case str():
-            rfile = File(file)
-            file_size = rfile.size
+            file = File(source)
+            file_size = file.size
         case bytes() | bytearray():
-            file_size = len(file)
+            file_size = len(source)
         case int():
-            file_size = file
+            file_size = source
         case _:
-            throw(TypeError, file)
+            throw(TypeError, source)
 
     # Calculate.
     seconds = file_size / 125_000 / bandwidth

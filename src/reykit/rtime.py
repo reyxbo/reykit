@@ -456,8 +456,8 @@ def wait(
     """
 
     # Set parameter.
-    rtm = TimeMark()
-    rtm()
+    tm = TimeMark()
+    tm()
 
     # Not set timeout.
     if _timeout is None:
@@ -479,8 +479,8 @@ def wait(
                 break
 
             ## Timeout.
-            rtm()
-            if rtm.__total_spend > _timeout:
+            tm()
+            if tm.total_spend > _timeout:
 
                 ### Throw exception.
                 if _raising:
@@ -492,8 +492,8 @@ def wait(
             sleep(_interval)
 
     ## Return.
-    rtm()
-    return rtm.__total_spend
+    tm()
+    return tm.total_spend
 
 
 class TimeMark(Base):
@@ -519,7 +519,7 @@ class TimeMark(Base):
         self.record: dict[int, RecordData] = {}
 
 
-    def __mark(self, note: str | None = None) -> int:
+    def mark(self, note: str | None = None) -> int:
         """
         Marking now time.
 
@@ -557,7 +557,7 @@ class TimeMark(Base):
         return index
 
 
-    def __get_report(self, title: str | None = None):
+    def get_report(self, title: str | None = None):
         """
         Return time mark report table.
 
@@ -630,7 +630,7 @@ class TimeMark(Base):
 
 
     @property
-    def __total_spend(self) -> float:
+    def total_spend(self) -> float:
         """
         Get total spend seconds.
 
@@ -664,7 +664,7 @@ class TimeMark(Base):
         """
 
         # Get.
-        report = self.__get_report()
+        report = self.get_report()
 
         # Convert.
         string = str(report)
@@ -672,6 +672,6 @@ class TimeMark(Base):
         return string
 
 
-    __call__ = __getitem__ = __getattr__ = __mark
+    __call__ = __getitem__ = mark
 
-    __float__ = __total_spend
+    __float__ = total_spend

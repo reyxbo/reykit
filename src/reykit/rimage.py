@@ -61,8 +61,8 @@ def encode_qrcode(text: str, path: str | None = None) -> bytes:
 
     # Save.
     if path is not None:
-        rfile = File(path)
-        rfile.write(file_bytes)
+        file = File(path)
+        file.write(file_bytes)
 
     return file_bytes
 
@@ -139,8 +139,8 @@ def compress_image(
 
     # Handle parameter.
     if type(input_image) == str:
-        rfile = File(input_image)
-        input_image = rfile.str
+        file = File(input_image)
+        input_image = file.str
     now_size = len(input_image)
     if target_size < 1:
         target_size = now_size * target_size
@@ -180,8 +180,8 @@ def compress_image(
 
     ## Save file and return path.
     else:
-        rfile = File(ouput_image)
-        rfile(content)
+        file = File(ouput_image)
+        file(content)
 
 
 def to_pil_image(source: str | bytes) -> Image:
@@ -252,7 +252,7 @@ def generate_captcha_image(
 
     # Save.
     if path is not None:
-        rfile = File(path)
-        rfile.write(file_bytes)
+        file = File(path)
+        file.write(file_bytes)
 
     return file_bytes

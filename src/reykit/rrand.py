@@ -196,15 +196,15 @@ def randn(*thresholds: float, precision: int | None = None) -> int | float:
 
     ## No seed.
     thread_id = threading_get_ident()
-    rrandom = ConfigRandom._rrandom_dict.get(thread_id)
-    if rrandom is None:
+    seed = ConfigRandom._rrandom_dict.get(thread_id)
+    if seed is None:
         range_ = threshold_high - threshold_low + 1
         number = secrets_randbelow(range_)
         number += threshold_low
 
     ## Seed.
     else:
-        number = rrandom.random.randint(threshold_low, threshold_high)
+        number = seed.random.randint(threshold_low, threshold_high)
     number = number / magnifier
 
     # Convert Integer.

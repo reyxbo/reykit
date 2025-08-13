@@ -24,7 +24,7 @@ __all__ = (
 
 
 def compress(
-    obj_path: str,
+    path: str,
     build_dir: str | None = None,
     overwrite: bool = True
 ) -> None:
@@ -33,7 +33,7 @@ def compress(
 
     Parameters
     ----------
-    obj_path : File or folder path.
+    path : File or folder path.
     build_dir : Build directory.
         - `None`: Work directory.
         - `str`: Use this value.
@@ -46,13 +46,13 @@ def compress(
         mode = 'w'
     else:
         mode = 'x'
-    is_file = os_isfile(obj_path)
+    is_file = os_isfile(path)
     if is_file:
-        rfile = File(obj_path)
-        obj_name = rfile.name_suffix
+        file = File(path)
+        obj_name = file.name_suffix
     else:
-        rfolder = Folder(obj_path)
-        obj_name = rfolder.name
+        folder = Folder(path)
+        obj_name = folder.name
     build_name = obj_name + '.zip'
     build_path = os_join(build_dir, build_name)
 
@@ -61,12 +61,12 @@ def compress(
 
         ## File.
         if is_file:
-            zip_file.write(rfile.path, rfile.name_suffix)
+            zip_file.write(file.path, file.name_suffix)
 
         ## Folder.
         else:
-            dir_path_len = len(rfolder.path)
-            dirs = os_walk(rfolder.path)
+            dir_path_len = len(folder.path)
+            dirs = os_walk(folder.path)
             for folder_name, sub_folders_name, files_name in dirs:
                 for sub_folder_name in sub_folders_name:
                     sub_folder_path = os_join(folder_name, sub_folder_name)

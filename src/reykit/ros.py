@@ -50,6 +50,7 @@ from .rsys import run_cmd
 
 
 __all__ = (
+    'get_path',
     'get_md5',
     'make_dir',
     'find_relpath',
@@ -135,8 +136,8 @@ def make_dir(*paths: str, report: bool = False) -> None:
 
     # Create.
     for path in paths:
-        rfolder = Folder(path)
-        rfolder.create(report)
+        folder = Folder(path)
+        folder.make(report)
 
 
 def find_relpath(abspath: str, relpath: str) -> str:
@@ -187,13 +188,13 @@ def find_relpath(abspath: str, relpath: str) -> str:
     return path
 
 
-def get_file_str(file: FileStr) -> str:
+def get_file_str(source: FileStr) -> str:
     """
     Get file string data.
 
     Parameters
     ----------
-    file : File source.
+    source : File source.
         - `'str' and path`: Return this string data.
         - `'str' and not path`: As a file path read string data.
         - `TextIOBase`: Read string data.
@@ -204,39 +205,39 @@ def get_file_str(file: FileStr) -> str:
     """
 
     # Get.
-    match file:
+    match source:
 
         ## Path or string.
         case str():
-            exist = os_exists(file)
+            exist = os_exists(source)
 
             ## Path.
             if exist:
-                rfile = File(file)
-                file_str = rfile.str
+                file = File(source)
+                file_str = file.str
 
             ## String.
             else:
-                file_str = file
+                file_str = source
 
         ## IO.
         case TextIOBase():
-            file_str = file.read()
+            file_str = source.read()
 
         ## Throw exception.
         case _:
-            throw(TypeError, file)
+            throw(TypeError, source)
 
     return file_str
 
 
-def get_file_bytes(file: FileBytes) -> bytes:
+def get_file_bytes(source: FileBytes) -> bytes:
     """
     Get file bytes data.
 
     Parameters
     ----------
-    file : File source.
+    source : File source.
         - `bytes`: Return this bytes data.
         - `str`: As a file path read bytes data.
         - `BufferedIOBase`: Read bytes data.
@@ -247,26 +248,26 @@ def get_file_bytes(file: FileBytes) -> bytes:
     """
 
     # Get.
-    match file:
+    match source:
 
         ## Bytes.
         case bytes():
-            file_bytes = file
+            file_bytes = source
         case bytearray():
-            file_bytes = bytes(file)
+            file_bytes = bytes(source)
 
         ## Path.
         case str():
-            rfile = File(file)
-            file_bytes = rfile.bytes
+            file = File(source)
+            file_bytes = file.bytes
 
         ## IO.
         case BufferedIOBase():
-            file_bytes = file.read()
+            file_bytes = source.read()
 
         ## Throw exception.
         case _:
-            throw(TypeError, file)
+            throw(TypeError, source)
 
     return file_bytes
 
@@ -290,12 +291,12 @@ def read_toml(path: str | File) -> dict[str, Any]:
 
         ## File path.
         case str():
-            rfile = File(path)
-            text = rfile.str
+            file = File(path)
+            text = file.str
 
         ## File object.
         case File():
-            text = rfile.str
+            text = file.str
 
     # Parse.
 
@@ -1014,7 +1015,7 @@ class Folder(Base):
         return join_path
 
 
-    def create(self, report: bool = False) -> None:
+    def make(self, report: bool = False) -> None:
         """
         Create folders.
 

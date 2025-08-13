@@ -22,7 +22,6 @@ from os import (
     remove as os_remove
 )
 from os.path import (
-    abspath as os_abspath,
     join as os_join,
     isfile as os_isfile,
     isdir as os_isdir,
@@ -38,6 +37,7 @@ from os.path import (
     splitdrive as os_splitdrive
 )
 from shutil import copy as shutil_copy
+from pathlib import Path
 from json import JSONDecodeError
 from tomllib import loads as tomllib_loads
 from hashlib import md5 as hashlib_md5
@@ -72,6 +72,31 @@ type FileText = str
 type FileData = bytes
 type FileStr = FilePath | FileText | TextIOBase
 type FileBytes = FilePath | FileData | BufferedIOBase
+
+
+def get_path(path: str | None = None) -> str:
+    """
+    resolve relative path and replace to forward slash `/`.
+
+    Parameters
+    ----------
+    path : Path.
+        - `None`: Use working directory.
+
+    Returns
+    -------
+    Handled path.
+    """
+
+    # Handle parameter.
+    path = path or ''
+
+    # Handle.
+    path_obj = Path(path)
+    path_obj = path_obj.resolve()
+    path = path_obj.as_posix()
+
+    return path
 
 
 def get_md5(data: str | bytes) -> str:
@@ -298,7 +323,7 @@ class File(Base):
         """
 
         # Set attribute.
-        self.path = os_abspath(path)
+        self.path = get_path(path)
 
 
     @overload
@@ -542,68 +567,68 @@ class File(Base):
         return file_bytes
 
 
-    @property
-    def name_suffix(self) -> str:
-        """
-        Return file name with suffix.
+    # @property
+    # def name_suffix(self) -> str:
+    #     """
+    #     Return file name with suffix.
 
-        Returns
-        -------
-        File name with suffix.
-        """
+    #     Returns
+    #     -------
+    #     File name with suffix.
+    #     """
 
-        # Get.
-        file_name_suffix = os_basename(self.path)
+    #     # Get.
+    #     file_name_suffix = os_basename(self.path)
 
-        return file_name_suffix
-
-
-    @property
-    def name(self) -> str:
-        """
-        Return file name not with suffix.
-
-        Returns
-        -------
-        File name not with suffix.
-        """
-
-        # Get.
-        file_name, _ = os_splitext(self.name_suffix)
-
-        return file_name
+    #     return file_name_suffix
 
 
-    @property
-    def suffix(self) -> str:
-        """
-        Return file suffix.
+    # @property
+    # def name(self) -> str:
+    #     """
+    #     Return file name not with suffix.
 
-        Returns
-        -------
-        File suffix.
-        """
+    #     Returns
+    #     -------
+    #     File name not with suffix.
+    #     """
 
-        # Get.
-        _, file_suffix = os_splitext(self.path)
+    #     # Get.
+    #     file_name, _ = os_splitext(self.name_suffix)
 
-        return file_suffix
+    #     return file_name
 
 
-    @property
-    def dir(self) -> str:
-        """
-        Return file directory.
+    # @property
+    # def suffix(self) -> str:
+    #     """
+    #     Return file suffix.
 
-        Returns
-        -------
-        File directory.
-        """
+    #     Returns
+    #     -------
+    #     File suffix.
+    #     """
 
-        # Get.
-        file_dir = os_dirname(self.path)
+    #     # Get.
+    #     _, file_suffix = os_splitext(self.path)
 
-        return file_dir
+    #     return file_suffix
+
+
+    # @property
+    # def dir(self) -> str:
+    #     """
+    #     Return file directory.
+
+    #     Returns
+    #     -------
+    #     File directory.
+    #     """
+
+    #     # Get.
+    #     file_dir = os_dirname(self.path)
+
+    #     return file_dir
 
 
     @property
@@ -824,14 +849,11 @@ class Folder(Base):
         Parameters
         ----------
         path : Folder path.
-            - `None`: Work folder path.
-            - `str`: Use this folder path.
+            - `None`: Use working directory.
         """
 
         # Set attribute.
-        if path is None:
-            path = ''
-        self.path = os_abspath(path)
+        self.path = get_path(path)
 
 
     def paths(
@@ -1201,13 +1223,13 @@ class Folder(Base):
         return folder_size
 
 
-    def __contains__(self, pattern: str) -> bool:
+    def __contains__(self, relpath: str) -> bool:
         """
-        Search file by name, recursion directory.
+        whether exist relative path object.
 
         Parameters
         ----------
-        pattern : Match file name pattern.
+        relpath : Relative path.
 
         Returns
         -------
@@ -1215,8 +1237,8 @@ class Folder(Base):
         """
 
         # Judge.
-        result = self.search(pattern)
-        judge = result is not None
+        path = self.join(relpath)
+        judge = os_exists(path)
 
         return judge
 
@@ -1227,7 +1249,7 @@ class Folder(Base):
     __add__ = __radd__ = join
 
 
-class TempFile(Base):
+class TempFile(File):
     """
     Temporary file type.
     """
@@ -1263,7 +1285,7 @@ class TempFile(Base):
             suffix=suffix,
             dir=dir_
         )
-        self.path = self.file.name
+        self.path = get_path(self.file.name)
 
 
     def read(self) -> bytes | str:
@@ -1540,7 +1562,7 @@ class TempFolder(Base):
 
         # Set attribute.
         self.folder = TemporaryDirectory(dir=dir_)
-        self.path = os_abspath(self.folder.name)
+        self.path = get_path(self.folder.name)
 
 
     def paths(
@@ -1848,13 +1870,13 @@ class TempFolder(Base):
         return folder_size
 
 
-    def __contains__(self, pattern: str) -> bool:
+    def __contains__(self, relpath: str) -> bool:
         """
-        Search file by name, recursion directory.
+        whether exist relative path object.
 
         Parameters
         ----------
-        pattern : Match file name pattern.
+        relpath : Relative path.
 
         Returns
         -------
@@ -1862,8 +1884,8 @@ class TempFolder(Base):
         """
 
         # Judge.
-        result = self.search(pattern)
-        judge = result is not None
+        path = self.join(relpath)
+        judge = os_exists(path)
 
         return judge
 

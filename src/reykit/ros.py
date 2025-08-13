@@ -973,6 +973,25 @@ class Folder(Base):
             return match_paths
 
 
+    def join(self, path: str) -> str:
+        """
+        Join folder path and relative path.
+
+        Parameters
+        ----------
+        path : Relative path.
+
+        Returns
+        -------
+        Joined path.
+        """
+
+        # Join.
+        join_path = os_join(self.path, path)
+
+        return join_path
+
+
     def create(self, report: bool = False) -> None:
         """
         Create folders.
@@ -1203,6 +1222,9 @@ class Folder(Base):
 
 
     __call__ = paths
+
+
+    __add__ = __radd__ = join
 
 
 class TempFile(Base):
@@ -1660,6 +1682,25 @@ class TempFolder(Base):
             return match_paths
 
 
+    def join(self, path: str) -> str:
+        """
+        Join folder path and relative path.
+
+        Parameters
+        ----------
+        path : Relative path.
+
+        Returns
+        -------
+        Joined path.
+        """
+
+        # Join.
+        join_path = os_join(self.path, path)
+
+        return join_path
+
+
     @property
     def name(self) -> str:
         """
@@ -1837,6 +1878,9 @@ class TempFolder(Base):
 
 
     __call__ = paths
+
+
+    __add__ = __radd__ = join
 
 
 def doc_to_docx(path: str, save_path: str | None = None) -> str:

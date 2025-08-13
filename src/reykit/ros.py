@@ -567,68 +567,68 @@ class File(Base):
         return file_bytes
 
 
-    # @property
-    # def name_suffix(self) -> str:
-    #     """
-    #     Return file name with suffix.
+    @property
+    def name_suffix(self) -> str:
+        """
+        Return file name with suffix.
 
-    #     Returns
-    #     -------
-    #     File name with suffix.
-    #     """
+        Returns
+        -------
+        File name with suffix.
+        """
 
-    #     # Get.
-    #     file_name_suffix = os_basename(self.path)
+        # Get.
+        file_name_suffix = os_basename(self.path)
 
-    #     return file_name_suffix
-
-
-    # @property
-    # def name(self) -> str:
-    #     """
-    #     Return file name not with suffix.
-
-    #     Returns
-    #     -------
-    #     File name not with suffix.
-    #     """
-
-    #     # Get.
-    #     file_name, _ = os_splitext(self.name_suffix)
-
-    #     return file_name
+        return file_name_suffix
 
 
-    # @property
-    # def suffix(self) -> str:
-    #     """
-    #     Return file suffix.
+    @property
+    def name(self) -> str:
+        """
+        Return file name not with suffix.
 
-    #     Returns
-    #     -------
-    #     File suffix.
-    #     """
+        Returns
+        -------
+        File name not with suffix.
+        """
 
-    #     # Get.
-    #     _, file_suffix = os_splitext(self.path)
+        # Get.
+        file_name, _ = os_splitext(self.name_suffix)
 
-    #     return file_suffix
+        return file_name
 
 
-    # @property
-    # def dir(self) -> str:
-    #     """
-    #     Return file directory.
+    @property
+    def suffix(self) -> str:
+        """
+        Return file suffix.
 
-    #     Returns
-    #     -------
-    #     File directory.
-    #     """
+        Returns
+        -------
+        File suffix.
+        """
 
-    #     # Get.
-    #     file_dir = os_dirname(self.path)
+        # Get.
+        _, file_suffix = os_splitext(self.path)
 
-    #     return file_dir
+        return file_suffix
+
+
+    @property
+    def dir(self) -> str:
+        """
+        Return file directory.
+
+        Returns
+        -------
+        File directory.
+        """
+
+        # Get.
+        file_dir = os_dirname(self.path)
+
+        return file_dir
 
 
     @property
@@ -1249,7 +1249,7 @@ class Folder(Base):
     __add__ = __radd__ = join
 
 
-class TempFile(File):
+class TempFile(Base):
     """
     Temporary file type.
     """

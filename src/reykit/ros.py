@@ -838,7 +838,7 @@ class Folder(Base):
         self,
         target: Literal['all', 'file', 'folder'] = 'all',
         recursion: bool = False
-    ) -> list:
+    ) -> list[str]:
         """
         Get the path of files and folders in the folder path.
 
@@ -856,7 +856,7 @@ class Folder(Base):
         """
 
         # Get paths.
-        paths = []
+        paths: list[str] = []
 
         ## Recursive.
         if recursion:
@@ -912,59 +912,65 @@ class Folder(Base):
     def search(
         self,
         pattern: str,
-        recursion: bool = False,
-        all_ : Literal[False] = False
+        target: Literal['all', 'file', 'folder'] = 'all',
+        recursion: bool = False
     ) -> str | None: ...
 
     @overload
     def search(
         self,
         pattern: str,
+        target: Literal['all', 'file', 'folder'] = 'all',
         recursion: bool = False,
         *,
-        all_ : Literal[True]
+        first: Literal[False]
     ) -> list[str]: ...
 
     def search(
         self,
         pattern: str,
+        target: Literal['all', 'file', 'folder'] = 'all',
         recursion: bool = False,
-        all_ : bool = False
+        first: bool = True
     ) -> str | list[str] | None:
         """
-        Search file by name.
+        Search file name by regular expression.
 
         Parameters
         ----------
-        pattern : Match file name pattern.
+        pattern : Regular expression pattern.
+        target : Target data.
+            - `Literal['all']`: Return file and folder path.
+            - `Literal['file']`: Return file path.
+            - `Literal['folder']`: Return folder path.
         recursion : Is recursion directory.
-        all\\_ : Whether return all match file path, otherwise return first match file path.
+        first : Whether return first search path, otherwise return all search path.
 
         Returns
         -------
-        Match file path or null.
+        Searched path or null.
         """
 
         # Get paths.
-        file_paths = self.paths('file', recursion)
+        file_paths = self.paths(target, recursion)
+
+        # First.
+        if first:
+            for path in file_paths:
+                name = os_basename(path)
+                result = search(pattern, name)
+                if result is not None:
+                    return path
 
         # All.
-        if all_:
-            match_paths = []
+        else:
+            match_paths: list[str] = []
             for path in file_paths:
-                file_name = os_basename(path)
-                result = search(pattern, file_name)
+                name = os_basename(path)
+                result = search(pattern, name)
                 if result is not None:
                     match_paths.append(path)
             return match_paths
-
-        # First.
-        else:
-            for path in file_paths:
-                file_name = os_basename(path)
-                result = search(pattern, file_name)
-                if result is not None:
-                    return path
 
 
     def create(self, report: bool = False) -> None:
@@ -1593,59 +1599,65 @@ class TempFolder(Base):
     def search(
         self,
         pattern: str,
-        recursion: bool = False,
-        all_ : Literal[False] = False
+        target: Literal['all', 'file', 'folder'] = 'all',
+        recursion: bool = False
     ) -> str | None: ...
 
     @overload
     def search(
         self,
         pattern: str,
+        target: Literal['all', 'file', 'folder'] = 'all',
         recursion: bool = False,
         *,
-        all_ : Literal[True]
+        first: Literal[False]
     ) -> list[str]: ...
 
     def search(
         self,
         pattern: str,
+        target: Literal['all', 'file', 'folder'] = 'all',
         recursion: bool = False,
-        all_ : bool = False
-    ) -> str | None:
+        first: bool = True
+    ) -> str | list[str] | None:
         """
-        Search file by name.
+        Search file name by regular expression.
 
         Parameters
         ----------
-        pattern : Match file name pattern.
+        pattern : Regular expression pattern.
+        target : Target data.
+            - `Literal['all']`: Return file and folder path.
+            - `Literal['file']`: Return file path.
+            - `Literal['folder']`: Return folder path.
         recursion : Is recursion directory.
-        all\\_ : Whether return all match file path, otherwise return first match file path.
+        first : Whether return first search path, otherwise return all search path.
 
         Returns
         -------
-        Match file path or null.
+        Searched path or null.
         """
 
         # Get paths.
-        file_paths = self.paths('file', recursion)
+        file_paths = self.paths(target, recursion)
+
+        # First.
+        if first:
+            for path in file_paths:
+                name = os_basename(path)
+                result = search(pattern, name)
+                if result is not None:
+                    return path
 
         # All.
-        if all_:
-            match_paths = []
+        else:
+            match_paths: list[str] = []
             for path in file_paths:
-                file_name = os_basename(path)
-                result = search(pattern, file_name)
+                name = os_basename(path)
+                result = search(pattern, name)
                 if result is not None:
                     match_paths.append(path)
             return match_paths
-
-        # First.
-        else:
-            for path in file_paths:
-                file_name = os_basename(path)
-                result = search(pattern, file_name)
-                if result is not None:
-                    return path
 
 
     @property

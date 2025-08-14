@@ -1027,12 +1027,12 @@ class Folder(Base):
         # Exist.
         exist = os_exists(self.path)
         if exist:
-            text = 'Folder already exists    | %s' % self.path
+            text = 'Directory already exists    | %s' % self.path
 
         # Not exist.
         else:
             os_makedirs(self.path)
-            text = 'Folder creation complete | %s' % self.path
+            text = 'Directory creation complete | %s' % self.path
 
         # Report.
         if report:

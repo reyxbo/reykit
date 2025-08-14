@@ -549,7 +549,7 @@ class File(Base):
         Remove file.
         """
 
-        # Copy.
+        # Remove.
         try:
             os_remove(self.path)
 
@@ -2026,7 +2026,7 @@ class FileCache(Base):
             return file_path
 
 
-    def store(self, source: FileSourceBytes, name: str | None = None) -> str:
+    def store(self, source: FileSourceBytes, name: str | None = None, delete: bool = False) -> str:
         """
         Store file to cache directory.
 
@@ -2035,6 +2035,7 @@ class FileCache(Base):
         source : Source file path or file data.
         name : File name.
             - `None`: Use md5 value.
+        delete : When source is file path, whether delete original file.
 
         Returns
         -------
@@ -2046,10 +2047,17 @@ class FileCache(Base):
         file_md5 = get_md5(file_bytes)
         if name is None:
             name = file_md5
+        delete = delete and type(source) == str
 
         # Exist.
         path = self.index(file_md5, name)
         if path is not None:
+
+            ## Delete.
+            if delete:
+                file = File(source)
+                file.remove()
+
             return path
 
         # Store.
@@ -2057,11 +2065,19 @@ class FileCache(Base):
         md5_path = self.folder + md5_relpath
         folder = Folder(md5_path)
         folder.make()
-        file_path = folder + name
-        file = File(file_path)
-        file(file_bytes)
+        path = folder + name
 
-        return file.path
+        ## Delete.
+        if delete:
+            file = File(source)
+            file.move(path)
+
+        ## Make.
+        else:
+            file = File(path)
+            file(file_bytes)
+
+        return path
 
 
 def doc_to_docx(path: str, save_path: str | None = None) -> str:

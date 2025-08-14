@@ -11,9 +11,9 @@
 
 from zipfile import ZipFile, is_zipfile, ZIP_DEFLATED
 from os import getcwd as os_getcwd, walk as os_walk
-from os.path import join as os_join, isfile as os_isfile
+from os.path import isfile as os_isfile
 
-from .ros import File, Folder
+from .ros import File, Folder, join_path
 
 
 __all__ = (
@@ -54,7 +54,7 @@ def compress(
         folder = Folder(path)
         obj_name = folder.name
     build_name = obj_name + '.zip'
-    build_path = os_join(build_dir, build_name)
+    build_path = join_path(build_dir, build_name)
 
     # Compress.
     with ZipFile(build_path, mode, ZIP_DEFLATED) as zip_file:
@@ -69,11 +69,11 @@ def compress(
             dirs = os_walk(folder.path)
             for folder_name, sub_folders_name, files_name in dirs:
                 for sub_folder_name in sub_folders_name:
-                    sub_folder_path = os_join(folder_name, sub_folder_name)
+                    sub_folder_path = join_path(folder_name, sub_folder_name)
                     zip_path = sub_folder_path[dir_path_len:]
                     zip_file.write(sub_folder_path, zip_path)
                 for file_name in files_name:
-                    file_path = os_join(folder_name, file_name)
+                    file_path = join_path(folder_name, file_name)
                     zip_path = file_path[dir_path_len:]
                     zip_file.write(file_path, zip_path)
 

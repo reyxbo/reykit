@@ -16,7 +16,7 @@ from email.mime.application import MIMEApplication
 
 from .rbase import Base, throw
 from .rdata import unique
-from .ros import FileBytes, get_file_bytes
+from .ros import FileBytes, read_file_bytes
 
 
 __all__ = (
@@ -236,7 +236,7 @@ class Email(Base):
 
         ## Attachment.
         for file_name, file_source in attachment.items():
-            file_bytes = get_file_bytes(file_source)
+            file_bytes = read_file_bytes(file_source)
             attachment[file_name] = file_bytes
 
         # Create email.

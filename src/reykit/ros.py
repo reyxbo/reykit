@@ -50,17 +50,19 @@ from .rsys import run_cmd
 
 
 __all__ = (
-    'get_path',
+    'format_path',
+    'join_path',
     'get_md5',
     'make_dir',
     'find_relpath',
-    'get_file_str',
-    'get_file_bytes',
+    'read_file_str',
+    'read_file_bytes',
     'read_toml',
     'File',
     'Folder',
     'TempFile',
     'TempFolder',
+    'FileCache',
     'doc_to_docx',
     'extract_docx_content',
     'extract_pdf_content',
@@ -71,13 +73,13 @@ __all__ = (
 type FilePath = str
 type FileText = str
 type FileData = bytes
-type FileStr = FilePath | FileText | TextIOBase
-type FileBytes = FilePath | FileData | BufferedIOBase
+type FileSourceStr = FilePath | FileText | TextIOBase
+type FileSourceBytes = FilePath | FileData | BufferedIOBase
 
 
-def get_path(path: str | None = None) -> str:
+def format_path(path: str | None = None) -> str:
     """
-    resolve relative path and replace to forward slash `/`.
+    Resolve relative path and replace to forward slash `/`.
 
     Parameters
     ----------
@@ -86,16 +88,38 @@ def get_path(path: str | None = None) -> str:
 
     Returns
     -------
-    Handled path.
+    Formatted path.
     """
 
     # Handle parameter.
     path = path or ''
 
-    # Handle.
+    # Format.
     path_obj = Path(path)
     path_obj = path_obj.resolve()
     path = path_obj.as_posix()
+
+    return path
+
+
+def join_path(*paths: str) -> str:
+    """
+    Join path and resolve relative path and replace to forward slash `/`.
+
+    Parameters
+    ----------
+    paths : Paths.
+
+    Returns
+    -------
+    Joined and formatted path.
+    """
+
+    # Join.
+    path = os_join(*paths)
+
+    # Format.
+    path = format_path(path)
 
     return path
 
@@ -183,14 +207,14 @@ def find_relpath(abspath: str, relpath: str) -> str:
     for _ in range(level):
         folder_path, _ = os_split(folder_path)
     relpath = relpath[level + strip_n:]
-    path = os_join(folder_path, relpath)
+    path = join_path(folder_path, relpath)
 
     return path
 
 
-def get_file_str(source: FileStr) -> str:
+def read_file_str(source: FileSourceStr) -> str:
     """
-    Get file string data.
+    Read file string data.
 
     Parameters
     ----------
@@ -231,9 +255,9 @@ def get_file_str(source: FileStr) -> str:
     return file_str
 
 
-def get_file_bytes(source: FileBytes) -> bytes:
+def read_file_bytes(source: FileSourceBytes) -> bytes:
     """
-    Get file bytes data.
+    Read file bytes data.
 
     Parameters
     ----------
@@ -324,7 +348,7 @@ class File(Base):
         """
 
         # Set attribute.
-        self.path = get_path(path)
+        self.path = format_path(path)
 
 
     @overload
@@ -512,7 +536,7 @@ class File(Base):
         """
 
         # Get parameter.
-        move_path = os_join(self.dir, name)
+        move_path = join_path(self.dir, name)
 
         # Move.
         self.move(move_path)
@@ -854,7 +878,7 @@ class Folder(Base):
         """
 
         # Set attribute.
-        self.path = get_path(path)
+        self.path = format_path(path)
 
 
     def paths(
@@ -887,21 +911,21 @@ class Folder(Base):
             match target:
                 case 'all':
                     targets_path = [
-                        os_join(path, file_name)
+                        join_path(path, file_name)
                         for path, folders_name, files_name in obj_walk
                         for file_name in files_name + folders_name
                     ]
                     paths.extend(targets_path)
                 case 'file':
                     targets_path = [
-                        os_join(path, file_name)
+                        join_path(path, file_name)
                         for path, _, files_name in obj_walk
                         for file_name in files_name
                     ]
                     paths.extend(targets_path)
-                case 'all' | 'folder':
+                case 'folder':
                     targets_path = [
-                        os_join(path, folder_name)
+                        join_path(path, folder_name)
                         for path, folders_name, _ in obj_walk
                         for folder_name in folders_name
                     ]
@@ -913,17 +937,17 @@ class Folder(Base):
             match target:
                 case 'all':
                     for name in names:
-                        target_path = os_join(self.path, name)
+                        target_path = join_path(self.path, name)
                         paths.append(target_path)
                 case 'file':
                     for name in names:
-                        target_path = os_join(self.path, name)
+                        target_path = join_path(self.path, name)
                         is_file = os_isfile(target_path)
                         if is_file:
                             paths.append(target_path)
                 case 'folder':
                     for name in names:
-                        target_path = os_join(self.path, name)
+                        target_path = join_path(self.path, name)
                         is_dir = os_isdir(target_path)
                         if is_dir:
                             paths.append(target_path)
@@ -934,7 +958,7 @@ class Folder(Base):
     @overload
     def search(
         self,
-        pattern: str,
+        pattern: str = '',
         target: Literal['all', 'file', 'folder'] = 'all',
         recursion: bool = False
     ) -> str | None: ...
@@ -942,7 +966,7 @@ class Folder(Base):
     @overload
     def search(
         self,
-        pattern: str,
+        pattern: str = '',
         target: Literal['all', 'file', 'folder'] = 'all',
         recursion: bool = False,
         *,
@@ -951,7 +975,7 @@ class Folder(Base):
 
     def search(
         self,
-        pattern: str,
+        pattern: str = '',
         target: Literal['all', 'file', 'folder'] = 'all',
         recursion: bool = False,
         first: bool = True
@@ -1010,9 +1034,9 @@ class Folder(Base):
         """
 
         # Join.
-        join_path = os_join(self.path, path)
+        path = join_path(self.path, path)
 
-        return join_path
+        return path
 
 
     def make(self, report: bool = False) -> None:
@@ -1069,7 +1093,7 @@ class Folder(Base):
         """
 
         # Get parameter.
-        move_path = os_join(self.dir, name)
+        move_path = join_path(self.dir, name)
 
         # Move.
         self.move(move_path)
@@ -1286,7 +1310,7 @@ class TempFile(Base):
             suffix=suffix,
             dir=dir_
         )
-        self.path = get_path(self.file.name)
+        self.path = format_path(self.file.name)
 
 
     def read(self) -> bytes | str:
@@ -1563,7 +1587,7 @@ class TempFolder(Base):
 
         # Set attribute.
         self.folder = TemporaryDirectory(dir=dir_)
-        self.path = get_path(self.folder.name)
+        self.path = format_path(self.folder.name)
 
 
     def paths(
@@ -1596,21 +1620,21 @@ class TempFolder(Base):
             match target:
                 case 'all':
                     targets_path = [
-                        os_join(path, file_name)
+                        join_path(path, file_name)
                         for path, folders_name, files_name in obj_walk
                         for file_name in files_name + folders_name
                     ]
                     paths.extend(targets_path)
                 case 'file':
                     targets_path = [
-                        os_join(path, file_name)
+                        join_path(path, file_name)
                         for path, _, files_name in obj_walk
                         for file_name in files_name
                     ]
                     paths.extend(targets_path)
                 case 'all' | 'folder':
                     targets_path = [
-                        os_join(path, folder_name)
+                        join_path(path, folder_name)
                         for path, folders_name, _ in obj_walk
                         for folder_name in folders_name
                     ]
@@ -1622,17 +1646,17 @@ class TempFolder(Base):
             match target:
                 case 'all':
                     for name in names:
-                        target_path = os_join(self.path, name)
+                        target_path = join_path(self.path, name)
                         paths.append(target_path)
                 case 'file':
                     for name in names:
-                        target_path = os_join(self.path, name)
+                        target_path = join_path(self.path, name)
                         is_file = os_isfile(target_path)
                         if is_file:
                             paths.append(target_path)
                 case 'folder':
                     for name in names:
-                        target_path = os_join(self.path, name)
+                        target_path = join_path(self.path, name)
                         is_dir = os_isdir(target_path)
                         if is_dir:
                             paths.append(target_path)
@@ -1643,7 +1667,7 @@ class TempFolder(Base):
     @overload
     def search(
         self,
-        pattern: str,
+        pattern: str = '',
         target: Literal['all', 'file', 'folder'] = 'all',
         recursion: bool = False
     ) -> str | None: ...
@@ -1651,7 +1675,7 @@ class TempFolder(Base):
     @overload
     def search(
         self,
-        pattern: str,
+        pattern: str = '',
         target: Literal['all', 'file', 'folder'] = 'all',
         recursion: bool = False,
         *,
@@ -1660,7 +1684,7 @@ class TempFolder(Base):
 
     def search(
         self,
-        pattern: str,
+        pattern: str = '',
         target: Literal['all', 'file', 'folder'] = 'all',
         recursion: bool = False,
         first: bool = True
@@ -1719,7 +1743,7 @@ class TempFolder(Base):
         """
 
         # Join.
-        join_path = os_join(self.path, path)
+        join_path = join_path(self.path, path)
 
         return join_path
 
@@ -1904,6 +1928,140 @@ class TempFolder(Base):
 
 
     __add__ = __radd__ = join
+
+
+class FileCache(Base):
+    """
+    File cache type.
+    """
+
+
+    def __init__(self, path: str = 'cache') -> None:
+        """
+        Build instance attributes.
+
+        Parameters
+        ----------
+        path : Root directory path.
+        """
+
+        # Set attribute.
+        self.folder = Folder(path)
+
+        # Make directory.
+        self.__make_dir()
+
+
+    def __make_dir(self) -> None:
+        """
+        Make cache directory and subdirectories.
+        """
+
+        # Make.
+        chars = '0123456789abcdef'
+
+        ## Root.
+        paths = [self.folder.path]
+
+        ## Second layer.
+        paths.extend(
+            [
+                self.folder + char
+                for char in chars
+            ]
+        )
+
+        ## Third layer.
+        paths.extend(
+            [
+                self.folder + f'{char}/{char_sub}'
+                for char in chars
+                for char_sub in chars
+            ]
+        )
+
+        make_dir(*paths)
+
+
+    def index(self, md5: str, name: str | None = None, copy: bool = False) -> str | None:
+        """
+        Index file from cache directory.
+
+        Parameters
+        ----------
+        md5 : File md5 value.
+        name : File name.
+            - `None`: Use md5 value.
+        copy : Do you want to copy file when exist md5 value file and not exist file name.
+
+        Returns
+        -------
+        File path or not exist.
+        """
+
+        # Handle parameter.
+        if name is None:
+            name = md5
+
+        # Not exist md5.
+        md5_relpath = f'{md5[0]}/{md5[1]}/{md5}'
+        if md5_relpath not in self.folder:
+            return
+
+        # Exist md5.
+        file_relpath = f'{md5_relpath}/{name}'
+        file_path = self.folder + file_relpath
+
+        ## Exist file.
+        if file_path in self.folder:
+            return file_path
+
+        ## Copy file.
+        elif copy:
+            md5_path = self.folder + md5_relpath
+            md5_folder = Folder(md5_path)
+            md5_file_path = md5_folder.search(target='file')
+            file = File(md5_file_path)
+            file.copy(file_path)
+            return file_path
+
+
+    def store(self, source: FileSourceBytes, name: str | None = None) -> str:
+        """
+        Store file to cache directory.
+
+        Parameters
+        ----------
+        source : Source file path or file data.
+        name : File name.
+            - `None`: Use md5 value.
+
+        Returns
+        -------
+        Store file path.
+        """
+
+        # Handle parameter.
+        file_bytes = read_file_bytes(source)
+        file_md5 = get_md5(file_bytes)
+        if name is None:
+            name = file_md5
+
+        # Exist.
+        path = self.index(file_md5, name)
+        if path is not None:
+            return path
+
+        # Store.
+        md5_relpath = f'{file_md5[0]}/{file_md5[1]}/{file_md5}'
+        md5_path = self.folder + md5_relpath
+        folder = Folder(md5_path)
+        folder.make()
+        file_path = folder + name
+        file = File(file_path)
+        file(file_bytes)
+
+        return file.path
 
 
 def doc_to_docx(path: str, save_path: str | None = None) -> str:

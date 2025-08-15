@@ -412,7 +412,7 @@ def wrap_dos_command(
     Function return.
     """
 
-    # Get parameter.
+    # Handle parameter.
     arg_info = get_arg_info(func)
 
     # Set DOS command.
@@ -607,7 +607,7 @@ def wrap_redirect_stdout(
     Function return.
     """
 
-    # Get parameter.
+    # Handle parameter.
     if isinstance(redirect, IOBase):
         str_io = redirect
     else:

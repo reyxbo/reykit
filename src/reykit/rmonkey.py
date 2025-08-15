@@ -95,8 +95,7 @@ def monkey_sqlalchemy_result_more_fetch():
         """
 
         # Handle parameter.
-        if limit is None:
-            limit = 0
+        limit = limit or 0
 
         # Convert.
         df: DataFrame = self.to_df()

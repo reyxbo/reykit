@@ -320,7 +320,7 @@ def add_print_position() -> None:
         Preprocessed text.
         """
 
-        # Get parameter.
+        # Handle parameter.
         stack_params = get_stack_param('full', 3)
         stack_floor = stack_params[-1]
 

@@ -188,7 +188,7 @@ def find_relpath(abspath: str, relpath: str) -> str:
     C:/Folder1/Folder4/File.txt
     """
 
-    # Get parameter.
+    # Handle parameter.
     level = 0
     for char in relpath:
         if char == '.':
@@ -370,7 +370,7 @@ class File(Base):
         IO object.
         """
 
-        # Get parameter.
+        # Handle parameter.
         if (
             (
                 'r' in mode
@@ -535,7 +535,7 @@ class File(Base):
         New file path.
         """
 
-        # Get parameter.
+        # Handle parameter.
         move_path = join_path(self.dir, name)
 
         # Move.
@@ -843,7 +843,7 @@ class File(Base):
         Judge result.
         """
 
-        # Get parameter.
+        # Handle parameter.
         match value:
             case str():
                 content = self.str
@@ -1092,7 +1092,7 @@ class Folder(Base):
         New folder path.
         """
 
-        # Get parameter.
+        # Handle parameter.
         move_path = join_path(self.dir, name)
 
         # Move.
@@ -1295,7 +1295,7 @@ class TempFile(Base):
         type\\_ : File data type.
         """
 
-        # Get parameter.
+        # Handle parameter.
         match type_:
             case 'bytes':
                 mode = 'w+b'
@@ -1549,7 +1549,7 @@ class TempFile(Base):
         Judge result.
         """
 
-        # Get parameter.
+        # Handle parameter.
         content = self.read()
 
         # Judge.
@@ -2000,8 +2000,7 @@ class FileCache(Base):
         """
 
         # Handle parameter.
-        if name is None:
-            name = md5
+        name = name or md5
 
         # Not exist md5.
         md5_relpath = f'{md5[0]}/{md5[1]}/{md5}'
@@ -2045,8 +2044,7 @@ class FileCache(Base):
         # Handle parameter.
         file_bytes = read_file_bytes(source)
         file_md5 = get_md5(file_bytes)
-        if name is None:
-            name = file_md5
+        name = name or file_md5
         delete = delete and type(source) == str
 
         # Exist.

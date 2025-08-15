@@ -116,10 +116,8 @@ def sub(
     """
 
     # Handle parameter.
-    if replace is None:
-        replace = ''
-    if count is None:
-        count = 0
+    replace = replace or ''
+    count = count or 0
 
     # Replace.
     result = re_sub(pattern, replace, text, count, RS)
@@ -147,8 +145,7 @@ def split(
     """
 
     # Handle parameter.
-    if count is None:
-        count = 0
+    count = count or 0
 
     # Replace.
     result = re_split(pattern, text, count, RS)

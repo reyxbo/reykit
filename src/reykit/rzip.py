@@ -40,7 +40,7 @@ def compress(
     overwrite : Whether to overwrite.
     """
 
-    # Get parameter.
+    # Handle parameter.
     build_dir = Folder(build_dir).path
     if overwrite:
         mode = 'w'

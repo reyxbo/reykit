@@ -233,7 +233,7 @@ def text_to_time(
     Object or null.
     """
 
-    # Get parameter.
+    # Handle parameter.
     time_obj = None
     str_len = len(string)
 
@@ -575,7 +575,7 @@ class TimeMark(Base):
         # Import.
         from pandas import DataFrame
 
-        # Get parameter.
+        # Handle parameter.
         record_len = len(self.record)
         data = [
             info.copy()
@@ -643,7 +643,7 @@ class TimeMark(Base):
         if len(self.record) <= 1:
             return 0.0
 
-        # Get parameter.
+        # Handle parameter.
         first_timestamp = self.record[0]['timestamp']
         max_index = max(self.record)
         last_timestamp = self.record[max_index]['timestamp']

@@ -234,7 +234,7 @@ def generate_captcha_image(
     Captcha image bytes data.
     """
 
-    # Get parameter.
+    # Handle parameter.
     text = text or 5
     if type(text) == int:
         text = randchar(text, False)

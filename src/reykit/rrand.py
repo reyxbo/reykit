@@ -339,7 +339,7 @@ def randchar(
     Random characters.
     """
 
-    # Get parameter.
+    # Handle parameter.
     char_range = string_digits + string_ascii_letters
     if punctuation:
         char_range += string_punctuation

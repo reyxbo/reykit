@@ -388,8 +388,7 @@ def request(
     if response.encoding == 'ISO-8859-1':
         pattern = r'<meta [^>]*charset=([\w-]+)[^>]*>'
         charset = search(pattern, response.text)
-        if charset is None:
-            charset = 'utf-8'
+        charset = charset or 'utf-8'
         response.encoding = charset
 
     # Check code.
@@ -436,8 +435,7 @@ def download(url: str, path: str | None = None) -> str:
             file_type_obj = get_content_type(content)
             if file_type_obj is not None:
                 file_name = 'download.' + file_type_obj.EXTENSION
-        if file_name is None:
-            file_name = 'download'
+        file_name = file_name or 'download'
         path = os_abspath(file_name)
 
     # Save.
@@ -467,7 +465,7 @@ def compute_stream_time(
     File send seconds.
     """
 
-    # Get parameter.
+    # Handle parameter.
     match source:
         case str():
             file = File(source)

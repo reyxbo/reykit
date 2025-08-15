@@ -35,7 +35,7 @@ def inject_dll(
     from ctypes import create_string_buffer
     from .rdll_core import InjectDLL
 
-    # Get parameter.
+    # Handle parameter.
     path_bytes = path.encode()
     buffer = create_string_buffer(path_bytes)
 

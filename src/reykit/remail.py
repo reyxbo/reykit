@@ -16,7 +16,7 @@ from email.mime.application import MIMEApplication
 
 from .rbase import Base, throw
 from .rdata import unique
-from .ros import FileBytes, read_file_bytes
+from .ros import FileSourceBytes, read_file_bytes
 
 
 __all__ = (
@@ -44,7 +44,7 @@ class Email(Base):
         password : Email password.
         """
 
-        # Get parameter.
+        # Handle parameter.
         host, port = self.get_server_address(username)
 
         # Set attribute.
@@ -170,7 +170,7 @@ class Email(Base):
         to: str | list[str],
         title: str | None = None,
         text: str | None = None,
-        attachment: dict[str, FileBytes] = {},
+        attachment: dict[str, FileSourceBytes] = {},
         cc: str | list[str] | None = None,
         show_from: str | None = None,
         show_to: str | list[str] | None = None,

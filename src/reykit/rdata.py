@@ -53,7 +53,7 @@ def to_json(
     JSON format string.
     """
 
-    # Get parameter.
+    # Handle parameter.
     if compact:
         indent = None
         separators = (',', ':')
@@ -364,8 +364,7 @@ def default_dict(default: T = null, data: dict[KT, VT] | None = None) -> Default
     else:
         default_factory = lambda: default
 
-    if data is None:
-        data = {}
+    data = data or {}
 
     # Instance.
     dict_set = Defaultdict(default_factory, data)

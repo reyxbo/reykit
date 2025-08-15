@@ -359,7 +359,7 @@ def catch_exc(
         - `TracebackType`: Exception traceback instance.
     """
 
-    # Get parameter.
+    # Handle parameter.
     exc_report = format_exc()
     exc_report = exc_report.strip()
     exc_type, exc_instance, exc_traceback = sys_exc_info()

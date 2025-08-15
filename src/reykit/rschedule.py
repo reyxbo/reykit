@@ -179,8 +179,6 @@ class Schedule(Base):
         """
 
         # Arguments.
-            
-        ## Get parameter.
         params_arg = {}
         if args is not None:
             params_arg['args'] = args
@@ -218,7 +216,7 @@ class Schedule(Base):
         task : Task instance or ID.
         """
 
-        # Get parameter.
+        # Handle parameter.
         if type(task) == Job:
             id_ = task.id
         else:
@@ -240,7 +238,7 @@ class Schedule(Base):
         task : Task instance or ID.
         """
 
-        # Get parameter.
+        # Handle parameter.
         if type(task) == Job:
             id_ = task.id
         else:
@@ -262,7 +260,7 @@ class Schedule(Base):
         task : Task instance or ID.
         """
 
-        # Get parameter.
+        # Handle parameter.
         if type(task) == Job:
             id_ = task.id
         else:

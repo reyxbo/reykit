@@ -266,7 +266,6 @@ def throw(
 
         ### Convert.
         if exception == TypeError:
-            print(11111)
             values = [
                 type(value)
                 for value in values

@@ -516,7 +516,7 @@ class TimeMark(Base):
         """
 
         # Record table.
-        self.record: dict[int, RecordData] = {}
+        self.records: dict[int, RecordData] = {}
 
 
     def mark(self, note: str | None = None) -> int:
@@ -535,7 +535,7 @@ class TimeMark(Base):
         # Get parametes.
 
         # Mark.
-        index = len(self.record)
+        index = len(self.records)
         now_timestamp = now('timestamp')
         now_datetime = now('datetime')
         record = {
@@ -548,11 +548,11 @@ class TimeMark(Base):
         ## Not first.
         if index != 0:
             last_index = index - 1
-            last_datetime = self.record[last_index]['datetime']
+            last_datetime = self.records[last_index]['datetime']
             record['timedelta'] = now_datetime - last_datetime
 
         ## Record.
-        self.record[index] = record
+        self.records[index] = record
 
         return index
 
@@ -576,14 +576,14 @@ class TimeMark(Base):
         from pandas import DataFrame
 
         # Handle parameter.
-        record_len = len(self.record)
+        record_len = len(self.records)
         data = [
             info.copy()
-            for info in self.record.values()
+            for info in self.records.values()
         ]
         indexes = [
             index
-            for index in self.record
+            for index in self.records
         ]
 
         # Generate report.
@@ -598,7 +598,7 @@ class TimeMark(Base):
         if record_len > 2:
             row: RecordData = dict.fromkeys(('timestamp', 'datetime', 'timedelta', 'note'))
             max_index = record_len - 1
-            total_timedelta = self.record[max_index]['datetime'] - self.record[0]['datetime']
+            total_timedelta = self.records[max_index]['datetime'] - self.records[0]['datetime']
             row['timedelta'] = total_timedelta
             data.append(row)
             indexes.append('total')
@@ -640,18 +640,27 @@ class TimeMark(Base):
         """
 
         # Break.
-        if len(self.record) <= 1:
+        if len(self.records) <= 1:
             return 0.0
 
         # Handle parameter.
-        first_timestamp = self.record[0]['timestamp']
-        max_index = max(self.record)
-        last_timestamp = self.record[max_index]['timestamp']
+        first_timestamp = self.records[0]['timestamp']
+        max_index = max(self.records)
+        last_timestamp = self.records[max_index]['timestamp']
 
         # Calculate.
         seconds = round((last_timestamp - first_timestamp) / 1000, 3)
 
         return seconds
+
+
+    def clear(self) -> None:
+        """
+        Clear records.
+        """
+
+        # Clear.
+        self.records.clear()
 
 
     def __str__(self) -> str:
@@ -672,6 +681,34 @@ class TimeMark(Base):
         return string
 
 
-    __call__ = __getitem__ = mark
+    def __int__(self) -> int:
+        """
+        Get total spend seconds, truncate the decimal part.
 
-    __float__ = total_spend
+        Returns
+        -------
+        Total spend seconds.
+        """
+
+        # Get
+        total_speend = int(self.total_spend)
+
+        return total_speend
+
+
+    def __float__(self) -> float:
+        """
+        Get total spend seconds.
+
+        Returns
+        -------
+        Total spend seconds.
+        """
+
+        # Get
+        total_speend = self.total_spend
+
+        return total_speend
+
+
+    __call__ = __getitem__ = mark

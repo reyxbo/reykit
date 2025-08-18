@@ -26,7 +26,8 @@ __all__ = (
     'frame_text',
     'frame_data',
     'join_data_text',
-    'join_filter_text'
+    'join_filter_text',
+    'is_zh'
 )
 
 
@@ -516,3 +517,27 @@ def join_filter_text(data: Iterable, char: str = ',', filter_: tuple = (None, ''
     text = char.join(data)
 
     return text
+
+
+def is_zh(char: str) -> bool:
+    """
+    whther is Chinese character.
+    Only includes basic Chinese character.
+
+    Parameters
+    ----------
+    char : One character.
+
+    Returns
+    -------
+    Judged result.
+    """
+
+    # Check.
+    if len(char) != 1:
+        throw(ValueError, char)
+
+    # Judge.
+    judge = '\u4e00' <= char <= '\u9fa5'
+
+    return judge

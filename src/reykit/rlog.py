@@ -941,7 +941,7 @@ class Log(Base):
 class Mark(Base):
     """
     Mark object type.
-    Based on memory ID, if released, it may change, can use fixed ID value.
+    Based on object hash value.
     """
 
 
@@ -969,7 +969,7 @@ class Mark(Base):
         """
 
         # Handle parameter.
-        obj_id = id(obj)
+        obj_id = hash(obj)
         group_set = self.data.setdefault(group, set())
 
         # Mark.
@@ -993,7 +993,7 @@ class Mark(Base):
         """
 
         # Handle parameter.
-        obj_id = id(obj)
+        obj_id = hash(obj)
         group_set = self.data.setdefault(group, set())
 
         # Remove.
@@ -1032,7 +1032,7 @@ class Mark(Base):
         """
 
         # Handle parameter.
-        obj_id = id(obj)
+        obj_id = hash(obj)
         group_set = self.data.setdefault(group, set())
 
         # Judge.

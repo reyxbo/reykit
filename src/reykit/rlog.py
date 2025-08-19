@@ -941,7 +941,7 @@ class Log(Base):
 class Mark(Base):
     """
     Mark object type.
-    Based on memory ID.
+    Based on memory ID, if released, it may change, can use fixed ID value.
     """
 
 
@@ -951,8 +951,7 @@ class Mark(Base):
         """
 
         # Build.
-        self.default_set: set[int] = set()
-        self.data: dict[Hashable, set[int]] = {null: self.default_set}
+        self.data: dict[Hashable, set[int]] = {}
 
 
     def mark(self, obj: Any, group: Hashable = null) -> int:

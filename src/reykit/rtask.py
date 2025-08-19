@@ -300,7 +300,6 @@ class ThreadPool(Base):
 
     __call__ = one
 
-
     __mul__ = repeat
 
 
@@ -874,6 +873,5 @@ class AsyncPool(Base):
 
 
     __call__ = one
-
 
     __mul__ = repeat

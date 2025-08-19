@@ -10,7 +10,7 @@
 
 
 from typing import Any, Literal, Final, overload
-from collections.abc import Callable
+from collections.abc import Hashable, Callable
 from queue import Queue
 from os.path import abspath as os_abspath
 from logging import (
@@ -29,8 +29,7 @@ from logging import (
 from logging.handlers import QueueHandler
 from concurrent_log_handler import ConcurrentRotatingFileHandler, ConcurrentTimedRotatingFileHandler
 
-from .rbase import Base, ConfigMeta, throw, catch_exc, get_first_notnone, get_stack_param
-from .ros import File
+from .rbase import Base, ConfigMeta, null, throw, catch_exc, get_first_notnone, get_stack_param
 from .rre import search, sub
 from .rstdout import ConfigStdout, modify_print, reset_print
 from .rtext import to_text
@@ -41,7 +40,7 @@ from .rwrap import wrap_thread
 __all__ = (
     'ConfigLog',
     'Log',
-    'Record'
+    'Mark'
 )
 
 
@@ -939,100 +938,110 @@ class Log(Base):
     __call__ = log
 
 
-class Record(Base):
+class Mark(Base):
     """
-    Record type.
+    Mark object type.
+    Based on memory ID.
     """
 
 
-    def __init__(
-        self,
-        path: str | None = '_rrecord'
-    ) -> None:
+    def __init__(self) -> None:
         """
         Build instance attributes.
+        """
+
+        # Build.
+        self.default_set: set[int] = set()
+        self.data: dict[Hashable, set[int]] = {null: self.default_set}
+
+
+    def mark(self, obj: Any, group: Hashable = null) -> int:
+        """
+        Mark object.
 
         Parameters
         ----------
-        path : File path.
-            - `None`: Record to variable.
-            - `path`: Record to file.
-        """
-
-        # Set attribute.
-        self.path = path
-        if path is None:
-            self.records = []
-
-
-    def record(
-        self,
-        value: Any
-    ) -> None:
-        """
-        Record value.
-
-        Parameters
-        ----------
-        value : Value.
-        """
-
-        # To variable.
-        if self.path is None:
-            self.records.append(value)
-
-        # To file.
-        else:
-            file = File(self.path)
-
-            ## Convert.
-            if type(value) != str:
-                value = str(value)
-            if file:
-                value += ':'
-            else:
-                value = ':%s:' % value
-
-            ## Record.
-            file(value, True)
-
-
-    def is_recorded(
-        self,
-        value: Any
-    ) -> bool:
-        """
-        Judge if has been recorded.
-
-        Parameters
-        ----------
-        value : Record value.
+        obj : Object.
+        group : Group index.
 
         Returns
         -------
-        Judge result.
+        Object memory ID.
         """
 
-        # To variable.
-        if self.path is None:
-            judge = value in self.records
+        # Handle parameter.
+        obj_id = id(obj)
+        group_set = self.data.setdefault(group, set())
 
-        # To file.
-        else:
-            file = File(self.path)
+        # Mark.
+        group_set.add(obj_id)
 
-            ## Convert.
-            if type(value) != str:
-                value = str(value)
-            value = ':%s:' % value
-
-            ## Judge.
-            judge = value in file
-
-        return judge
+        return obj_id
 
 
-    __call__ = record
+    def remove(self, obj: Any, group: Hashable = null) -> None:
+        """
+        Whether marked.
+
+        Parameters
+        ----------
+        obj : Object.
+        group : Group index.
+
+        Returns
+        -------
+        Judgment result.
+        """
+
+        # Handle parameter.
+        obj_id = id(obj)
+        group_set = self.data.setdefault(group, set())
+
+        # Remove.
+        group_set.remove(obj_id)
 
 
-    __contains__ = is_recorded
+    def remove_group(self, group: Hashable) -> None:
+        """
+        Whether marked.
+
+        Parameters
+        ----------
+        group : Group index.
+
+        Returns
+        -------
+        Judgment result.
+        """
+
+        # Remove.
+        del self.data[group]
+
+
+    def is_marked(self, obj: Any, group: Hashable = null) -> bool:
+        """
+        Whether marked.
+
+        Parameters
+        ----------
+        obj : Object.
+        group : Group index.
+
+        Returns
+        -------
+        Judgment result.
+        """
+
+        # Handle parameter.
+        obj_id = id(obj)
+        group_set = self.data.setdefault(group, set())
+
+        # Judge.
+        result = obj_id in group_set
+
+        return result
+
+
+    __call__ = mark
+
+    __contains__ = is_marked

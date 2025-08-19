@@ -1270,7 +1270,6 @@ class Folder(Base):
 
     __call__ = paths
 
-
     __add__ = __radd__ = join
 
 
@@ -1925,7 +1924,6 @@ class TempFolder(Base):
 
 
     __call__ = paths
-
 
     __add__ = __radd__ = join
 

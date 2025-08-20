@@ -10,11 +10,10 @@
 
 
 from typing import Any, Literal, Self, TypeVar, NoReturn, overload
-from types import TracebackType
 from collections.abc import Callable, Iterable, Container, Mapping
 from sys import exc_info as sys_exc_info
 from os.path import exists as os_exists
-from traceback import format_exc
+from traceback import StackSummary, format_exc, extract_tb
 from warnings import warn as warnings_warn
 from traceback import format_stack, extract_stack
 from atexit import register as atexit_register
@@ -36,7 +35,7 @@ __all__ = (
     'Singleton',
     'Null',
     'null',
-    'BaseError',
+    'ErrorBase',
     'Exit',
     'Error',
     'throw',
@@ -213,19 +212,19 @@ class Null(Singleton):
 null = Null()
 
 
-class BaseError(Base, BaseException):
+class ErrorBase(Base, BaseException):
     """
     Base error type.
     """
 
 
-class Exit(BaseError):
+class Exit(ErrorBase):
     """
     Exit type.
     """
 
 
-class Error(BaseError):
+class Error(ErrorBase):
     """
     Error type.
     """
@@ -337,42 +336,25 @@ def warn(
     warnings_warn(infos, exception, stacklevel)
 
 
-def catch_exc(
-    title: str | None = None
-) -> tuple[str, type[BaseException], BaseException, TracebackType]:
+def catch_exc() -> tuple[str, BaseException, StackSummary]:
     """
-    Catch exception information and print, must used in `except` syntax.
-
-    Parameters
-    ----------
-    title : Print title.
-        - `None`: Not print.
-        - `str`: Print and use this title.
+    Catch or print exception data, must used in `except` syntax.
 
     Returns
     -------
     Exception data.
-        - `str`: Exception report text.
-        - `type[BaseException]`: Exception type.
+        - `str`: Exception traceback text of from `try` to exception.
         - `BaseException`: Exception instance.
-        - `TracebackType`: Exception traceback instance.
+        - `StackSummary`: Exception traceback stack instance.
     """
 
     # Handle parameter.
-    exc_report = format_exc()
-    exc_report = exc_report.strip()
-    exc_type, exc_instance, exc_traceback = sys_exc_info()
+    exc_text = format_exc()
+    exc_text = exc_text.strip()
+    _, exc, traceback = sys_exc_info()
+    stack = extract_tb(traceback)
 
-    # Print.
-    if title is not None:
-
-        ## Import.
-        from .rstdout import echo
-
-        ## Execute.
-        echo(exc_report, title=title, frame='half')
-
-    return exc_report, exc_type, exc_instance, exc_traceback
+    return exc_text, exc, stack
 
 
 @overload
@@ -919,7 +901,7 @@ def block() -> None:
                 print('End blocking.')
                 break
 
-            except:
+            except BaseException:
                 continue
 
 

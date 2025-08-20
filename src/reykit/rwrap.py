@@ -10,9 +10,9 @@
 
 
 from typing import Any, Literal, overload
-from types import TracebackType
 from collections.abc import Callable
 from io import IOBase, StringIO
+from traceback import StackSummary
 from inspect import getdoc as inspect_getdoc
 from functools import wraps as functools_wraps, partial as functools_partial
 from datetime import datetime as Datetime, timedelta as Timedelta
@@ -42,7 +42,7 @@ type Decorated = Callable
 type Decorator = Callable[..., Decorated]
 
 
-def wrap_wrap(decorator: Decorator) -> Decorator:
+def wrap_wrap(decorator: Decorator | None = None) -> Decorator:
     """
     Decorate decorator.
 
@@ -102,8 +102,13 @@ def wrap_wrap(decorator: Decorator) -> Decorator:
         Decorated function or decorated self.
         """
 
-        # Method one and three.
-        if func is not None:
+        # Has decorator parameter.
+        if func is None:
+            __wrap = functools_partial(_wrap, **wrap_kwargs)
+            return __wrap
+
+        # No decorator parameter.
+        else:
 
 
             @functools_wraps(func)
@@ -121,19 +126,13 @@ def wrap_wrap(decorator: Decorator) -> Decorator:
                 Function return.
                 """
 
-                # Decorate function.
+                # Excute.
                 result = decorator(func, args, kwargs, **wrap_kwargs)
 
                 return result
 
 
             return _func
-
-
-        # Method two and four.
-        else:
-            __wrap = functools_partial(_wrap, **wrap_kwargs)
-            return __wrap
 
 
     return _wrap
@@ -271,14 +270,14 @@ def wrap_thread(
 @overload
 def wrap_exc(
     func: Callable[..., T],
-    handler: Callable[[tuple[str, type[BaseException], BaseException, TracebackType]], Any],
+    handler: Callable[[str, BaseException, StackSummary], Any],
     exception: BaseException | tuple[BaseException, ...] | None = BaseException
 ) -> Callable[..., T | None]: ...
 
 @overload
 def wrap_exc(
     *,
-    handler: Callable[[tuple[str, type[BaseException], BaseException, TracebackType]], Any],
+    handler: Callable[[str, BaseException, StackSummary], Any],
     exception: BaseException | tuple[BaseException, ...] | None = BaseException
 ) -> Callable[[Callable[..., T]], T | None]: ...
 
@@ -287,7 +286,7 @@ def wrap_exc(
     func: Callable[..., T],
     args: Any,
     kwargs: Any,
-    handler: Callable[[tuple[str, type[BaseException], BaseException, TracebackType]], Any],
+    handler: Callable[[str, BaseException, StackSummary], Any],
     exception: BaseException | tuple[BaseException, ...] | None = BaseException
 ) -> T | None:
     """
@@ -312,8 +311,8 @@ def wrap_exc(
 
     # Handle exception.
     except exception:
-        exc_report, exc_type, exc_instance, exc_traceback = catch_exc()
-        handler(exc_report, exc_type, exc_instance, exc_traceback)
+        exc_text, exc, stack = catch_exc()
+        handler(exc_text, exc, stack)
 
     else:
         return result
@@ -323,7 +322,7 @@ def wrap_exc(
 def wrap_retry(
     func: Callable[..., T],
     total: int = 1,
-    handler: Callable[[tuple[str, type[BaseException], BaseException, TracebackType]], Any] | None = None,
+    handler: Callable[[tuple[str, BaseException, StackSummary]], Any] | None = None,
     exception: BaseException | tuple[BaseException, ...] = BaseException
 ) -> Callable[..., T]: ...
 
@@ -331,7 +330,7 @@ def wrap_retry(
 def wrap_retry(
     *,
     total: int = 1,
-    handler: Callable[[tuple[str, type[BaseException], BaseException, TracebackType]], Any] | None = None,
+    handler: Callable[[tuple[str, BaseException, StackSummary]], Any] | None = None,
     exception: BaseException | tuple[BaseException, ...] = BaseException
 ) -> Callable[[Callable[..., T]], T]: ...
 
@@ -341,7 +340,7 @@ def wrap_retry(
     args: Any,
     kwargs: Any,
     total: int = 2,
-    handler: Callable[[tuple[str, type[BaseException], BaseException, TracebackType]], Any] | None = None,
+    handler: Callable[[tuple[str, BaseException, StackSummary]], Any] | None = None,
     exception: BaseException | tuple[BaseException, ...] = BaseException
 ) -> T:
     """
@@ -371,8 +370,8 @@ def wrap_retry(
         ## Handle.
         except exception:
             if handler is not None:
-                exc_report, exc_type, exc_instance, exc_traceback = catch_exc()
-                handler(exc_report, exc_type, exc_instance, exc_traceback)
+                exc_text, exc, stack = catch_exc()
+                handler(exc_text, exc, stack)
 
         else:
             return result

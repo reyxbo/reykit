@@ -771,7 +771,7 @@ class Log(Base):
             level is None
             or catch
         ):
-            exc_report, exc_type, *_ = catch_exc()
+            exc_text, exc, _ = catch_exc()
 
         ## Messages.
         messages_len = len(messages)
@@ -780,7 +780,7 @@ class Log(Base):
 
         ## Level.
         if level is None:
-            if exc_type is None:
+            if exc is None:
                 level = self.INFO
             else:
                 level = self.ERROR
@@ -798,11 +798,11 @@ class Log(Base):
         ### Exception.
         if (
             catch
-            and exc_type is not None
+            and exc is not None
         ):
             messages = '%s\n%s' % (
                 messages,
-                exc_report
+                exc_text
             )
 
         # Record.

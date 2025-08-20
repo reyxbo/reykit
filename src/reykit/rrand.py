@@ -11,7 +11,6 @@
 
 from __future__ import annotations
 from typing import Literal, Self, overload
-from types import TracebackType
 from collections.abc import Sequence
 from string import digits as string_digits, ascii_letters as string_ascii_letters, punctuation as string_punctuation
 from math import ceil as math_ceil
@@ -112,18 +111,10 @@ class RandomSeed(Base):
 
     def __exit__(
         self,
-        exc_type: type[BaseException] | None,
-        exc_instance: BaseException | None,
-        exc_traceback: TracebackType | None
+        *_
     ) -> None:
         """
         Exit syntax `with`.
-
-        Parameters
-        ----------
-        exc_type : Exception type.
-        exc_instance : Exception instance.
-        exc_traceback : Exception traceback instance.
         """
 
         # Delete.

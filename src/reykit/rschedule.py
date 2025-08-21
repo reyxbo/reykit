@@ -124,7 +124,7 @@ class Schedule(Base):
 
     def add_task(
         self,
-        func: Callable,
+        task: Callable,
         trigger: Literal['date', 'interval', 'cron'] = 'date',
         args: tuple | None = None,
         kwargs: dict | None = None,
@@ -135,7 +135,7 @@ class Schedule(Base):
 
         Parameters
         ----------
-        func : Task function.
+        task : Task function.
         trigger : Trigger type.
         args : Task position arguments.
         kwargs : Task keyword arguments.
@@ -148,7 +148,7 @@ class Schedule(Base):
 
         # Add.
         job = self.scheduler.add_job(
-            func,
+            task,
             trigger,
             args,
             kwargs,

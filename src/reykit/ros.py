@@ -352,38 +352,27 @@ class File(Base):
 
 
     @overload
-    def open(self, mode: OpenBinaryMode = 'wb+') -> BinaryIO: ...
+    def open(self, mode: OpenBinaryMode = 'wb+', encode: str = 'utf-8') -> BinaryIO: ...
 
     @overload
-    def open(self, mode: OpenTextMode) -> TextIO: ...
+    def open(self, mode: OpenTextMode, encode: str = 'utf-8') -> TextIO: ...
 
-    def open(self, mode: OpenTextMode | OpenBinaryMode = 'wb+') -> TextIO | BinaryIO:
+    def open(self, mode: OpenTextMode | OpenBinaryMode = 'wb+', encode: str = 'utf-8') -> TextIO | BinaryIO:
         """
         Open file.
 
         Parameters
         ----------
         mode : Open mode.
+        encode : Encoding method.
 
         Returns
         -------
         IO object.
         """
 
-        # Handle parameter.
-        if (
-            (
-                'r' in mode
-                or '+' in mode
-            )
-            and 'b' not in mode
-        ):
-            encoding = 'utf-8'
-        else:
-            encoding = None
-
         # Open.
-        io = open(self.path, mode, encoding=encoding)
+        io = open(self.path, mode, encoding=encode)
 
         return io
 

@@ -88,7 +88,7 @@ def is_table(obj: Any) -> bool:
         for row in obj:
             if not isinstance(row, MutableMapping):
                 break
-            keys_str = ':'.join(row.keys())
+            keys_str = ':'.join(row)
             keys_strs.append(keys_str)
         keys_strs = set(keys_strs)
         if len(keys_strs) == 1:
@@ -197,7 +197,7 @@ class Table(Base):
             return {}
 
         # Get fields.
-        fields = list(data[0].keys())
+        fields = list(data[0])
         if type(key_field) == int:
             key_field = fields[key_field]
         if type(val_field) == int:
@@ -249,7 +249,7 @@ class Table(Base):
             return []
 
         # Get fields.
-        fields = list(data[0].keys())
+        fields = list(data[0])
         if type(field) == int:
             field = fields[field]
 

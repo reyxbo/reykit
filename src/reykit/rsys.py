@@ -172,7 +172,7 @@ def del_modules(path: str) -> list[str]:
 
     # Set parameter.
     deleted_dict = {}
-    module_keys = tuple(sys_modules.keys())
+    module_keys = tuple(sys_modules)
 
     # Delete.
     for key in module_keys:

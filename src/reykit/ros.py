@@ -352,7 +352,7 @@ class File(Base):
 
 
     @overload
-    def open(self, mode: OpenBinaryMode = 'wb+', encode: str = 'utf-8') -> BinaryIO: ...
+    def open(self, mode: OpenBinaryMode = 'wb+') -> BinaryIO: ...
 
     @overload
     def open(self, mode: OpenTextMode, encode: str = 'utf-8') -> TextIO: ...
@@ -370,6 +370,10 @@ class File(Base):
         -------
         IO object.
         """
+
+        # Handle parameter.
+        if 'b' in mode:
+            encode = None
 
         # Open.
         io = open(self.path, mode, encoding=encode)

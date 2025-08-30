@@ -432,9 +432,8 @@ def download(url: str, path: str | None = None) -> str:
         else:
             file_name = None
         if file_name is None:
-            file_type_obj = get_content_type(content)
-            if file_type_obj is not None:
-                file_name = 'download.' + file_type_obj.EXTENSION
+            file_type_obj = filetype_guess(content)
+            file_name = 'download.' + file_type_obj.EXTENSION
         file_name = file_name or 'download'
         path = os_abspath(file_name)
 

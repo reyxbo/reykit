@@ -10,6 +10,7 @@
 
 
 from typing import Any, Literal, TypedDict, NotRequired
+from functools import wraps as functools_wraps
 from collections.abc import Callable
 from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -54,15 +55,15 @@ class Schedule(Base):
             - `Database`: Automatic record to database.
         """
 
-        # Set parameter.
+        # Build.
+
+        ## Scheduler.
         executor = ThreadPoolExecutor(max_workers)
         executors = {'default': executor}
         job_defaults = {
             'coalesce': coalesce,
             'max_instances': max_instances
         }
-
-        # Instance.
         if block:
             scheduler = BlockingScheduler(
                 executors=executors,
@@ -73,17 +74,19 @@ class Schedule(Base):
                 executors=executors,
                 job_defaults=job_defaults
             )
-
-        # Set attribute.
         self.scheduler = scheduler
+
+        ## Database.
         self.database = database
- 
-        ## Database path name.
+
+        ### Database path name.
         self.db_names = {
             'base': 'base',
             'base.schedule': 'schedule',
-            'base.schedule_stats': 'schedule_stats'
+            'base.stats_schedule': 'stats_schedule'
         }
+
+        self.notes: dict[str, str] = {}
 
 
     def start(self) -> None:
@@ -136,12 +139,91 @@ class Schedule(Base):
         return jobs
 
 
+    def wrap_record_db(
+        self,
+        task: Callable,
+        note: str | None
+    ) -> None:
+        """
+        Decorator, record to database.
+
+        Parameters
+        ----------
+        task : Task.
+        note : Task note.
+        """
+
+
+        # Define.
+        @functools_wraps(task)
+        def _task(*args, **kwargs) -> None:
+            """
+            Decorated function.
+
+            Parameters
+            ----------
+            args : Position arguments of function.
+            kwargs : Keyword arguments of function.
+            """
+
+            # Handle parameter.
+            nonlocal task, note
+
+            # Status executing.
+            data = {
+                'status': 0,
+                'task': task.__name__,
+                'note': note
+            }
+            conn = self.database.connect()
+            conn.execute_insert(
+                (self.db_names['base'], self.db_names['base.schedule']),
+                data
+            )
+            id_ = conn.variables['identity']
+            conn.commit()
+
+            # Try execute.
+
+            ## Record error.
+            task = self.database.error.wrap(task, note=note)
+
+            try:
+                task(*args, **kwargs)
+
+            # Status occurred error.
+            except BaseException:
+                data = {
+                    'id': id_,
+                    'status': 2
+                }
+                self.database.execute_update(
+                    (self.db_names['base'], self.db_names['base.schedule']),
+                    data
+                )
+                raise
+
+            # Status completed.
+            else:
+                data = {
+                    'id': id_,
+                    'status': 1
+                }
+                self.database.execute_update(
+                    (self.db_names['base'], self.db_names['base.schedule']),
+                    data
+                )
+
+        return _task
+
+
     def add_task(
         self,
         task: Callable,
         plan: dict[str, Any],
-        *args: Any,
-        **kwargs: Any
+        args: Any | None = None,
+        kwargs: Any | None = None,
+        note: str | None = None
     ) -> Job:
         """
         Add task.
@@ -152,6 +234,7 @@ class Schedule(Base):
         plan : Plan trigger keyword arguments.
         args : Task position arguments.
         kwargs : Task keyword arguments.
+        note : Task note.
 
         Returns
         -------
@@ -169,6 +252,11 @@ class Schedule(Base):
         }
 
         # Add.
+
+        ## Database.
+        if self.database is not None:
+            task = self.wrap_record_db(task, note)
+
         job = self.scheduler.add_job(
             task,
             trigger,
@@ -177,6 +265,9 @@ class Schedule(Base):
             **trigger_args
         )
 
+        # Note.
+        self.notes[job.id] = note
+
         return job
 
 
@@ -184,8 +275,9 @@ class Schedule(Base):
         self,
         task: Job | str,
         plan: dict[str, Any],
-        *args: Any,
-        **kwargs: Any
+        args: Any | None = None,
+        kwargs: Any | None = None,
+        note: str | None = None
     ) -> None:
         """
         Modify task.
@@ -196,6 +288,7 @@ class Schedule(Base):
         plan : Plan trigger keyword arguments.
         args : Task position arguments.
         kwargs : Task keyword arguments.
+        note : Task note.
         """
 
         # Handle parameter.
@@ -210,7 +303,7 @@ class Schedule(Base):
             if key != 'trigger'
         }
 
-        # Modify trigger.
+        # Modify plan.
         if plan != {}:
             self.scheduler.reschedule_job(
                 task,
@@ -224,10 +317,13 @@ class Schedule(Base):
             or kwargs != {}
         ):
             self.scheduler.modify_job(
-                task.id,
+                task,
                 args=args,
                 kwargs=kwargs
             )
+
+        # Modify note.
+        self.notes[task] = note
 
 
     def remove_task(
@@ -310,14 +406,14 @@ class Schedule(Base):
         ## Database.
         databases = [
             {
-                'name': self.db_names['worm']
+                'name': self.db_names['base']
             }
         ]
 
         ## Table.
         tables = [
 
-            ### 'douban_media'.
+            ### 'schedule'.
             {
                 'path': (self.db_names['base'], self.db_names['base.schedule']),
                 'fields': [
@@ -336,123 +432,25 @@ class Schedule(Base):
                     {
                         'name': 'id',
                         'type': 'int unsigned',
+                        'constraint': 'NOT NULL AUTO_INCREMENT',
+                        'comment': 'ID.'
+                    },
+                    {
+                        'name': 'status',
+                        'type': 'tinyint',
                         'constraint': 'NOT NULL',
-                        'comment': 'Douban media ID.'
+                        'comment': 'Schedule status, 0 is executing, 1 is completed, 2 is occurred error.'
                     },
                     {
-                        'name': 'imdb',
-                        'type': 'char(10)',
-                        'comment': 'IMDb ID.'
-                    },
-                    {
-                        'name': 'type',
-                        'type': 'varchar(5)',
+                        'name': 'task',
+                        'type': 'varchar(100)',
                         'constraint': 'NOT NULL',
-                        'comment': 'Media type.'
+                        'comment': 'Schedule task function name.'
                     },
                     {
-                        'name': 'name',
-                        'type': 'varchar(50)',
-                        'constraint': 'NOT NULL',
-                        'comment': 'Media name.'
-                    },
-                    {
-                        'name': 'year',
-                        'type': 'year',
-                        'constraint': 'NOT NULL',
-                        'comment': 'Release year.'
-                    },
-                    {
-                        'name': 'desc',
-                        'type': 'varchar(1000)',
-                        'comment': 'Media content description.'
-                    },
-                    {
-                        'name': 'score',
-                        'type': 'float',
-                        'comment': 'Media score, [0,10].'
-                    },
-                    {
-                        'name': 'score_count',
-                        'type': 'int',
-                        'comment': 'Media score count.'
-                    },
-                    {
-                        'name': 'minute',
-                        'type': 'smallint',
-                        'comment': 'Movie or TV drama episode minute.'
-                    },
-                    {
-                        'name': 'episode',
-                        'type': 'smallint',
-                        'comment': 'TV drama total episode number.'
-                    },
-                    {
-                        'name': 'episode_now',
-                        'type': 'smallint',
-                        'comment': 'TV drama current episode number.'
-                    },
-                    {
-                        'name': 'premiere',
-                        'type': 'json',
-                        'comment': 'Premiere region and date dictionary.'
-                    },
-                    {
-                        'name': 'country',
-                        'type': 'json',
-                        'comment': 'Release country list.'
-                    },
-                    {
-                        'name': 'class',
-                        'type': 'json',
-                        'comment': 'Class list.'
-                    },
-                    {
-                        'name': 'director',
-                        'type': 'json',
-                        'comment': 'Director list.'
-                    },
-                    {
-                        'name': 'star',
-                        'type': 'json',
-                        'comment': 'Star list.'
-                    },
-                    {
-                        'name': 'scriptwriter',
-                        'type': 'json',
-                        'comment': 'Scriptwriter list.'
-                    },
-                    {
-                        'name': 'language',
-                        'type': 'json',
-                        'comment': 'Language list.'
-                    },
-                    {
-                        'name': 'alias',
-                        'type': 'json',
-                        'comment': 'Alias list.'
-                    },
-                    {
-                        'name': 'comment',
-                        'type': 'json',
-                        'comment': 'Comment list.'
-                    },
-                    {
-                        'name': 'image',
-                        'type': 'varchar(150)',
-                        'constraint': 'NOT NULL',
-                        'comment': 'Picture image URL.'
-                    },
-                    {
-                        'name': 'image_low',
-                        'type': 'varchar(150)',
-                        'constraint': 'NOT NULL',
-                        'comment': 'Picture image low resolution URL.'
-                    },
-                    {
-                        'name': 'video',
-                        'type': 'varchar(150)',
-                        'comment': 'Preview video Douban page URL.'
+                        'name': 'note',
+                        'type': 'varchar(500)',
+                        'comment': 'Schedule note.'
                     }
                 ],
                 'primary': 'id',
@@ -470,19 +468,13 @@ class Schedule(Base):
                         'comment': 'Record update time normal index.'
                     },
                     {
-                        'name': 'u_imdb',
-                        'fields': 'imdb',
-                        'type': 'unique',
-                        'comment': 'IMDb number unique index.'
-                    },
-                    {
-                        'name': 'n_name',
-                        'fields': 'name',
+                        'name': 'n_task',
+                        'fields': 'task',
                         'type': 'noraml',
-                        'comment': 'Media name normal index.'
+                        'comment': 'Schedule task function name normal index.'
                     }
                 ],
-                'comment': 'Douban media information table.'
+                'comment': 'Schedule execute record table.'
             }
 
         ]
@@ -490,76 +482,60 @@ class Schedule(Base):
         ## View stats.
         views_stats = [
 
-            ### 'schedule_stats'.
+            ### 'stats_schedule'.
             {
-                'path': (self.db_names['base'], self.db_names['base.schedule_stats']),
+                'path': (self.db_names['base'], self.db_names['base.stats_schedule']),
                 'items': [
                     {
                         'name': 'count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{self.db_names['worm']}`.`{self.db_names['worm.douban_media']}`'
+                            f'FROM `{self.db_names['base']}`.`{self.db_names['base.schedule']}`'
                         ),
-                        'comment': 'Media count.'
+                        'comment': 'Schedule count.'
                     },
                     {
                         'name': 'past_day_count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{self.db_names['worm']}`.`{self.db_names['worm.douban_media']}`\n'
+                            f'FROM `{self.db_names['base']}`.`{self.db_names['base.schedule']}`\n'
                             'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) = 0'
                         ),
-                        'comment': 'Media count in the past day.'
+                        'comment': 'Schedule count in the past day.'
                     },
                     {
                         'name': 'past_week_count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{self.db_names['worm']}`.`{self.db_names['worm.douban_media']}`\n'
+                            f'FROM `{self.db_names['base']}`.`{self.db_names['base.schedule']}`\n'
                             'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) <= 6'
                         ),
-                        'comment': 'Media count in the past week.'
+                        'comment': 'Schedule count in the past week.'
                     },
                     {
                         'name': 'past_month_count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{self.db_names['worm']}`.`{self.db_names['worm.douban_media']}`\n'
+                            f'FROM `{self.db_names['base']}`.`{self.db_names['base.schedule']}`\n'
                             'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) <= 29'
                         ),
-                        'comment': 'Media count in the past month.'
+                        'comment': 'Schedule count in the past month.'
                     },
                     {
-                        'name': 'avg_score',
+                        'name': 'task_count',
                         'select': (
-                            'SELECT ROUND(AVG(`score`), 1)\n'
-                            f'FROM `{self.db_names['worm']}`.`{self.db_names['worm.douban_media']}`'
+                            'SELECT COUNT(DISTINCT `task`)\n'
+                            f'FROM `{self.db_names['base']}`.`{self.db_names['base.schedule']}`'
                         ),
-                        'comment': 'Media average score.'
+                        'comment': 'Task count.'
                     },
                     {
-                        'name': 'score_count',
-                        'select': (
-                            'SELECT FORMAT(SUM(`score_count`), 0)\n'
-                            f'FROM `{self.db_names['worm']}`.`{self.db_names['worm.douban_media']}`'
-                        ),
-                        'comment': 'Media score count.'
-                    },
-                    {
-                        'name': 'last_create_time',
-                        'select': (
-                            'SELECT MAX(`create_time`)\n'
-                            f'FROM `{self.db_names['worm']}`.`{self.db_names['worm.douban_media']}`'
-                        ),
-                        'comment': 'Media last record create time.'
-                    },
-                    {
-                        'name': 'last_update_time',
+                        'name': 'last_time',
                         'select': (
                             'SELECT IFNULL(MAX(`update_time`), MAX(`create_time`))\n'
-                            f'FROM `{self.db_names['worm']}`.`{self.db_names['worm.douban_media']}`'
+                            f'FROM `{self.db_names['base']}`.`{self.db_names['base.schedule']}`'
                         ),
-                        'comment': 'Media last record update time.'
+                        'comment': 'Schedule last record time.'
                     }
                 ]
 
@@ -569,6 +545,9 @@ class Schedule(Base):
 
         # Build.
         self.database.build.build(databases, tables, views_stats=views_stats)
+
+        ## Error.
+        self.database.error.build_db()
 
 
     __iter__ = tasks

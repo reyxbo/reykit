@@ -76,6 +76,9 @@ class Schedule(Base):
             )
         self.scheduler = scheduler
 
+        ### Start.
+        self.scheduler.start()
+
         ## Database.
         self.database = database
 
@@ -87,15 +90,6 @@ class Schedule(Base):
         }
 
         self.notes: dict[str, str] = {}
-
-
-    def start(self) -> None:
-        """
-        Start scheduler.
-        """
-
-        # Start.
-        self.scheduler.start()
 
 
     def pause(self) -> None:

@@ -89,8 +89,6 @@ class Schedule(Base):
             'base.stats_schedule': 'stats_schedule'
         }
 
-        self.notes: dict[str, str] = {}
-
 
     def pause(self) -> None:
         """
@@ -258,9 +256,6 @@ class Schedule(Base):
             kwargs,
             **trigger_args
         )
-
-        # Note.
-        self.notes[job.id] = note
 
         return job
 

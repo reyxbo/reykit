@@ -22,7 +22,6 @@ from os import (
     remove as os_remove
 )
 from os.path import (
-    abspath as os_abspath,
     join as os_join,
     isfile as os_isfile,
     isdir as os_isdir,
@@ -47,7 +46,6 @@ from tempfile import TemporaryFile, TemporaryDirectory
 
 from .rbase import Base, throw
 from .rdata import to_json
-from .rnet import request
 from .rre import search, sub
 from .rsys import run_cmd
 
@@ -2086,6 +2084,9 @@ class FileCache(Base):
         -------
         File absolute path.
         """
+
+        # Import.
+        from .rnet import request
 
         # Download.
         response = request(url)

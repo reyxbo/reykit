@@ -58,7 +58,7 @@ def now(format_: Literal['time']) -> Time: ...
 def now(format_: Literal['datetime_str', 'date_str', 'time_str']) -> str: ...
 
 @overload
-def now(format_: Literal['timestamp']) -> int: ...
+def now(format_: Literal['timestamp', 'timestamp_s']) -> int: ...
 
 def now(
     format_: Literal[
@@ -68,7 +68,8 @@ def now(
         'datetime_str',
         'date_str',
         'time_str',
-        'timestamp'
+        'timestamp',
+        'timestamp_s'
     ] = 'datetime'
 ) -> Datetime | Date | Time | str | int:
     """
@@ -84,6 +85,7 @@ def now(
         - `Literal['date_str']`: Return string in format `'%Y-%m-%d'`.
         - `Literal['time_str']`: Return string in foramt `'%H:%M:%S'`.
         - `Literal['timestamp']`: Return time stamp in milliseconds.
+        - `Literal['timestamp_s']`: Return time stamp in seconds.
 
     Returns
     -------
@@ -106,6 +108,8 @@ def now(
             return Datetime.now().strftime('%H:%M:%S')
         case 'timestamp':
             return int(time_time() * 1000)
+        case 'timestamp_s':
+            return int(time_time())
         case _:
             throw(ValueError, format_)
 

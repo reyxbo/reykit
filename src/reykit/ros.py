@@ -2078,7 +2078,7 @@ class FileCache(Base):
         ----------
         url : Download URL.
         name : File name.
-            - `None`: Get from response, or is MD5 value join automatic judge file type.
+            - `None`: Use MD5 value join automatic judge file type.
 
         Returns
         -------
@@ -2086,30 +2086,17 @@ class FileCache(Base):
         """
 
         # Import.
-        from .rnet import request
+        from .rnet import request, get_response_file_name
 
         # Download.
         response = request(url)
-        content = response.content
 
         # File name.
         if name is None:
-            Content_disposition = response.headers.get('Content-Disposition', '')
-            if 'filename' in Content_disposition:
-                name: str | None = search(
-                    'filename=[\'"]?([^\\s\'"]+)',
-                    Content_disposition
-                )
-            if name is None:
-                file_md5 = get_md5(content)
-                file_type_obj = filetype_guess(content)
-                if file_type_obj is not None:
-                    name = f'{file_md5}.{file_type_obj.EXTENSION}'
-                else:
-                    name = file_md5
+            name = get_response_file_name(response)
 
         # Store.
-        path = self.store(content, name)
+        path = self.store(response.content, name)
 
         return path
 

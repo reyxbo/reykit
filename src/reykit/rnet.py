@@ -31,8 +31,8 @@ from filetype import guess as filetype_guess
 from datetime import datetime
 
 from .rbase import Base, throw, check_response_code
-from .ros import File
-from .rre import search
+from .ros import File, get_md5
+from .rre import search, split
 
 
 __all__ = (
@@ -42,6 +42,7 @@ __all__ = (
     'split_cookie',
     'get_content_type',
     'request',
+    'get_response_file_name',
     'download',
     'compute_stream_time',
     'listen_socket',
@@ -402,6 +403,52 @@ def request(
     return response
 
 
+def get_response_file_name(response: Response, default_name: str | None = None) -> str:
+    """
+    Get file name from response.
+
+    Parameters
+    ----------
+    response : `Response` instance.
+    default_name : Default file name.
+        - `None`: Use MD5 value join automatic judge file type.
+
+    Returns
+    -------
+    File name.
+    """
+
+    # Handle parameter.
+    content = response.content
+
+    # Get.
+    file_name = None
+    Content_disposition = response.headers.get('Content-Disposition', '')
+    if 'filename' in Content_disposition:
+        file_name: str | None = search(
+            'filename=[\'"]?([^\\s\'"]+)',
+            Content_disposition
+        )
+    if file_name is None:
+        pattern = r'[/\\]'
+        url_parts = split(pattern, response.request.url)
+        if (
+            len(url_parts) != 1
+            and '.' in url_parts[-1]
+        ):
+            file_name = url_parts[-1]
+    if file_name is None:
+        if default_name is None:
+            default_name = get_md5(content)
+            file_type_obj = filetype_guess(content)
+            if file_type_obj is not None:
+                default_name += f'.{file_type_obj.EXTENSION}'
+                file_name = f'{default_name}.' + file_type_obj.EXTENSION
+        file_name = default_name
+
+    return file_name
+
+
 def download(url: str, path: str | None = None) -> str:
     """
     Download file from URL.
@@ -410,7 +457,7 @@ def download(url: str, path: str | None = None) -> str:
     ----------
     url : Download URL.
     path : Save path.
-        - `None`: File name is get from response, or is 'download' join automatic judge file type.
+        - `None`: File name use MD5 value join automatic judge file type.
 
     Returns
     -------
@@ -419,28 +466,15 @@ def download(url: str, path: str | None = None) -> str:
 
     # Download.
     response = request(url)
-    content = response.content
 
     # File name.
     if path is None:
-        file_name = None
-        Content_disposition = response.headers.get('Content-Disposition', '')
-        if 'filename' in Content_disposition:
-            file_name: str | None = search(
-                'filename=[\'"]?([^\\s\'"]+)',
-                Content_disposition
-            )
-        if file_name is None:
-            file_type_obj = filetype_guess(content)
-            if file_type_obj is not None:
-                file_name = 'download.' + file_type_obj.EXTENSION
-            else:
-                file_name = 'download'
+        file_name = get_response_file_name(response)
         path = os_abspath(file_name)
 
     # Save.
     file = File(path)
-    file(content)
+    file(response.content)
 
     return path
 

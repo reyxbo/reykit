@@ -22,6 +22,7 @@ from os import (
     remove as os_remove
 )
 from os.path import (
+    abspath as os_abspath,
     join as os_join,
     isfile as os_isfile,
     isdir as os_isdir,
@@ -38,13 +39,15 @@ from os.path import (
 )
 from shutil import copy as shutil_copy
 from pathlib import Path
-from json import JSONDecodeError
-from tomllib import loads as tomllib_loads
 from hashlib import md5 as hashlib_md5
+from tomllib import loads as tomllib_loads
+from json import JSONDecodeError
+from filetype import guess as filetype_guess
 from tempfile import TemporaryFile, TemporaryDirectory
 
 from .rbase import Base, throw
 from .rdata import to_json
+from .rnet import request
 from .rre import search, sub
 from .rsys import run_cmd
 
@@ -1980,10 +1983,10 @@ class FileCache(Base):
 
         Parameters
         ----------
-        md5 : File md5 value.
+        md5 : File MD5 value.
         name : File name.
-            - `None`: Use md5 value.
-        copy : Do you want to copy file when exist md5 value file and not exist file name.
+            - `None`: Use MD5 value.
+        copy : Do you want to copy file when exist MD5 value file and not exist file name.
 
         Returns
         -------
@@ -2024,7 +2027,7 @@ class FileCache(Base):
         ----------
         source : Source file path or file data.
         name : File name.
-            - `None`: Use md5 value.
+            - `None`: Use MD5 value.
         delete : When source is file path, whether delete original file.
 
         Returns
@@ -2065,6 +2068,47 @@ class FileCache(Base):
         else:
             file = File(path)
             file(file_bytes)
+
+        return path
+
+
+    def download(self, url: str, name: str | None = None) -> str:
+        """
+        Download file from URL.
+
+        Parameters
+        ----------
+        url : Download URL.
+        name : File name.
+            - `None`: Get from response, or is MD5 value join automatic judge file type.
+
+        Returns
+        -------
+        File absolute path.
+        """
+
+        # Download.
+        response = request(url)
+        content = response.content
+
+        # File name.
+        if name is None:
+            Content_disposition = response.headers.get('Content-Disposition', '')
+            if 'filename' in Content_disposition:
+                name: str | None = search(
+                    'filename=[\'"]?([^\\s\'"]+)',
+                    Content_disposition
+                )
+            if name is None:
+                file_md5 = get_md5(content)
+                file_type_obj = filetype_guess(content)
+                if file_type_obj is not None:
+                    name = f'{file_md5}.{file_type_obj.EXTENSION}'
+                else:
+                    name = file_md5
+
+        # Store.
+        path = self.store(content, name)
 
         return path
 

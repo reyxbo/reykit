@@ -410,7 +410,7 @@ def download(url: str, path: str | None = None) -> str:
     ----------
     url : Download URL.
     path : Save path.
-        - `None`, File name is `download`: and automatic judge file type.
+        - `None`: File name is get from response, or is 'download' join automatic judge file type.
 
     Returns
     -------
@@ -421,20 +421,21 @@ def download(url: str, path: str | None = None) -> str:
     response = request(url)
     content = response.content
 
-    # Judge file type and path.
+    # File name.
     if path is None:
+        file_name = None
         Content_disposition = response.headers.get('Content-Disposition', '')
         if 'filename' in Content_disposition:
-            file_name = search(
+            file_name: str | None = search(
                 'filename=[\'"]?([^\\s\'"]+)',
                 Content_disposition
             )
-        else:
-            file_name = None
         if file_name is None:
             file_type_obj = filetype_guess(content)
-            file_name = 'download.' + file_type_obj.EXTENSION
-        file_name = file_name or 'download'
+            if file_type_obj is not None:
+                file_name = 'download.' + file_type_obj.EXTENSION
+            else:
+                file_name = 'download'
         path = os_abspath(file_name)
 
     # Save.

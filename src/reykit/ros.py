@@ -1947,7 +1947,12 @@ class FileStore(Base):
     def __make_dir(self) -> None:
         """
         Make cache directory and subdirectories.
+        When root directory exists, then not make.
         """
+
+        # Exist.
+        if self.folder:
+            return
 
         # Handle parameter.
         chars = '0123456789abcdef'

@@ -63,7 +63,7 @@ __all__ = (
     'Folder',
     'TempFile',
     'TempFolder',
-    'FileCache',
+    'FileStore',
     'doc_to_docx',
     'extract_docx_content',
     'extract_pdf_content',
@@ -1922,13 +1922,13 @@ class TempFolder(Base):
     __add__ = __radd__ = join
 
 
-class FileCache(Base):
+class FileStore(Base):
     """
-    File cache type.
+    File Store type.
     """
 
 
-    def __init__(self, path: str = 'cache') -> None:
+    def __init__(self, path: str = 'file') -> None:
         """
         Build instance attributes.
 
@@ -1949,29 +1949,29 @@ class FileCache(Base):
         Make cache directory and subdirectories.
         """
 
-        # Make.
+        # Handle parameter.
         chars = '0123456789abcdef'
-
-        ## Root.
+        subdir_names = [
+            char1 + char2
+            for char1 in chars
+            for char2 in chars
+        ]
         paths = [self.folder.path]
-
-        ## Second layer.
         paths.extend(
             [
-                self.folder + char
-                for char in chars
+                self.folder + name
+                for name in subdir_names
+            ]
+        )
+        paths.extend(
+            [
+                self.folder + f'{name1}/{name2}'
+                for name1 in subdir_names
+                for name2 in subdir_names
             ]
         )
 
-        ## Third layer.
-        paths.extend(
-            [
-                self.folder + f'{char}/{char_sub}'
-                for char in chars
-                for char_sub in chars
-            ]
-        )
-
+        # Make.
         make_dir(*paths)
 
 
@@ -1995,7 +1995,7 @@ class FileCache(Base):
         name = name or md5
 
         # Not exist md5.
-        md5_relpath = f'{md5[0]}/{md5[1]}/{md5}'
+        md5_relpath = f'{md5[:2]}/{md5[2:4]}/{md5}'
         if md5_relpath not in self.folder:
             return
 
@@ -2051,7 +2051,7 @@ class FileCache(Base):
             return path
 
         # Store.
-        md5_relpath = f'{file_md5[0]}/{file_md5[1]}/{file_md5}'
+        md5_relpath = f'{file_md5[:2]}/{file_md5[2:4]}/{file_md5}'
         md5_path = self.folder + md5_relpath
         folder = Folder(md5_path)
         folder.make()

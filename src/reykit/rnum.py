@@ -64,7 +64,6 @@ def digits(number: int | float) -> tuple[int, int]:
         int_digits = len(number_str)
         dec_digits = 0
     else:
-        number = int(number)
         number_str = str(number)
         int_str, dec_str = number_str.split('.')
         int_digits = len(int_str)

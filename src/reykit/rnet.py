@@ -353,7 +353,7 @@ def request(
                 item_data, item_headers = value, {}
             if type(item_data) == str:
                 file = File(item_data)
-                data = file.bytes
+                item_data = file.bytes
                 item_headers.setdefault('filename', file.name_suffix)
             if type(item_data) == bytes:
                 if 'Content-Type' not in item_headers:

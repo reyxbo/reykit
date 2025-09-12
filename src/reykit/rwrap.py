@@ -38,8 +38,8 @@ __all__ = (
 )
 
 
-type Decorated = Callable
-type Decorator = Callable[..., Decorated]
+type DecoratedCallable = Callable
+type Decorator = Callable[..., DecoratedCallable]
 
 
 def wrap_wrap(decorator: Decorator | None = None) -> Decorator:
@@ -82,13 +82,13 @@ def wrap_wrap(decorator: Decorator | None = None) -> Decorator:
 
     # Decorate Decorator.
     @overload
-    def _wrap(func: Callable, **wrap_kwargs: Any) -> Decorated: ...
+    def _wrap(func: Callable, **wrap_kwargs: Any) -> DecoratedCallable: ...
 
     @overload
     def _wrap(**wrap_kwargs: Any) -> Decorator: ...
 
     @functools_wraps(decorator)
-    def _wrap(func: Callable | None = None, **wrap_kwargs: Any) -> Decorated | Decorator:
+    def _wrap(func: Callable | None = None, **wrap_kwargs: Any) -> DecoratedCallable | Decorator:
         """
         Decorated decorator.
 

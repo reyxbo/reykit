@@ -167,13 +167,13 @@ class Schedule(Base):
                 'task': task.__name__,
                 'note': note
             }
-            conn = self.database.connect()
-            conn.execute_insert(
-                (self.db_names['base'], self.db_names['base.schedule']),
-                data
-            )
-            id_ = conn.variables['identity']
-            conn.commit()
+            with self.database.connect() as conn:
+                conn = self.database.connect()
+                conn.execute_insert(
+                    (self.db_names['base'], self.db_names['base.schedule']),
+                    data
+                )
+                id_ = conn.insert_id
 
             # Try execute.
 

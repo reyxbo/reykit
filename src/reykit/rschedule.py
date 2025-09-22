@@ -169,7 +169,7 @@ class Schedule(Base):
             }
             with self.database.connect() as conn:
                 conn = self.database.connect()
-                conn.execute_insert(
+                conn.execute.insert(
                     (self.db_names['base'], self.db_names['base.schedule']),
                     data
                 )
@@ -189,7 +189,7 @@ class Schedule(Base):
                     'id': id_,
                     'status': 2
                 }
-                self.database.execute_update(
+                self.database.execute.update(
                     (self.db_names['base'], self.db_names['base.schedule']),
                     data
                 )
@@ -201,7 +201,7 @@ class Schedule(Base):
                     'id': id_,
                     'status': 1
                 }
-                self.database.execute_update(
+                self.database.execute.update(
                     (self.db_names['base'], self.db_names['base.schedule']),
                     data
                 )

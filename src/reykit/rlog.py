@@ -597,7 +597,7 @@ class Log(Base):
 
         Parameters
         ----------
-        queue : Queue instance.
+        queue : `Queue` instance.
             - `None`: Create queue and use.
             - `Queue`: Use this queue.
         level : Handler level.

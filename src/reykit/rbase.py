@@ -29,6 +29,7 @@ __all__ = (
     'V',
     'KT',
     'VT',
+    'CallableT',
     'Base',
     'StaticMeta',
     'ConfigMeta',
@@ -67,6 +68,7 @@ U = TypeVar('U') # Any.
 V = TypeVar('V') # Any.
 KT = TypeVar('KT') # Any dictionary key.
 VT = TypeVar('VT') # Any dictionary value.
+CallableT = TypeVar('CallableT', bound=Callable) # Any callable.
 
 
 class Base(object):

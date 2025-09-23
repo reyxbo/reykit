@@ -93,10 +93,6 @@ class Schedule(Base):
     def pause(self) -> None:
         """
         Pause scheduler.
-
-        Parameters
-        ----------
-        task : Task instance.
         """
 
         # Pause.
@@ -106,10 +102,6 @@ class Schedule(Base):
     def resume(self) -> None:
         """
         Resume scheduler.
-
-        Parameters
-        ----------
-        task : Task instance.
         """
 
         # Resume.

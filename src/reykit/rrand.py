@@ -9,7 +9,6 @@
 """
 
 
-from __future__ import annotations
 from typing import Literal, Self, overload
 from collections.abc import Sequence
 from string import digits as string_digits, ascii_letters as string_ascii_letters, punctuation as string_punctuation
@@ -39,7 +38,7 @@ class ConfigRandom(Base, metaclass=ConfigMeta):
     """
 
     # RRandom.
-    _rrandom_dict: dict[int, RandomSeed] = {}
+    _rrandom_dict: dict[int, 'RandomSeed'] = {}
 
 
 class RandomSeed(Base):

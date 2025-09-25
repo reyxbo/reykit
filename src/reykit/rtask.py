@@ -45,6 +45,9 @@ __all__ = (
 )
 
 
+type CallableCoroutine = Coroutine | ATask | Callable[[], Coroutine]
+
+
 class ThreadPool(Base):
     """
     Thread pool type.
@@ -307,26 +310,51 @@ class ThreadPool(Base):
 def async_run(
     coroutine: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
     *,
-    return_exceptions: bool = False
+    before: CallableCoroutine | None = None,
+    after: CallableCoroutine | None = None,
+    return_exc: bool = False
 ) -> T: ...
 
 @overload
 def async_run(
-    *coroutines: Coroutine[Any, Any, T] | ATask[Any, Any, T] |  Callable[[], Coroutine[Any, Any, T]],
-    return_exceptions: bool = False
+    *coroutines: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
+    before: CallableCoroutine | None = None,
+    after: CallableCoroutine | None = None,
+    return_exc: bool = False
 ) -> list[T]: ...
 
+@overload
 def async_run(
-    *coroutines: Coroutine[Any, Any, T] | ATask[Any, Any, T] |  Callable[[], Coroutine[Any, Any, T]],
-    return_exceptions: bool = False
+    coroutine: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
+    *,
+    before: CallableCoroutine | None = None,
+    after: CallableCoroutine | None = None,
+    return_exc: Literal[True]
+) -> T | BaseException: ...
+
+@overload
+def async_run(
+    *coroutines: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
+    before: CallableCoroutine | None = None,
+    after: CallableCoroutine | None = None,
+    return_exc: Literal[True]
+) -> list[T] | BaseException: ...
+
+def async_run(
+    *coroutines: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
+    before: CallableCoroutine | None = None,
+    after: CallableCoroutine | None = None,
+    return_exc: bool = False
 ) -> T | list[T]:
     """
     Asynchronous run coroutines.
 
     Parameters
     ----------
-    coroutines : `Coroutine` instances or `ATask` instances or `Coroutine` function.
-    return_exceptions : Whether return exception instances, otherwise throw first exception.
+    coroutines : `Coroutine` instances or `ATask` instances or `Coroutine` functions.
+    before : `Coroutine` instance or `ATask` instance or `Coroutine` function of execute before execute.
+    after : `Coroutine` instance or `ATask` instance or `Coroutine` function of execute after execute.
+    return_exc : Whether return exception instances, otherwise throw first exception.
 
     Returns
     -------
@@ -340,9 +368,14 @@ def async_run(
         else coroutine
         for coroutine in coroutines
     ]
+    if asyncio_iscoroutinefunction(before):
+        before = before()
+    if asyncio_iscoroutinefunction(after):
+        after = after()
+
 
     # Define.
-    async def async_run_coroutine() -> list:
+    async def async_run_coroutine() -> list[T]:
         """
         Asynchronous run coroutines.
 
@@ -351,8 +384,16 @@ def async_run(
         Run result list.
         """
 
+        # Before.
+        if before is not None:
+            await before
+
         # Gather.
-        results = await asyncio_gather(*coroutines, return_exceptions=return_exceptions)
+        results: list[T] = await asyncio_gather(*coroutines, return_exceptions=return_exc)
+
+        # After.
+        if after is not None:
+            await after
 
         return results
 
@@ -488,6 +529,94 @@ async def async_wait(
     return tm.total_spend
 
 
+@overload
+async def async_request(
+    url: str,
+    params: dict | None = None,
+    data: dict | str | bytes | None = None,
+    *,
+    headers: dict[str, str] = {},
+    timeout: float | None = None,
+    proxy: str | None = None,
+    ssl: bool = False,
+    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = None,
+    check: bool | int | Iterable[int] = False
+) -> bytes: ...
+
+@overload
+async def async_request(
+    url: str,
+    params: dict | None = None,
+    *,
+    json: dict | None = None,
+    headers: dict[str, str] = {},
+    timeout: float | None = None,
+    proxy: str | None = None,
+    ssl: bool = False,
+    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = None,
+    check: bool | int | Iterable[int] = False
+) -> bytes: ...
+
+@overload
+async def async_request(
+    url: str,
+    params: dict | None = None,
+    data: dict | str | bytes | None = None,
+    *,
+    headers: dict[str, str] = {},
+    timeout: float | None = None,
+    proxy: str | None = None,
+    ssl: bool = False,
+    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = None,
+    check: bool | int | Iterable[int] = False,
+    handler: tuple[str]
+) -> list: ...
+
+@overload
+async def async_request(
+    url: str,
+    params: dict | None = None,
+    *,
+    json: dict | None = None,
+    headers: dict[str, str] = {},
+    timeout: float | None = None,
+    proxy: str | None = None,
+    ssl: bool = False,
+    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = None,
+    check: bool | int | Iterable[int] = False,
+    handler: tuple[str]
+) -> list: ...
+
+@overload
+async def async_request(
+    url: str,
+    params: dict | None = None,
+    data: dict | str | bytes | None = None,
+    *,
+    headers: dict[str, str] = {},
+    timeout: float | None = None,
+    proxy: str | None = None,
+    ssl: bool = False,
+    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = None,
+    check: bool | int | Iterable[int] = False,
+    handler: Callable[[ClientResponse], Coroutine[Any, Any, T] | T]
+) -> T: ...
+
+@overload
+async def async_request(
+    url: str,
+    params: dict | None = None,
+    *,
+    json: dict | None = None,
+    headers: dict[str, str] = {},
+    timeout: float | None = None,
+    proxy: str | None = None,
+    ssl: bool = False,
+    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = None,
+    check: bool | int | Iterable[int] = False,
+    handler: Callable[[ClientResponse], Coroutine[Any, Any, T] | T]
+) -> T: ...
+
 async def async_request(
     url: str,
     params: dict | None = None,
@@ -496,6 +625,7 @@ async def async_request(
     headers: dict[str, str] = {},
     timeout: float | None = None,
     proxy: str | None = None,
+    ssl: bool = False,
     method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = None,
     check: bool | int | Iterable[int] = False,
     handler: str | tuple[str] | Callable[[ClientResponse], Coroutine | Any] | None = None
@@ -521,6 +651,7 @@ async def async_request(
     headers : Request header data.
     timeout : Request maximun waiting time.
     proxy : Proxy URL.
+    ssl : Whether verify SSL certificate.
     method : Request method.
         - `None`: Automatic judge.
             When parameter `data` or `json` not has value, then request method is `get`.
@@ -571,7 +702,8 @@ async def async_request(
             json=json,
             headers=headers,
             timeout=timeout,
-            proxy=proxy
+            proxy=proxy,
+            ssl=ssl
         ) as response:
 
             # Check code.

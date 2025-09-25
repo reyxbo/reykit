@@ -9,9 +9,6 @@
 """
 
 
-from __future__ import annotations
-
-
 __all__ = (
     'monkey_sqlalchemy_result_more_fetch',
     'monkey_sqlalchemy_row_index_field',
@@ -47,7 +44,6 @@ def monkey_sqlalchemy_result_more_fetch():
 
     # Import.
     from typing import Self
-    from types import MethodType
     from sqlalchemy.engine.cursor import CursorResult
     from pandas import DataFrame, NA, concat
     from .rbase import Base

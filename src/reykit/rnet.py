@@ -211,22 +211,8 @@ def get_content_type(file: str | bytes) -> str | None:
 def request(
     url: str,
     params: dict | None = None,
+    data: dict | str | bytes | None = None,
     *,
-    headers: dict[str, str] = {},
-    timeout: float | None = None,
-    proxies: dict[str, str] = {},
-    stream: bool = False,
-    verify: bool = False,
-    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] = Literal['get'],
-    check: bool | int | Iterable[int] = False
-) -> Response: ...
-
-@overload
-def request(
-    url: str,
-    params: dict | None = None,
-    *,
-    data: dict | str | bytes,
     files: dict[str, str | bytes | tuple[str | bytes, dict]] | None = None,
     headers: dict[str, str] = {},
     timeout: float | None = None,
@@ -237,28 +223,13 @@ def request(
     check: bool | int | Iterable[int] = False
 ) -> Response: ...
 
-@overload
-def request(
-    url: str,
-    params: dict | None = None,
-    *,
-    data: dict | str | bytes | None = None,
-    files: dict[str, str | bytes | tuple[str | bytes, dict]],
-    headers: dict[str, str] = {},
-    timeout: float | None = None,
-    proxies: dict[str, str] = {},
-    stream: bool = False,
-    verify: bool = False,
-    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = Literal['post'],
-    check: bool | int | Iterable[int] = False
-) -> Response: ...
 
 @overload
 def request(
     url: str,
     params: dict | None = None,
     *,
-    json: dict,
+    json: dict | None = None,
     headers: dict[str, str] = {},
     timeout: float | None = None,
     proxies: dict[str, str] = {},
@@ -312,7 +283,7 @@ def request(
         - `None`: No setup.
         - `dict[str, str]`: Name and use IP of each protocol.
     stream : Whether use stream request.
-    verify : Whether verify certificate.
+    verify : Whether verify SSL certificate.
     method : Request method.
         - `None`: Automatic judge.
             When parameter `data` or `json` or `files` not has value, then request method is `get`.

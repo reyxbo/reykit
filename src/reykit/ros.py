@@ -9,7 +9,6 @@
 """
 
 
-from __future__ import annotations
 from typing import Any, Literal, TextIO, BinaryIO, overload, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import OpenTextMode, OpenBinaryMode
@@ -297,7 +296,7 @@ def read_file_bytes(source: FileSourceBytes) -> bytes:
     return file_bytes
 
 
-def read_toml(path: str | File) -> dict[str, Any]:
+def read_toml(path: 'str | File') -> dict[str, Any]:
     """
     Read and parse TOML file.
     Treat nan as a None or null value.
@@ -353,12 +352,12 @@ class File(Base):
 
 
     @overload
-    def open(self, mode: OpenBinaryMode = 'wb+') -> BinaryIO: ...
+    def open(self, mode: 'OpenBinaryMode' = 'wb+') -> BinaryIO: ...
 
     @overload
-    def open(self, mode: OpenTextMode, encode: str = 'utf-8') -> TextIO: ...
+    def open(self, mode: 'OpenTextMode', encode: str = 'utf-8') -> TextIO: ...
 
-    def open(self, mode: OpenTextMode | OpenBinaryMode = 'wb+', encode: str = 'utf-8') -> TextIO | BinaryIO:
+    def open(self, mode: 'OpenTextMode | OpenBinaryMode' = 'wb+', encode: str = 'utf-8') -> TextIO | BinaryIO:
         """
         Open file.
 
@@ -824,7 +823,7 @@ class File(Base):
         return file_bytes
 
 
-    def __contains__(self, value: str | bytes) -> bool:
+    def __contains__(self, value: 'str | bytes') -> bool:
         """
         Judge if file text contain value.
 

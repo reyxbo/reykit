@@ -54,7 +54,7 @@ def monkey_sqlalchemy_result_more_fetch():
 
     # Add.
     @property
-    def method_data(self: Result) -> Self:
+    def method_data(self: 'Result') -> Self:
         """
         Get Data.
 
@@ -79,7 +79,7 @@ def monkey_sqlalchemy_result_more_fetch():
     CursorResult.to_excel = Table.to_excel
 
 
-    def method_show(self: Result, limit: int | None = None) -> None:
+    def method_show(self: 'Result', limit: int | None = None) -> None:
         """
         Print result.
 
@@ -131,7 +131,7 @@ def monkey_sqlalchemy_result_more_fetch():
 
 
     @property
-    def method_exist(self: Result) -> bool:
+    def method_exist(self: 'Result') -> bool:
         """
         Judge whether is exist row.
 
@@ -150,7 +150,7 @@ def monkey_sqlalchemy_result_more_fetch():
 
 
     @property
-    def method_empty(self: Result) -> bool:
+    def method_empty(self: 'Result') -> bool:
         """
         Judge whether is empty row.
 

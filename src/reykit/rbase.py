@@ -35,7 +35,6 @@ __all__ = (
     'ConfigMeta',
     'Singleton',
     'Null',
-    'null',
     'ErrorBase',
     'Exit',
     'Error',
@@ -205,13 +204,10 @@ class Singleton(Base):
         return self._instance
 
 
-class Null(Singleton):
+class Null(Base, metaclass=StaticMeta):
     """
     Null type.
     """
-
-
-null = Null()
 
 
 class ErrorBase(Base, BaseException):
@@ -591,7 +587,7 @@ def get_first_notnone(*values: None) -> NoReturn: ...
 @overload
 def get_first_notnone(*values: T) -> T: ...
 
-def get_first_notnone(*values: T, default: U = null) -> T | U:
+def get_first_notnone(*values: T, default: U | Null = Null) -> T | U:
     """
     Get the first value that is not `None`.
 
@@ -600,7 +596,7 @@ def get_first_notnone(*values: T, default: U = null) -> T | U:
     values : Check values.
     default : When all are `None`, then return this is value, or throw exception.
         - `Any`: Return this is value.
-        - `Literal['exception']`: Throw exception.
+        - `Null`: Throw exception.
 
     Returns
     -------
@@ -613,7 +609,7 @@ def get_first_notnone(*values: T, default: U = null) -> T | U:
             return value
 
     # Throw exception.
-    if default == null:
+    if default == Null:
         vars_name: list[str] = get_varname('values')
         if vars_name is not None:
             vars_name_de_dup = list(set(vars_name))

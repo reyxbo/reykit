@@ -11,12 +11,12 @@
 
 from typing import Any, TypedDict, Literal, overload
 from collections import Counter, defaultdict as Defaultdict, ChainMap
-from collections.abc import Callable, Iterable, Generator
+from collections.abc import Callable, Iterable, Generator, AsyncGenerator
 from itertools import chain as IChain
 from decimal import Decimal
 from json import dumps as json_dumps
 
-from .rbase import T, KT, VT, Base, null, check_least_one, check_most_one, is_iterable
+from .rbase import T, KT, VT, Base, Null, check_least_one, check_most_one, is_iterable
 
 
 __all__ = (
@@ -337,14 +337,14 @@ def chain(*iterables: dict[KT, VT] | Iterable[T]) -> ChainMap[KT, VT] | IChain[T
     return data
 
 
-def default_dict(default: T = null, data: dict[KT, VT] | None = None) -> Defaultdict[KT, VT | T]:
+def default_dict(default: T | Null = Null, data: dict[KT, VT] | None = None) -> Defaultdict[KT, VT | T]:
     """
     Set `dict` instance, default value when key does not exist.
 
     Parameters
     ----------
     default : Default value.
-        - `Literal[null]`: Nest function self.
+        - `Null`: Nest function self.
         - `Callable`: Use call return value.
     data : `dict` instance.
         - `None`: Empty `dict`.
@@ -353,7 +353,7 @@ def default_dict(default: T = null, data: dict[KT, VT] | None = None) -> Default
     # Handle parameter.
 
     ## Null.
-    if default == null:
+    if default == Null:
         default_factory = default_dict
 
     ## Callable.
@@ -408,12 +408,35 @@ class FunctionGenerator(Base):
         self.args = args
         self.kwargs = kwargs
         self.params: list[tuple[tuple, dict]] = []
-        self.generator = self.__generator()
 
 
-    def __generator(self) -> Generator[Any, Any, None]:
+    def generator(self) -> Generator[Any, Any, None]:
         """
         Create generator.
+
+        Parameters
+        ----------
+        Generator.
+        """
+
+        # Loop.
+        while True:
+
+            # Break.
+            if self.params == []:
+                break
+
+            # Generate.
+            args, kwargs = self.params.pop(0)
+            result = self.func(*args, **kwargs)
+
+            # Return.
+            yield result
+
+
+    async def agenerator(self) -> AsyncGenerator[Any, Any]:
+        """
+        Asynchronous create generator.
 
         Parameters
         ----------
@@ -480,7 +503,8 @@ class FunctionGenerator(Base):
         """
 
         # Generate.
-        result = next(self.generator)
+        generator = self.generator()
+        result = next(generator)
 
         return result
 
@@ -491,4 +515,33 @@ class FunctionGenerator(Base):
         """
 
         # Iterating.
-        return self.generator
+        generator = self.generator()
+
+        return generator
+
+
+    async def __anext__(self) -> Any:
+        """
+        Asynchronous generate once from generator.
+
+        Returns
+        -------
+        Generate value.
+        """
+
+        # Generate.
+        agenerator = await self.agenerator()
+        result = anext(agenerator)
+
+        return result
+
+
+    async def __aiter__(self) -> AsyncGenerator[Any, Any]:
+        """
+        Asynchronous iterating generator.
+        """
+
+        # Iterating.
+        agenerator = await self.agenerator()
+
+        return agenerator

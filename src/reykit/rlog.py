@@ -29,7 +29,7 @@ from logging import (
 from logging.handlers import QueueHandler
 from concurrent_log_handler import ConcurrentRotatingFileHandler, ConcurrentTimedRotatingFileHandler
 
-from .rbase import Base, ConfigMeta, null, throw, catch_exc, get_first_notnone, get_stack_param
+from .rbase import Base, ConfigMeta, Null, throw, catch_exc, get_first_notnone, get_stack_param
 from .rre import search, sub
 from .rstdout import ConfigStdout, modify_print, reset_print
 from .rtext import to_text
@@ -954,7 +954,7 @@ class Mark(Base):
         self.data: dict[Hashable, set[int]] = {}
 
 
-    def mark(self, obj: Any, group: Hashable = null) -> int:
+    def mark(self, obj: Any, group: Hashable | Null = Null) -> int:
         """
         Mark object.
 
@@ -978,7 +978,7 @@ class Mark(Base):
         return obj_id
 
 
-    def remove(self, obj: Any, group: Hashable = null) -> None:
+    def remove(self, obj: Any, group: Hashable | Null = Null) -> None:
         """
         Whether marked.
 
@@ -1017,7 +1017,7 @@ class Mark(Base):
         del self.data[group]
 
 
-    def is_marked(self, obj: Any, group: Hashable = null) -> bool:
+    def is_marked(self, obj: Any, group: Hashable | Null = Null) -> bool:
         """
         Whether marked.
 

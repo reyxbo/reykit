@@ -165,7 +165,7 @@ class Schedule(Base):
                     (self.db_names['base'], self.db_names['base.schedule']),
                     data
                 )
-                id_ = conn.insert_id
+                id_ = conn.insert_id()
 
             # Try execute.
 

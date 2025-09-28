@@ -312,7 +312,7 @@ def async_run(
     *,
     before: CallableCoroutine | None = None,
     after: CallableCoroutine | None = None,
-    return_exc: bool = False
+    return_exc: Literal[False] = False
 ) -> T: ...
 
 @overload
@@ -320,7 +320,7 @@ def async_run(
     *coroutines: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
     before: CallableCoroutine | None = None,
     after: CallableCoroutine | None = None,
-    return_exc: bool = False
+    return_exc: Literal[False] = False
 ) -> list[T]: ...
 
 @overload
@@ -338,14 +338,14 @@ def async_run(
     before: CallableCoroutine | None = None,
     after: CallableCoroutine | None = None,
     return_exc: Literal[True]
-) -> list[T] | BaseException: ...
+) -> list[T | BaseException]: ...
 
 def async_run(
     *coroutines: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
     before: CallableCoroutine | None = None,
     after: CallableCoroutine | None = None,
     return_exc: bool = False
-) -> T | list[T]:
+) -> T | BaseException | list[T | BaseException]:
     """
     Asynchronous run coroutines.
 
@@ -375,7 +375,7 @@ def async_run(
 
 
     # Define.
-    async def async_run_coroutine() -> list[T]:
+    async def async_run_coroutine() -> list[T | BaseException]:
         """
         Asynchronous run coroutines.
 
@@ -389,7 +389,7 @@ def async_run(
             await before
 
         # Gather.
-        results: list[T] = await asyncio_gather(*coroutines, return_exceptions=return_exc)
+        results: list[T | BaseException] = await asyncio_gather(*coroutines, return_exceptions=return_exc)
 
         # After.
         if after is not None:

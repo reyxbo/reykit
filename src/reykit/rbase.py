@@ -30,6 +30,7 @@ __all__ = (
     'KT',
     'VT',
     'CallableT',
+    'CoroutineFunctionT',
     'Base',
     'StaticMeta',
     'ConfigMeta',

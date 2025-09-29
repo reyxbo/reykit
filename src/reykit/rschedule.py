@@ -162,7 +162,7 @@ class Schedule(Base):
             with self.database.connect() as conn:
                 conn = self.database.connect()
                 conn.execute.insert(
-                    (self.db_names['base'], self.db_names['base.schedule']),
+                    self.db_names['base.schedule'],
                     data
                 )
                 id_ = conn.insert_id()
@@ -182,7 +182,7 @@ class Schedule(Base):
                     'status': 2
                 }
                 self.database.execute.update(
-                    (self.db_names['base'], self.db_names['base.schedule']),
+                    self.db_names['base.schedule'],
                     data
                 )
                 raise
@@ -194,7 +194,7 @@ class Schedule(Base):
                     'status': 1
                 }
                 self.database.execute.update(
-                    (self.db_names['base'], self.db_names['base.schedule']),
+                    self.db_names['base.schedule'],
                     data
                 )
 
@@ -375,7 +375,7 @@ class Schedule(Base):
 
     def build_db(self) -> None:
         """
-        Check and build all standard databases and tables, by `self.db_names`.
+        Check and build database tables, by `self.db_names`.
         """
 
         # Check.

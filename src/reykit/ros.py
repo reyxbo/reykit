@@ -148,20 +148,20 @@ def get_md5(data: str | bytes) -> str:
     return md5
 
 
-def make_dir(*paths: str, report: bool = False) -> None:
+def make_dir(*paths: str, echo: bool = False) -> None:
     """
     Make directorys.
 
     Parameters
     ----------
     paths : Folder paths.
-    report : Whether report the creation process.
+    echo : Whether report the creation process.
     """
 
     # Create.
     for path in paths:
         folder = Folder(path)
-        folder.make(report)
+        folder.make(echo)
 
 
 def find_relpath(abspath: str, relpath: str) -> str:
@@ -1032,13 +1032,13 @@ class Folder(Base):
         return path
 
 
-    def make(self, report: bool = False) -> None:
+    def make(self, echo: bool = False) -> None:
         """
         Create folders.
 
         Parameters
         ----------
-        report : Whether report the creation process.
+        echo : Whether report the creation process.
         """
 
         # Exist.
@@ -1052,7 +1052,7 @@ class Folder(Base):
             text = 'Directory creation complete | %s' % self.path
 
         # Report.
-        if report:
+        if echo:
             print(text)
 
 

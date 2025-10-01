@@ -17,7 +17,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.job import Job
 from reydb import rorm
-from reydb.rdb import Database, DatabaseAsync
+from reydb.rdb import Database
 
 from .rbase import Base, throw
 
@@ -35,6 +35,7 @@ class Schedule(Base):
     Attributes
     ----------
     db_names : Database table name mapping dictionary.
+    Error : Database `schedule` table model.
     """
 
     db_names = {
@@ -43,13 +44,23 @@ class Schedule(Base):
     }
 
 
+    class Schedule(rorm.Model, table=True):
+        __comment__ = 'Schedule execute record table.'
+        create_time: rorm.Datetime = rorm.Field(field_default='CURRENT_TIMESTAMP', not_null=True, index_n=True, comment='Record create time.')
+        update_time: rorm.Datetime = rorm.Field(field_default='CURRENT_TIMESTAMP', index_n=True, comment='Record update time.')
+        id: int = rorm.Field(field_type=rorm.types_mysql.INTEGER(unsigned=True), key_auto=True, comment='ID.')
+        status: str = rorm.Field(field_type=rorm.types_mysql.TINYINT(unsigned=True), not_null=True, comment='Schedule status, 0 is executing, 1 is completed, 2 is occurred error.')
+        task: str = rorm.Field(field_type=rorm.types.VARCHAR(100), not_null=True, comment='Schedule task function name.')
+        note: str = rorm.Field(field_type=rorm.types.VARCHAR(500), comment='Schedule note.')
+
+
     def __init__(
         self,
         max_workers: int = 10,
         max_instances: int = 1,
         coalesce: bool = True,
         block: bool = False,
-        db: Database | DatabaseAsync | None = None
+        db: Database | None = None
     ) -> None:
         """
         Build instance attributes.
@@ -93,6 +104,103 @@ class Schedule(Base):
         self.db = db
 
 
+    def handle_build_db(self) -> tuple[list[type[Schedule]], list[dict[str, Any]]]:
+        """
+        Handle method of check and build database tables, by `self.db_names`.
+
+        Returns
+        -------
+        Build database parameter.
+        """
+
+        # Check.
+        if self.db is None:
+            throw(ValueError, self.db)
+
+        # Set parameter.
+        self.Schedule._name(self.db_names['schedule'])
+
+        ## Table.
+        tables = [self.Schedule]
+
+        ## View stats.
+        views_stats = [
+            {
+                'path': self.db_names['stats_schedule'],
+                'items': [
+                    {
+                        'name': 'count',
+                        'select': (
+                            'SELECT COUNT(1)\n'
+                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`'
+                        ),
+                        'comment': 'Schedule count.'
+                    },
+                    {
+                        'name': 'past_day_count',
+                        'select': (
+                            'SELECT COUNT(1)\n'
+                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`\n'
+                            'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) = 0'
+                        ),
+                        'comment': 'Schedule count in the past day.'
+                    },
+                    {
+                        'name': 'past_week_count',
+                        'select': (
+                            'SELECT COUNT(1)\n'
+                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`\n'
+                            'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) <= 6'
+                        ),
+                        'comment': 'Schedule count in the past week.'
+                    },
+                    {
+                        'name': 'past_month_count',
+                        'select': (
+                            'SELECT COUNT(1)\n'
+                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`\n'
+                            'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) <= 29'
+                        ),
+                        'comment': 'Schedule count in the past month.'
+                    },
+                    {
+                        'name': 'task_count',
+                        'select': (
+                            'SELECT COUNT(DISTINCT `task`)\n'
+                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`'
+                        ),
+                        'comment': 'Task count.'
+                    },
+                    {
+                        'name': 'last_time',
+                        'select': (
+                            'SELECT IFNULL(MAX(`update_time`), MAX(`create_time`))\n'
+                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`'
+                        ),
+                        'comment': 'Schedule last record time.'
+                    }
+                ]
+            }
+        ]
+
+        return tables, views_stats
+
+
+    def build_db(self) -> None:
+        """
+        Check and build database tables, by `self.db_names`.
+        """
+
+        # Get parameter.
+        tables, views_stats = self.handle_build_db()
+
+        # Build.
+        self.db.build.build(tables=tables, views_stats=views_stats, skip=True)
+
+        # ## Error.
+        self.db.error.build_db()
+
+
     def pause(self) -> None:
         """
         Pause scheduler.
@@ -124,6 +232,9 @@ class Schedule(Base):
         jobs = self.scheduler.get_jobs()
 
         return jobs
+
+
+    __iter__ = tasks
 
 
     def wrap_record_db(
@@ -374,96 +485,3 @@ class Schedule(Base):
 
         # Resume.
         self.scheduler.resume_job(id_)
-
-
-    def build_db(self) -> None:
-        """
-        Check and build database tables, by `self.db_names`.
-        """
-
-        # Check.
-        if self.db is None:
-            throw(ValueError, self.db)
-
-        # Set parameter.
-
-        ## Table.
-        class Schedule(rorm.Model, table=True):
-            __name__ = self.db_names['schedule']
-            __comment__ = 'Schedule execute record table.'
-            create_time: rorm.Datetime = rorm.Field(field_default='CURRENT_TIMESTAMP', not_null=True, index_n=True, comment='Record create time.')
-            update_time: rorm.Datetime = rorm.Field(field_default='CURRENT_TIMESTAMP', index_n=True, comment='Record update time.')
-            id: int = rorm.Field(field_type=rorm.types_mysql.INTEGER(unsigned=True), key_auto=True, comment='ID.')
-            status: str = rorm.Field(field_type=rorm.types_mysql.TINYINT(unsigned=True), not_null=True, comment='Schedule status, 0 is executing, 1 is completed, 2 is occurred error.')
-            task: str = rorm.Field(field_type=rorm.types.VARCHAR(100), not_null=True, comment='Schedule task function name.')
-            note: str = rorm.Field(field_type=rorm.types.VARCHAR(500), comment='Schedule note.')
-        tables = [Schedule]
-
-        ## View stats.
-        views_stats = [
-            {
-                'path': self.db_names['stats_schedule'],
-                'items': [
-                    {
-                        'name': 'count',
-                        'select': (
-                            'SELECT COUNT(1)\n'
-                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`'
-                        ),
-                        'comment': 'Schedule count.'
-                    },
-                    {
-                        'name': 'past_day_count',
-                        'select': (
-                            'SELECT COUNT(1)\n'
-                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`\n'
-                            'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) = 0'
-                        ),
-                        'comment': 'Schedule count in the past day.'
-                    },
-                    {
-                        'name': 'past_week_count',
-                        'select': (
-                            'SELECT COUNT(1)\n'
-                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`\n'
-                            'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) <= 6'
-                        ),
-                        'comment': 'Schedule count in the past week.'
-                    },
-                    {
-                        'name': 'past_month_count',
-                        'select': (
-                            'SELECT COUNT(1)\n'
-                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`\n'
-                            'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) <= 29'
-                        ),
-                        'comment': 'Schedule count in the past month.'
-                    },
-                    {
-                        'name': 'task_count',
-                        'select': (
-                            'SELECT COUNT(DISTINCT `task`)\n'
-                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`'
-                        ),
-                        'comment': 'Task count.'
-                    },
-                    {
-                        'name': 'last_time',
-                        'select': (
-                            'SELECT IFNULL(MAX(`update_time`), MAX(`create_time`))\n'
-                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`'
-                        ),
-                        'comment': 'Schedule last record time.'
-                    }
-                ]
-            }
-        ]
-
-        # Build.
-        self.db.build.build(tables=tables, views_stats=views_stats, skip=True)
-
-        ## Error.
-        self.db.error.build_db()
-
-
-    __iter__ = tasks

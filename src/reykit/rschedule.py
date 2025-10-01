@@ -23,12 +23,12 @@ from .rbase import Base, throw
 
 
 __all__ = (
-    'TableSchedule',
+    'DatabaseTableSchedule',
     'Schedule'
 )
 
 
-class TableSchedule(rorm.Model, table=True):
+class DatabaseTableSchedule(rorm.Model, table=True):
     """
     Database `schedule` table model.
     """
@@ -108,7 +108,7 @@ class Schedule(Base):
         self.db = db
 
 
-    def handle_build_db(self) -> tuple[list[type[TableSchedule]], list[dict[str, Any]]]:
+    def handle_build_db(self) -> tuple[list[type[DatabaseTableSchedule]], list[dict[str, Any]]]:
         """
         Handle method of check and build database tables, by `self.db_names`.
 
@@ -122,10 +122,10 @@ class Schedule(Base):
             throw(ValueError, self.db)
 
         # Set parameter.
-        TableSchedule._set_name(self.db_names['schedule'])
 
         ## Table.
-        tables = [TableSchedule]
+        DatabaseTableSchedule._set_name(self.db_names['schedule'])
+        tables = [DatabaseTableSchedule]
 
         ## View stats.
         views_stats = [

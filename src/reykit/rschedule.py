@@ -35,7 +35,7 @@ class DatabaseTableSchedule(rorm.Model, table=True):
 
     __comment__ = 'Schedule execute record table.'
     create_time: rorm.Datetime = rorm.Field(field_default='CURRENT_TIMESTAMP', not_null=True, index_n=True, comment='Record create time.')
-    update_time: rorm.Datetime = rorm.Field(field_default='CURRENT_TIMESTAMP', index_n=True, comment='Record update time.')
+    update_time: rorm.Datetime = rorm.Field(field_default='ON UPDATE CURRENT_TIMESTAMP', index_n=True, comment='Record update time.')
     id: int = rorm.Field(field_type=rorm.types_mysql.INTEGER(unsigned=True), key_auto=True, comment='ID.')
     status: str = rorm.Field(field_type=rorm.types_mysql.TINYINT(unsigned=True), not_null=True, comment='Schedule status, 0 is executing, 1 is completed, 2 is occurred error.')
     task: str = rorm.Field(field_type=rorm.types.VARCHAR(100), not_null=True, comment='Schedule task function name.')
@@ -75,7 +75,7 @@ class Schedule(Base):
         max_instances : Maximum number of synchronized executions of tasks with the same ID.
         coalesce : Whether to coalesce tasks with the same ID.
         block : Whether to block.
-        db : Database instance.
+        db : `Database` instance.
             - `None`: Not use database.
             - `Database`: Automatic record to database.
         """
@@ -108,13 +108,9 @@ class Schedule(Base):
         self.db = db
 
 
-    def handle_build_db(self) -> tuple[list[type[DatabaseTableSchedule]], list[dict[str, Any]]]:
+    def build_db(self) -> None:
         """
-        Handle method of check and build database tables, by `self.db_names`.
-
-        Returns
-        -------
-        Build database parameter.
+        Check and build database tables, by `self.db_names`.
         """
 
         # Check.
@@ -186,17 +182,6 @@ class Schedule(Base):
                 ]
             }
         ]
-
-        return tables, views_stats
-
-
-    def build_db(self) -> None:
-        """
-        Check and build database tables, by `self.db_names`.
-        """
-
-        # Get parameter.
-        tables, views_stats = self.handle_build_db()
 
         # Build.
         self.db.build.build(tables=tables, views_stats=views_stats, skip=True)

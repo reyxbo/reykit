@@ -23,8 +23,23 @@ from .rbase import Base, throw
 
 
 __all__ = (
-    'Schedule',
+    'TableSchedule',
+    'Schedule'
 )
+
+
+class TableSchedule(rorm.Model, table=True):
+    """
+    Database `schedule` table model.
+    """
+
+    __comment__ = 'Schedule execute record table.'
+    create_time: rorm.Datetime = rorm.Field(field_default='CURRENT_TIMESTAMP', not_null=True, index_n=True, comment='Record create time.')
+    update_time: rorm.Datetime = rorm.Field(field_default='CURRENT_TIMESTAMP', index_n=True, comment='Record update time.')
+    id: int = rorm.Field(field_type=rorm.types_mysql.INTEGER(unsigned=True), key_auto=True, comment='ID.')
+    status: str = rorm.Field(field_type=rorm.types_mysql.TINYINT(unsigned=True), not_null=True, comment='Schedule status, 0 is executing, 1 is completed, 2 is occurred error.')
+    task: str = rorm.Field(field_type=rorm.types.VARCHAR(100), not_null=True, comment='Schedule task function name.')
+    note: str = rorm.Field(field_type=rorm.types.VARCHAR(500), comment='Schedule note.')
 
 
 class Schedule(Base):
@@ -35,23 +50,12 @@ class Schedule(Base):
     Attributes
     ----------
     db_names : Database table name mapping dictionary.
-    Error : Database `schedule` table model.
     """
 
     db_names = {
         'schedule': 'schedule',
         'stats_schedule': 'stats_schedule'
     }
-
-
-    class Schedule(rorm.Model, table=True):
-        __comment__ = 'Schedule execute record table.'
-        create_time: rorm.Datetime = rorm.Field(field_default='CURRENT_TIMESTAMP', not_null=True, index_n=True, comment='Record create time.')
-        update_time: rorm.Datetime = rorm.Field(field_default='CURRENT_TIMESTAMP', index_n=True, comment='Record update time.')
-        id: int = rorm.Field(field_type=rorm.types_mysql.INTEGER(unsigned=True), key_auto=True, comment='ID.')
-        status: str = rorm.Field(field_type=rorm.types_mysql.TINYINT(unsigned=True), not_null=True, comment='Schedule status, 0 is executing, 1 is completed, 2 is occurred error.')
-        task: str = rorm.Field(field_type=rorm.types.VARCHAR(100), not_null=True, comment='Schedule task function name.')
-        note: str = rorm.Field(field_type=rorm.types.VARCHAR(500), comment='Schedule note.')
 
 
     def __init__(
@@ -104,7 +108,7 @@ class Schedule(Base):
         self.db = db
 
 
-    def handle_build_db(self) -> tuple[list[type[Schedule]], list[dict[str, Any]]]:
+    def handle_build_db(self) -> tuple[list[type[TableSchedule]], list[dict[str, Any]]]:
         """
         Handle method of check and build database tables, by `self.db_names`.
 
@@ -118,10 +122,10 @@ class Schedule(Base):
             throw(ValueError, self.db)
 
         # Set parameter.
-        self.Schedule._name(self.db_names['schedule'])
+        TableSchedule._set_name(self.db_names['schedule'])
 
         ## Table.
-        tables = [self.Schedule]
+        tables = [TableSchedule]
 
         ## View stats.
         views_stats = [

@@ -44,7 +44,7 @@ class Email(Base):
         password : Email password.
         """
 
-        # Handle parameter.
+        # Set parameter.
         host, port = self.get_server_address(username)
 
         # Set attribute.
@@ -121,7 +121,7 @@ class Email(Base):
         show_cc : Show carbon copy email addresses list.
         """
 
-        # Handle parameter.
+        # Set parameter.
         if type(show_to) == list:
             show_to = ','.join(show_to)
         if type(show_cc) == list:
@@ -208,7 +208,7 @@ class Email(Base):
             - `list[str]`: Email addresses list.
         """
 
-        # Handle parameter.
+        # Set parameter.
 
         ## To.
         if type(to) == str:

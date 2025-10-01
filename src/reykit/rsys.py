@@ -256,7 +256,7 @@ def get_cmd_var(*vars: Any) -> list[Any]:
     10 [20, 21] 3
     """
 
-    # Handle parameter.
+    # Set parameter.
     vars_name: list[str] = get_varname('vars')
     vars_info = tuple(zip(vars_name, vars))
 
@@ -524,7 +524,7 @@ def search_process(
     List of process instances that match any condition.
     """
 
-    # Handle parameter.
+    # Set parameter.
     match id_:
         case None:
             ids = []
@@ -610,7 +610,7 @@ def kill_process(
     List of process instances that match any condition.
     """
 
-    # Handle parameter.
+    # Set parameter.
     self_pid = os_getpid()
 
     # Search.
@@ -648,7 +648,7 @@ def pause_process(
     List of process instances that match any condition.
     """
 
-    # Handle parameter.
+    # Set parameter.
     self_pid = os_getpid()
 
     # Search.
@@ -710,7 +710,7 @@ def get_idle_port(min: int = 49152) -> int:
     Idle port number.
     """
 
-    # Handle parameter.
+    # Set parameter.
     network_table = get_network_table()
     ports = [
         info['local_port']

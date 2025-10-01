@@ -114,7 +114,7 @@ class Log(Base):
         Stack parameters.
         """
 
-        # Handle parameter.
+        # Set parameter.
         stack_params = get_stack_param('full', 12)
         stack_param = stack_params[-1]
 
@@ -419,7 +419,7 @@ class Log(Base):
         Handler.
         """
 
-        # Handle parameter.
+        # Set parameter.
         format_ = get_first_notnone(format_, self.default_format)
         filter_ = filter_ or self.get_default_filter_method(format_, 'print')
 
@@ -498,7 +498,7 @@ class Log(Base):
         Handler.
         """
 
-        # Handle parameter.
+        # Set parameter.
         format_ = get_first_notnone(format_, self.default_format)
         path = path or self.name
         filter_ = filter_ or self.get_default_filter_method(format_, 'file')
@@ -766,7 +766,7 @@ class Log(Base):
         params : Record Format parameters.
         """
 
-        # Handle parameter.
+        # Set parameter.
         if (
             level is None
             or catch
@@ -968,7 +968,7 @@ class Mark(Base):
         Object memory ID.
         """
 
-        # Handle parameter.
+        # Set parameter.
         obj_id = hash(obj)
         group_set = self.data.setdefault(group, set())
 
@@ -992,7 +992,7 @@ class Mark(Base):
         Judgment result.
         """
 
-        # Handle parameter.
+        # Set parameter.
         obj_id = hash(obj)
         group_set = self.data.setdefault(group, set())
 
@@ -1031,7 +1031,7 @@ class Mark(Base):
         Judgment result.
         """
 
-        # Handle parameter.
+        # Set parameter.
         obj_id = hash(obj)
         group_set = self.data.setdefault(group, set())
 

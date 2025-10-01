@@ -91,7 +91,7 @@ def format_path(path: str | None = None) -> str:
     Formatted path.
     """
 
-    # Handle parameter.
+    # Set parameter.
     path = path or ''
 
     # Format.
@@ -137,7 +137,7 @@ def get_md5(data: str | bytes) -> str:
     MD5 value.
     """
 
-    # Handle parameter.
+    # Set parameter.
     if type(data) == str:
         data = data.encode()
 
@@ -188,7 +188,7 @@ def find_relpath(abspath: str, relpath: str) -> str:
     C:/Folder1/Folder4/File.txt
     """
 
-    # Handle parameter.
+    # Set parameter.
     level = 0
     for char in relpath:
         if char == '.':
@@ -371,7 +371,7 @@ class File(Base):
         IO object.
         """
 
-        # Handle parameter.
+        # Set parameter.
         if 'b' in mode:
             encode = None
 
@@ -430,7 +430,7 @@ class File(Base):
         File data.
         """
 
-        # Handle parameter.
+        # Set parameter.
         match type_:
             case 'bytes':
                 mode = 'rb'
@@ -461,7 +461,7 @@ class File(Base):
         append : Whether append data, otherwise overwrite data.
         """
 
-        # Handle parameter.
+        # Set parameter.
 
         ## Write mode.
         if append:
@@ -528,7 +528,7 @@ class File(Base):
         New file path.
         """
 
-        # Handle parameter.
+        # Set parameter.
         move_path = join_path(self.dir, name)
 
         # Move.
@@ -836,7 +836,7 @@ class File(Base):
         Judge result.
         """
 
-        # Handle parameter.
+        # Set parameter.
         match value:
             case str():
                 content = self.str
@@ -1085,7 +1085,7 @@ class Folder(Base):
         New folder path.
         """
 
-        # Handle parameter.
+        # Set parameter.
         move_path = join_path(self.dir, name)
 
         # Move.
@@ -1287,7 +1287,7 @@ class TempFile(Base):
         type\\_ : File data type.
         """
 
-        # Handle parameter.
+        # Set parameter.
         match type_:
             case 'bytes':
                 mode = 'w+b'
@@ -1541,7 +1541,7 @@ class TempFile(Base):
         Judge result.
         """
 
-        # Handle parameter.
+        # Set parameter.
         content = self.read()
 
         # Judge.
@@ -1953,7 +1953,7 @@ class FileStore(Base):
         if self.folder:
             return
 
-        # Handle parameter.
+        # Set parameter.
         chars = '0123456789abcdef'
         subdir_names = [
             char1 + char2
@@ -1995,7 +1995,7 @@ class FileStore(Base):
         File path or not exist.
         """
 
-        # Handle parameter.
+        # Set parameter.
         name = name or md5
 
         # Not exist md5.
@@ -2037,7 +2037,7 @@ class FileStore(Base):
         Store file path.
         """
 
-        # Handle parameter.
+        # Set parameter.
         file_bytes = read_file_bytes(source)
         file_md5 = get_md5(file_bytes)
         name = name or file_md5
@@ -2123,7 +2123,7 @@ def doc_to_docx(path: str, save_path: str | None = None) -> str:
     # Import.
     from win32com.client import Dispatch, CDispatch
 
-    # Handle parameter.
+    # Set parameter.
     if save_path is None:
         pattern = '.[dD][oO][cC]'
         save_path = sub(
@@ -2245,7 +2245,7 @@ def extract_file_content(path: str) -> str:
     Content.
     """
 
-    # Handle parameter.
+    # Set parameter.
     _, suffix = os_splitext(path)
     suffix = suffix.lower()
     if suffix == '.doc':

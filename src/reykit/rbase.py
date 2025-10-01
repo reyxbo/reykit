@@ -320,7 +320,7 @@ def warn(
     stacklevel : Warning code location, number of recursions up the code level.
     """
 
-    # Handle parameter.
+    # Set parameter.
     if infos == ():
         infos = 'Warning!'
     elif len(infos) == 1:
@@ -347,7 +347,7 @@ def catch_exc() -> tuple[str, BaseException, StackSummary]:
         - `StackSummary`: Exception traceback stack instance.
     """
 
-    # Handle parameter.
+    # Set parameter.
     exc_text = format_exc()
     exc_text = exc_text.strip()
     _, exc, traceback = sys_exc_info()
@@ -854,7 +854,7 @@ def get_varname(argname: str, level: int = 1) -> str | list[str] | None:
         - `Throw VarnameException`: Return `None`.
     """
 
-    # Handle parameter.
+    # Set parameter.
     level += 1
 
     # Get.

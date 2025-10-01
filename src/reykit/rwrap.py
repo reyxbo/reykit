@@ -254,7 +254,7 @@ def wrap_thread(
     Thread instance.
     """
 
-    # Handle parameter.
+    # Set parameter.
     thread_name = '%s_%d' % (func.__name__, now('timestamp'))
 
     # Create thread.
@@ -411,7 +411,7 @@ def wrap_dos_command(
     Function return.
     """
 
-    # Handle parameter.
+    # Set parameter.
     arg_info = get_arg_info(func)
 
     # Set DOS command.
@@ -606,7 +606,7 @@ def wrap_redirect_stdout(
     Function return.
     """
 
-    # Handle parameter.
+    # Set parameter.
     if isinstance(redirect, IOBase):
         str_io = redirect
     else:

@@ -154,7 +154,7 @@ def number_ch(number: int) -> str:
         16: '兆'
     }
 
-    # Handle parameter.
+    # Set parameter.
     number_str = str(number)
 
     # Replace digit.

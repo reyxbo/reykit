@@ -189,7 +189,7 @@ class Table(Base):
         Dictionary.
         """
 
-        # Handle parameter.
+        # Set parameter.
         data = self.to_table()
 
         # Check.
@@ -241,7 +241,7 @@ class Table(Base):
         List.
         """
 
-        # Handle parameter.
+        # Set parameter.
         data = self.to_table()
 
         # Check.
@@ -276,7 +276,7 @@ class Table(Base):
         Formatted text.
         """
 
-        # Handle parameter.
+        # Set parameter.
         data = self.to_table()
 
         # Convert.
@@ -298,7 +298,7 @@ class Table(Base):
         JSON string.
         """
 
-        # Handle parameter.
+        # Set parameter.
         data = self.to_table()
 
         # Convert.
@@ -316,7 +316,7 @@ class Table(Base):
         SQL string.
         """
 
-        # Handle parameter.
+        # Set parameter.
         data = self.to_table()
         data = [
             {
@@ -364,7 +364,7 @@ class Table(Base):
         if type(self.data) == DataFrame:
             return self.data
 
-        # Handle parameter.
+        # Set parameter.
         data = self.to_table()
 
         # Convert.
@@ -382,7 +382,7 @@ class Table(Base):
         HTML string.
         """
 
-        # Handle parameter.
+        # Set parameter.
         data = self.to_df()
 
         # Convert.
@@ -405,7 +405,7 @@ class Table(Base):
         File absolute path.
         """
 
-        # Handle parameter.
+        # Set parameter.
         data = self.to_df()
         file = File(path)
         if file:
@@ -457,7 +457,7 @@ class Table(Base):
         >>> to_excel(data, 'file.xlsx', 'group', sheets_set)
         """
 
-        # Handle parameter.
+        # Set parameter.
         data = self.to_df()
         path = os_abspath(path)
 

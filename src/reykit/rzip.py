@@ -40,7 +40,7 @@ def compress(
     overwrite : Whether to overwrite.
     """
 
-    # Handle parameter.
+    # Set parameter.
     build_dir = Folder(build_dir).path
     if overwrite:
         mode = 'w'
@@ -102,7 +102,7 @@ def decompress(
     if not is_support:
         raise AssertionError('file format that cannot be decompressed')
 
-    # Handle parameter.
+    # Set parameter.
     build_dir = build_dir or os_getcwd()
 
     # Decompress.

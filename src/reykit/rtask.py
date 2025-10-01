@@ -361,7 +361,7 @@ def async_run(
     run results.
     """
 
-    # Handle parameter.
+    # Set parameter.
     coroutines = [
         coroutine()
         if asyncio_iscoroutinefunction(coroutine)
@@ -449,7 +449,7 @@ async def async_sleep(*thresholds: float, precision: int | None = None) -> float
         - When parameters `precision` is `greater than 0`, then return float.
     """
 
-    # Handle parameter.
+    # Set parameter.
     if len(thresholds) == 1:
         second = thresholds[0]
     else:
@@ -683,7 +683,7 @@ async def async_request(
     # Check.
     check_most_one(data, json)
 
-    # Handle parameter.
+    # Set parameter.
     if method is None:
         if data is None and json is None:
             method = 'get'

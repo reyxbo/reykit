@@ -90,7 +90,7 @@ def monkey_sqlalchemy_result_more_fetch():
             - `<0`: Limit last few row.
         """
 
-        # Handle parameter.
+        # Set parameter.
         limit = limit or 0
 
         # Convert.

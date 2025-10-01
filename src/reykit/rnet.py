@@ -300,7 +300,7 @@ def request(
     Response object of requests package.
     """
 
-    # Handle parameter.
+    # Set parameter.
     if method is None:
         if data is None and json is None and files is None:
             method = 'get'
@@ -389,7 +389,7 @@ def get_response_file_name(response: Response, default_name: str | None = None) 
     File name.
     """
 
-    # Handle parameter.
+    # Set parameter.
     content = response.content
 
     # Get.
@@ -470,7 +470,7 @@ def compute_stream_time(
     File send seconds.
     """
 
-    # Handle parameter.
+    # Set parameter.
     match source:
         case str():
             file = File(source)
@@ -503,7 +503,7 @@ def listen_socket(
     handler : Handler function.
     """
 
-    # Handle parameter.
+    # Set parameter.
     port = int(port)
     rece_size = 1024 * 1024 * 1024
 

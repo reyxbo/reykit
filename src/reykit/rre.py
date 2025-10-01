@@ -115,7 +115,7 @@ def sub(
     Replaced result.
     """
 
-    # Handle parameter.
+    # Set parameter.
     replace = replace or ''
     count = count or 0
 
@@ -144,7 +144,7 @@ def split(
     Split result.
     """
 
-    # Handle parameter.
+    # Set parameter.
     count = count or 0
 
     # Replace.

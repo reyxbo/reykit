@@ -16,7 +16,8 @@ from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.job import Job
-from reydb.rdb import Database
+from reydb import rorm
+from reydb.rdb import Database, DatabaseAsync
 
 from .rbase import Base, throw
 
@@ -30,7 +31,16 @@ class Schedule(Base):
     """
     Schedule type.
     Can create database used `self.build_db` method.
+
+    Attributes
+    ----------
+    db_names : Database table name mapping dictionary.
     """
+
+    db_names = {
+        'schedule': 'schedule',
+        'stats_schedule': 'stats_schedule'
+    }
 
 
     def __init__(
@@ -39,7 +49,7 @@ class Schedule(Base):
         max_instances: int = 1,
         coalesce: bool = True,
         block: bool = False,
-        database: Database | None = None
+        db: Database | DatabaseAsync | None = None
     ) -> None:
         """
         Build instance attributes.
@@ -50,7 +60,7 @@ class Schedule(Base):
         max_instances : Maximum number of synchronized executions of tasks with the same ID.
         coalesce : Whether to coalesce tasks with the same ID.
         block : Whether to block.
-        database : `Database` instance.
+        db : Database instance.
             - `None`: Not use database.
             - `Database`: Automatic record to database.
         """
@@ -80,14 +90,7 @@ class Schedule(Base):
         self.scheduler.start()
 
         ## Database.
-        self.database = database
-
-        ### Database path name.
-        self.db_names = {
-            'base': 'base',
-            'base.schedule': 'schedule',
-            'base.stats_schedule': 'stats_schedule'
-        }
+        self.db = db
 
 
     def pause(self) -> None:
@@ -150,7 +153,7 @@ class Schedule(Base):
             kwargs : Keyword arguments of function.
             """
 
-            # Handle parameter.
+            # Set parameter.
             nonlocal task, note
 
             # Status executing.
@@ -159,10 +162,10 @@ class Schedule(Base):
                 'task': task.__name__,
                 'note': note
             }
-            with self.database.connect() as conn:
-                conn = self.database.connect()
+            with self.db.connect() as conn:
+                conn = self.db.connect()
                 conn.execute.insert(
-                    self.db_names['base.schedule'],
+                    self.db_names['schedule'],
                     data
                 )
                 id_ = conn.insert_id()
@@ -170,7 +173,7 @@ class Schedule(Base):
             # Try execute.
 
             ## Record error.
-            task = self.database.error.wrap(task, note=note)
+            task = self.db.error.wrap(task, note=note)
 
             try:
                 task(*args, **kwargs)
@@ -181,8 +184,8 @@ class Schedule(Base):
                     'id': id_,
                     'status': 2
                 }
-                self.database.execute.update(
-                    self.db_names['base.schedule'],
+                self.db.execute.update(
+                    self.db_names['schedule'],
                     data
                 )
                 raise
@@ -193,8 +196,8 @@ class Schedule(Base):
                     'id': id_,
                     'status': 1
                 }
-                self.database.execute.update(
-                    self.db_names['base.schedule'],
+                self.db.execute.update(
+                    self.db_names['schedule'],
                     data
                 )
 
@@ -225,7 +228,7 @@ class Schedule(Base):
         Task instance.
         """
 
-        # Handle parameter.
+        # Set parameter.
         if plan is None:
             plan = {}
         trigger = plan.get('trigger')
@@ -238,7 +241,7 @@ class Schedule(Base):
         # Add.
 
         ## Database.
-        if self.database is not None:
+        if self.db is not None:
             task = self.wrap_record_db(task, note)
 
         job = self.scheduler.add_job(
@@ -272,7 +275,7 @@ class Schedule(Base):
         note : Task note.
         """
 
-        # Handle parameter.
+        # Set parameter.
         if type(task) == Job:
             task = task.id
         if plan is None:
@@ -319,7 +322,7 @@ class Schedule(Base):
         task : Task instance or ID.
         """
 
-        # Handle parameter.
+        # Set parameter.
         if type(task) == Job:
             id_ = task.id
         else:
@@ -341,7 +344,7 @@ class Schedule(Base):
         task : Task instance or ID.
         """
 
-        # Handle parameter.
+        # Set parameter.
         if type(task) == Job:
             id_ = task.id
         else:
@@ -363,7 +366,7 @@ class Schedule(Base):
         task : Task instance or ID.
         """
 
-        # Handle parameter.
+        # Set parameter.
         if type(task) == Job:
             id_ = task.id
         else:
@@ -379,99 +382,33 @@ class Schedule(Base):
         """
 
         # Check.
-        if self.database is None:
-            throw(ValueError, self.database)
+        if self.db is None:
+            throw(ValueError, self.db)
 
         # Set parameter.
 
-        ## Database.
-        databases = [
-            {
-                'name': self.db_names['base']
-            }
-        ]
-
         ## Table.
-        tables = [
-
-            ### 'schedule'.
-            {
-                'path': (self.db_names['base'], self.db_names['base.schedule']),
-                'fields': [
-                    {
-                        'name': 'create_time',
-                        'type': 'datetime',
-                        'constraint': 'NOT NULL DEFAULT CURRENT_TIMESTAMP',
-                        'comment': 'Record create time.'
-                    },
-                    {
-                        'name': 'update_time',
-                        'type': 'datetime',
-                        'constraint': 'DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP',
-                        'comment': 'Record update time.'
-                    },
-                    {
-                        'name': 'id',
-                        'type': 'int unsigned',
-                        'constraint': 'NOT NULL AUTO_INCREMENT',
-                        'comment': 'ID.'
-                    },
-                    {
-                        'name': 'status',
-                        'type': 'tinyint',
-                        'constraint': 'NOT NULL',
-                        'comment': 'Schedule status, 0 is executing, 1 is completed, 2 is occurred error.'
-                    },
-                    {
-                        'name': 'task',
-                        'type': 'varchar(100)',
-                        'constraint': 'NOT NULL',
-                        'comment': 'Schedule task function name.'
-                    },
-                    {
-                        'name': 'note',
-                        'type': 'varchar(500)',
-                        'comment': 'Schedule note.'
-                    }
-                ],
-                'primary': 'id',
-                'indexes': [
-                    {
-                        'name': 'n_create_time',
-                        'fields': 'create_time',
-                        'type': 'noraml',
-                        'comment': 'Record create time normal index.'
-                    },
-                    {
-                        'name': 'n_update_time',
-                        'fields': 'update_time',
-                        'type': 'noraml',
-                        'comment': 'Record update time normal index.'
-                    },
-                    {
-                        'name': 'n_task',
-                        'fields': 'task',
-                        'type': 'noraml',
-                        'comment': 'Schedule task function name normal index.'
-                    }
-                ],
-                'comment': 'Schedule execute record table.'
-            }
-
-        ]
+        class Schedule(rorm.Model, table=True):
+            __name__ = self.db_names['schedule']
+            __comment__ = 'Schedule execute record table.'
+            create_time: rorm.Datetime = rorm.Field(field_default='CURRENT_TIMESTAMP', not_null=True, index_n=True, comment='Record create time.')
+            update_time: rorm.Datetime = rorm.Field(field_default='CURRENT_TIMESTAMP', index_n=True, comment='Record update time.')
+            id: int = rorm.Field(field_type=rorm.types_mysql.INTEGER(unsigned=True), key_auto=True, comment='ID.')
+            status: str = rorm.Field(field_type=rorm.types_mysql.TINYINT(unsigned=True), not_null=True, comment='Schedule status, 0 is executing, 1 is completed, 2 is occurred error.')
+            task: str = rorm.Field(field_type=rorm.types.VARCHAR(100), not_null=True, comment='Schedule task function name.')
+            note: str = rorm.Field(field_type=rorm.types.VARCHAR(500), comment='Schedule note.')
+        tables = [Schedule]
 
         ## View stats.
         views_stats = [
-
-            ### 'stats_schedule'.
             {
-                'path': (self.db_names['base'], self.db_names['base.stats_schedule']),
+                'path': self.db_names['stats_schedule'],
                 'items': [
                     {
                         'name': 'count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{self.db_names['base']}`.`{self.db_names['base.schedule']}`'
+                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`'
                         ),
                         'comment': 'Schedule count.'
                     },
@@ -479,7 +416,7 @@ class Schedule(Base):
                         'name': 'past_day_count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{self.db_names['base']}`.`{self.db_names['base.schedule']}`\n'
+                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`\n'
                             'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) = 0'
                         ),
                         'comment': 'Schedule count in the past day.'
@@ -488,7 +425,7 @@ class Schedule(Base):
                         'name': 'past_week_count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{self.db_names['base']}`.`{self.db_names['base.schedule']}`\n'
+                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`\n'
                             'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) <= 6'
                         ),
                         'comment': 'Schedule count in the past week.'
@@ -497,7 +434,7 @@ class Schedule(Base):
                         'name': 'past_month_count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{self.db_names['base']}`.`{self.db_names['base.schedule']}`\n'
+                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`\n'
                             'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) <= 29'
                         ),
                         'comment': 'Schedule count in the past month.'
@@ -506,7 +443,7 @@ class Schedule(Base):
                         'name': 'task_count',
                         'select': (
                             'SELECT COUNT(DISTINCT `task`)\n'
-                            f'FROM `{self.db_names['base']}`.`{self.db_names['base.schedule']}`'
+                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`'
                         ),
                         'comment': 'Task count.'
                     },
@@ -514,21 +451,19 @@ class Schedule(Base):
                         'name': 'last_time',
                         'select': (
                             'SELECT IFNULL(MAX(`update_time`), MAX(`create_time`))\n'
-                            f'FROM `{self.db_names['base']}`.`{self.db_names['base.schedule']}`'
+                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`'
                         ),
                         'comment': 'Schedule last record time.'
                     }
                 ]
-
             }
-
         ]
 
         # Build.
-        self.database.build.build(databases, tables, views_stats=views_stats)
+        self.db.build.build(tables=tables, views_stats=views_stats, skip=True)
 
         ## Error.
-        self.database.error.build_db()
+        self.db.error.build_db()
 
 
     __iter__ = tasks

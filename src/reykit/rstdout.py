@@ -76,7 +76,7 @@ def get_terminal_size(
     Column and line display character count.
     """
 
-    # Handle parameter.
+    # Set parameter.
     match stream:
         case 'stdin':
             stream = 0
@@ -130,7 +130,7 @@ def echo(
     # Import.
     from .rtext import frame_data
 
-    # Handle parameter.
+    # Set parameter.
     if title is None:
         title: list[str] = get_varname('data')
     if ConfigStdout.force_print_ascii:
@@ -191,7 +191,7 @@ def ask(
     # Import.
     from .rtext import frame_data
 
-    # Handle parameter.
+    # Set parameter.
     if ConfigStdout.force_print_ascii:
         border = 'ascii'
 
@@ -320,7 +320,7 @@ def add_print_position() -> None:
         Preprocessed text.
         """
 
-        # Handle parameter.
+        # Set parameter.
         stack_params = get_stack_param('full', 3)
         stack_floor = stack_params[-1]
 

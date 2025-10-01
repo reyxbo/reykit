@@ -34,12 +34,12 @@ class DatabaseTableSchedule(rorm.Model, table=True):
     """
 
     __comment__ = 'Schedule execute record table.'
-    create_time: rorm.Datetime = rorm.Field(field_default='CURRENT_TIMESTAMP', not_null=True, index_n=True, comment='Record create time.')
-    update_time: rorm.Datetime = rorm.Field(field_default='ON UPDATE CURRENT_TIMESTAMP', index_n=True, comment='Record update time.')
-    id: int = rorm.Field(field_type=rorm.types_mysql.INTEGER(unsigned=True), key_auto=True, comment='ID.')
-    status: str = rorm.Field(field_type=rorm.types_mysql.TINYINT(unsigned=True), not_null=True, comment='Schedule status, 0 is executing, 1 is completed, 2 is occurred error.')
-    task: str = rorm.Field(field_type=rorm.types.VARCHAR(100), not_null=True, comment='Schedule task function name.')
-    note: str = rorm.Field(field_type=rorm.types.VARCHAR(500), comment='Schedule note.')
+    create_time: rorm.Datetime = rorm.Field(field_default=':create_time', not_null=True, index_n=True, comment='Record create time.')
+    update_time: rorm.Datetime = rorm.Field(field_default=':update_time', index_n=True, comment='Record update time.')
+    id: int = rorm.Field(rorm.types_mysql.INTEGER(unsigned=True), key_auto=True, comment='ID.')
+    status: str = rorm.Field(rorm.types_mysql.TINYINT(unsigned=True), not_null=True, comment='Schedule status, 0 is executing, 1 is completed, 2 is occurred error.')
+    task: str = rorm.Field(rorm.types.VARCHAR(100), not_null=True, comment='Schedule task function name.')
+    note: str = rorm.Field(rorm.types.VARCHAR(500), comment='Schedule note.')
 
 
 class Schedule(Base):

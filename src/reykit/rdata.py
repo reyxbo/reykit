@@ -337,14 +337,14 @@ def chain(*iterables: dict[KT, VT] | Iterable[T]) -> ChainMap[KT, VT] | IChain[T
     return data
 
 
-def default_dict(default: T | Null = Null, data: dict[KT, VT] | None = None) -> Defaultdict[KT, VT | T]:
+def default_dict(default: T | Null.Type = Null, data: dict[KT, VT] | None = None) -> Defaultdict[KT, VT | T]:
     """
     Set `dict` instance, default value when key does not exist.
 
     Parameters
     ----------
     default : Default value.
-        - `Null`: Nest function self.
+        - `Null.Type`: Nest function self.
         - `Callable`: Use call return value.
     data : `dict` instance.
         - `None`: Empty `dict`.

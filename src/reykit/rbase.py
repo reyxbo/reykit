@@ -9,7 +9,7 @@
 """
 
 
-from typing import Any, Literal, Self, TypeVar, NoReturn, overload
+from typing import Any, Literal, Self, TypeVar, Type, NoReturn, overload, final
 from collections.abc import Callable, Iterable, Container, Mapping
 from sys import exc_info as sys_exc_info
 from os.path import exists as os_exists
@@ -35,6 +35,7 @@ __all__ = (
     'StaticMeta',
     'ConfigMeta',
     'Singleton',
+    'NullType',
     'Null',
     'ErrorBase',
     'Exit',
@@ -175,6 +176,28 @@ class ConfigMeta(StaticMeta):
         setattr(cls, name, value)
 
 
+type NullType = Type['Null']
+
+
+@final
+class Null(Base, metaclass=StaticMeta):
+    """
+    Null type.
+
+    Attributes
+    ----------
+    Type : Type hints of self.
+
+    Examples
+    --------
+    >>> def foo(arg: Any | Null.Type = Null):
+    ...     if arg == Null:
+    ...         ...
+    """
+
+    Type = NullType
+
+
 class Singleton(Base):
     """
     Singleton type.
@@ -185,7 +208,7 @@ class Singleton(Base):
     _instance : Global singleton instance.
     """
 
-    _instance: Self | None = None
+    __instance: Self
 
 
     def __new__(self, *arg: Any, **kwargs: Any) -> Self:
@@ -193,22 +216,19 @@ class Singleton(Base):
         Build `singleton` instance.
         """
 
+        # Built.
+        if hasattr(self, '__instance'):
+            return self.__instance
+
         # Build.
-        if self._instance is None:
-            self._instance = super().__new__(self)
+        self.__instance = super().__new__(self)
 
-            ## Singleton method.
-            if hasattr(self, "__singleton__"):
-                __singleton__: Callable = getattr(self, "__singleton__")
-                __singleton__(self, *arg, **kwargs)
+        ## Singleton method.
+        if hasattr(self, "__singleton__"):
+            __singleton__: Callable = getattr(self, "__singleton__")
+            __singleton__(self, *arg, **kwargs)
 
-        return self._instance
-
-
-class Null(Base, metaclass=StaticMeta):
-    """
-    Null type.
-    """
+        return self.__instance
 
 
 class ErrorBase(Base, BaseException):
@@ -588,7 +608,7 @@ def get_first_notnone(*values: None) -> NoReturn: ...
 @overload
 def get_first_notnone(*values: T) -> T: ...
 
-def get_first_notnone(*values: T, default: U | Null = Null) -> T | U:
+def get_first_notnone(*values: T, default: U | Null.Type = Null) -> T | U:
     """
     Get the first value that is not `None`.
 
@@ -597,7 +617,7 @@ def get_first_notnone(*values: T, default: U | Null = Null) -> T | U:
     values : Check values.
     default : When all are `None`, then return this is value, or throw exception.
         - `Any`: Return this is value.
-        - `Null`: Throw exception.
+        - `Null.Type`: Throw exception.
 
     Returns
     -------

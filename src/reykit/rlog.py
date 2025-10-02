@@ -954,7 +954,7 @@ class Mark(Base):
         self.data: dict[Hashable, set[int]] = {}
 
 
-    def mark(self, obj: Any, group: Hashable | Null = Null) -> int:
+    def mark(self, obj: Any, group: Hashable | Null.Type = Null) -> int:
         """
         Mark object.
 
@@ -978,7 +978,7 @@ class Mark(Base):
         return obj_id
 
 
-    def remove(self, obj: Any, group: Hashable | Null = Null) -> None:
+    def remove(self, obj: Any, group: Hashable | Null.Type = Null) -> None:
         """
         Whether marked.
 
@@ -1017,7 +1017,7 @@ class Mark(Base):
         del self.data[group]
 
 
-    def is_marked(self, obj: Any, group: Hashable | Null = Null) -> bool:
+    def is_marked(self, obj: Any, group: Hashable | Null.Type = Null) -> bool:
         """
         Whether marked.
 

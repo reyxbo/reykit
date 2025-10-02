@@ -40,7 +40,7 @@ class Table(Base):
     """
 
 
-    def __init__(self, data: Iterable) -> None:
+    def __init__(self, data: TableData) -> None:
         """
         Build instance attributes.
 

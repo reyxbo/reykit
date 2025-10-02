@@ -10,7 +10,7 @@
 
 
 from typing import Any, TypedDict, overload
-from collections.abc import Iterable, MutableMapping
+from collections.abc import Iterable, Mapping
 from os.path import abspath as os_abspath
 from sqlalchemy.engine.cursor import CursorResult, Row as CursorRow
 from pandas import DataFrame, Series, ExcelWriter
@@ -23,10 +23,14 @@ from .rtime import time_to
 
 
 __all__ = (
-    'Table',
+    'RowData',
+    'TableData',
+    'Table'
 )
 
 
+RowData = Iterable | Mapping
+TableData = Iterable[RowData]
 SheetSet = TypedDict('SheetsSet', {'name': str, 'index': int, 'fields': str | list[str]})
 
 
@@ -60,7 +64,7 @@ class Table(Base):
 
         # Convert.
         match self.data:
-            case MutableMapping():
+            case Mapping():
                 result = [dict(self.data)]
             case CursorRow():
                 result = [dict(self.data._mapping)]

@@ -9,8 +9,8 @@
 """
 
 
-from typing import Any, TypedDict, Literal, overload
-from collections.abc import Collection, MutableMapping
+from typing import Any, TypedDict, overload
+from collections.abc import Iterable, MutableMapping
 from os.path import abspath as os_abspath
 from sqlalchemy.engine.cursor import CursorResult, Row as CursorRow
 from pandas import DataFrame, Series, ExcelWriter
@@ -23,78 +23,11 @@ from .rtime import time_to
 
 
 __all__ = (
-    'is_row',
-    'is_table',
-    'Table'
+    'Table',
 )
 
 
-type RowData = MutableMapping | CursorRow | Series
-type TableData = Collection[MutableMapping] | RowData | CursorResult | DataFrame
 SheetSet = TypedDict('SheetsSet', {'name': str, 'index': int, 'fields': str | list[str]})
-
-
-@overload
-def is_row(obj: RowData) -> Literal[True]: ...
-
-@overload
-def is_row(obj: Any) -> Literal[False]: ...
-
-def is_row(obj: Any) -> bool:
-    """
-    Judge whether it is row format.
-
-    Parameters
-    ----------
-    obj : Ojbect.
-
-    Returns
-    -------
-    Judgment result.
-    """
-
-    # Judge.
-    result = isinstance(obj, (MutableMapping, CursorRow, Series))
-
-    return result
-
-
-@overload
-def is_table(obj: TableData) -> bool: ...
-
-@overload
-def is_table(obj: Any) -> Literal[False]: ...
-
-def is_table(obj: Any) -> bool:
-    """
-    Judge whether it is table format, and keys sort of the row are the same.
-
-    Parameters
-    ----------
-    obj : Ojbect.
-
-    Returns
-    -------
-    Judgment result.
-    """
-
-    # Judge.
-    if is_row(obj):
-        return True
-    if isinstance(obj, (CursorResult, DataFrame)):
-        return True
-    if isinstance(obj, Collection):
-        keys_strs = []
-        for row in obj:
-            if not isinstance(row, MutableMapping):
-                break
-            keys_str = ':'.join(row)
-            keys_strs.append(keys_str)
-        keys_strs = set(keys_strs)
-        if len(keys_strs) == 1:
-            return True
-
-    return False
 
 
 class Table(Base):
@@ -103,7 +36,7 @@ class Table(Base):
     """
 
 
-    def __init__(self, data: TableData) -> None:
+    def __init__(self, data: Iterable) -> None:
         """
         Build instance attributes.
 
@@ -131,19 +64,16 @@ class Table(Base):
                 result = [dict(self.data)]
             case CursorRow():
                 result = [dict(self.data._mapping)]
-            case Series():
-                result = [dict(self.data.items())]
             case CursorResult():
                 result = [
                     dict(row)
                     for row in self.data.mappings()
                 ]
+            case Series():
+                result = [dict(self.data.items())]
             case DataFrame():
                 result = self.data.to_dict('records')
-            case Collection():
-                if not is_table(self.data):
-                    text = 'is not table format, or keys sort of the row are the not same'
-                    throw(TypeError, text=text)
+            case Iterable():
                 result = [
                     dict(row)
                     for row in self.data

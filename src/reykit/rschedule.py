@@ -33,6 +33,7 @@ class DatabaseTableSchedule(rorm.Model, table=True):
     Database `schedule` table model.
     """
 
+    __name__ = 'schedule'
     __comment__ = 'Schedule execute record table.'
     create_time: rorm.Datetime = rorm.Field(field_default=':create_time', not_null=True, index_n=True, comment='Record create time.')
     update_time: rorm.Datetime = rorm.Field(field_default=':update_time', index_n=True, comment='Record update time.')

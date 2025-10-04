@@ -26,6 +26,7 @@ def monkey_sqlalchemy_result_more_fetch():
 
     Examples
     --------
+    Execute.
     >>> result = connection.execute(sql)
     >>> result.to_table()
     >>> result.to_dict()
@@ -40,11 +41,16 @@ def monkey_sqlalchemy_result_more_fetch():
     >>> result.show()
     >>> result.exist
     >>> result.empty
+
+    ORM.
+    >>> result = orm.insert(Model).execute()
+    >>> result.exist
+    >>> result.empty
     """
 
     # Import.
     from typing import Self
-    from sqlalchemy.engine.cursor import CursorResult
+    from sqlalchemy import CursorResult, ScalarResult
     from pandas import DataFrame, NA, concat
     from .rbase import Base
     from .rstdout import echo
@@ -64,19 +70,6 @@ def monkey_sqlalchemy_result_more_fetch():
         """
 
         return self
-
-
-    CursorResult.data = method_data
-    CursorResult.to_table = Table.to_table
-    CursorResult.to_dict = Table.to_dict
-    CursorResult.to_list = Table.to_list
-    CursorResult.to_text = Table.to_text
-    CursorResult.to_json = Table.to_json
-    CursorResult.to_sql = Table.to_sql
-    CursorResult.to_df = Table.to_df
-    CursorResult.to_html = Table.to_html
-    CursorResult.to_csv = Table.to_csv
-    CursorResult.to_excel = Table.to_excel
 
 
     def method_show(self: 'Result', limit: int | None = None) -> None:
@@ -127,9 +120,6 @@ def monkey_sqlalchemy_result_more_fetch():
         echo(df, title='Result')
 
 
-    CursorResult.show = method_show
-
-
     @property
     def method_exist(self: 'Result') -> bool:
         """
@@ -144,9 +134,6 @@ def monkey_sqlalchemy_result_more_fetch():
         judge = self.rowcount != 0
 
         return judge
-
-
-    CursorResult.exist = method_exist
 
 
     @property
@@ -165,10 +152,22 @@ def monkey_sqlalchemy_result_more_fetch():
         return judge
 
 
+    CursorResult.data = method_data
+    CursorResult.to_table = Table.to_table
+    CursorResult.to_dict = Table.to_dict
+    CursorResult.to_list = Table.to_list
+    CursorResult.to_text = Table.to_text
+    CursorResult.to_json = Table.to_json
+    CursorResult.to_sql = Table.to_sql
+    CursorResult.to_df = Table.to_df
+    CursorResult.to_html = Table.to_html
+    CursorResult.to_csv = Table.to_csv
+    CursorResult.to_excel = Table.to_excel
+    CursorResult.show = method_show
+    CursorResult.exist = method_exist
     CursorResult.empty = method_empty
 
 
-    # Update annotations.
     class Result(Base, CursorResult):
         """
         Update based on `CursorResult` object, for annotation return value.
@@ -191,7 +190,6 @@ def monkey_sqlalchemy_result_more_fetch():
         show = method_show
         exist = method_exist
         empty = method_empty
-
 
     return Result
 

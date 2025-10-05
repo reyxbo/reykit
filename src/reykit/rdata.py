@@ -53,7 +53,7 @@ def to_json(
     JSON format string.
     """
 
-    # Set parameter.
+    # Parameter.
     if compact:
         indent = None
         separators = (',', ':')
@@ -122,7 +122,7 @@ def flatten(data: Any, *, _flattern_data: list | None = None) -> list:
     Data after flatten.
     """
 
-    # Set parameter.
+    # Parameter.
     _flattern_data = _flattern_data or []
 
     # Flatten.
@@ -175,7 +175,7 @@ def split(data: Iterable[T], share: int | None = None, bin_size: int | None = No
     check_least_one(share, bin_size)
     check_most_one(share, bin_size)
 
-    # Set parameter.
+    # Parameter.
     data = list(data)
 
     # Split.
@@ -217,7 +217,7 @@ def unique(data: Iterable[T]) -> list[T]:
     List after de duplication.
     """
 
-    # Set parameter.
+    # Parameter.
     data = tuple(data)
 
     # Delete duplicate.
@@ -350,7 +350,7 @@ def default_dict(default: T | Null.Type = Null, data: dict[KT, VT] | None = None
         - `None`: Empty `dict`.
     """
 
-    # Set parameter.
+    # Parameter.
 
     ## Null.
     if default == Null:
@@ -472,7 +472,7 @@ class FunctionGenerator(Base):
         kwargs : Function keyword arguments.
         """
 
-        # Set parameter.
+        # Parameter.
         func_args = (
             *self.args,
             *args

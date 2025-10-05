@@ -170,7 +170,7 @@ def del_modules(path: str) -> list[str]:
     # Import.
     from .rre import search
 
-    # Set parameter.
+    # Parameter.
     deleted_dict = {}
     module_keys = tuple(sys_modules)
 
@@ -256,7 +256,7 @@ def get_cmd_var(*vars: Any) -> list[Any]:
     10 [20, 21] 3
     """
 
-    # Set parameter.
+    # Parameter.
     vars_name: list[str] = get_varname('vars')
     vars_info = tuple(zip(vars_name, vars))
 
@@ -339,7 +339,7 @@ def get_computer_info() -> ComputerInfo:
         - `Key 'login_users'`: Computer login users information.
     """
 
-    # Set parameter.
+    # Parameter.
     info = {}
 
     # Get.
@@ -524,7 +524,7 @@ def search_process(
     List of process instances that match any condition.
     """
 
-    # Set parameter.
+    # Parameter.
     match id_:
         case None:
             ids = []
@@ -610,7 +610,7 @@ def kill_process(
     List of process instances that match any condition.
     """
 
-    # Set parameter.
+    # Parameter.
     self_pid = os_getpid()
 
     # Search.
@@ -648,7 +648,7 @@ def pause_process(
     List of process instances that match any condition.
     """
 
-    # Set parameter.
+    # Parameter.
     self_pid = os_getpid()
 
     # Search.
@@ -710,7 +710,7 @@ def get_idle_port(min: int = 49152) -> int:
     Idle port number.
     """
 
-    # Set parameter.
+    # Parameter.
     network_table = get_network_table()
     ports = [
         info['local_port']

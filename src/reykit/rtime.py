@@ -237,7 +237,7 @@ def text_to_time(
     Object or null.
     """
 
-    # Set parameter.
+    # Parameter.
     time_obj = None
     str_len = len(string)
 
@@ -420,7 +420,7 @@ def sleep(
         - When parameters `precision` is `greater than 0`, then return float.
     """
 
-    # Set parameter.
+    # Parameter.
     if len(thresholds) == 1:
         second = thresholds[0]
     else:
@@ -459,7 +459,7 @@ def wait(
     Total spend seconds or None.
     """
 
-    # Set parameter.
+    # Parameter.
     tm = TimeMark()
     tm()
 
@@ -579,7 +579,7 @@ class TimeMark(Base):
         # Import.
         from pandas import DataFrame
 
-        # Set parameter.
+        # Parameter.
         record_len = len(self.records)
         data = [
             info.copy()
@@ -647,7 +647,7 @@ class TimeMark(Base):
         if len(self.records) <= 1:
             return 0.0
 
-        # Set parameter.
+        # Parameter.
         first_timestamp = self.records[0]['timestamp']
         max_index = max(self.records)
         last_timestamp = self.records[max_index]['timestamp']

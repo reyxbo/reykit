@@ -87,7 +87,7 @@ def decode_qrcode(image: str | bytes) -> list[str]:
     if isinstance(pyzbar_decode, BaseException):
         raise pyzbar_decode
 
-    # Set parameter.
+    # Parameter.
     if type(image) in (bytes, bytearray):
         image = BytesIO(image)
 
@@ -137,7 +137,7 @@ def compress_image(
     Compressed image bytes data.
     """
 
-    # Set parameter.
+    # Parameter.
     if type(input_image) == str:
         file = File(input_image)
         input_image = file.str
@@ -234,7 +234,7 @@ def generate_captcha_image(
     Captcha image bytes data.
     """
 
-    # Set parameter.
+    # Parameter.
     text = text or 5
     if type(text) == int:
         text = randchar(text, False)

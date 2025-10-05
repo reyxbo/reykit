@@ -30,7 +30,6 @@ __all__ = (
     'KT',
     'VT',
     'CallableT',
-    'CoroutineFunctionT',
     'Base',
     'StaticMeta',
     'ConfigMeta',
@@ -67,9 +66,9 @@ __all__ = (
 T = TypeVar('T') # Any.
 U = TypeVar('U') # Any.
 V = TypeVar('V') # Any.
-KT = TypeVar('KT') # Any dictionary key.
-VT = TypeVar('VT') # Any dictionary value.
-CallableT = TypeVar('CallableT', bound=Callable) # Any callable.
+KT = TypeVar('KT') # Dictionary key.
+VT = TypeVar('VT') # Dictionary value.
+CallableT = TypeVar('CallableT', bound=Callable) # Callable.
 
 
 class Base(object):
@@ -340,7 +339,7 @@ def warn(
     stacklevel : Warning code location, number of recursions up the code level.
     """
 
-    # Set parameter.
+    # Parameter.
     if infos == ():
         infos = 'Warning!'
     elif len(infos) == 1:
@@ -367,7 +366,7 @@ def catch_exc() -> tuple[str, BaseException, StackSummary]:
         - `StackSummary`: Exception traceback stack instance.
     """
 
-    # Set parameter.
+    # Parameter.
     exc_text = format_exc()
     exc_text = exc_text.strip()
     _, exc, traceback = sys_exc_info()
@@ -874,7 +873,7 @@ def get_varname(argname: str, level: int = 1) -> str | list[str] | None:
         - `Throw VarnameException`: Return `None`.
     """
 
-    # Set parameter.
+    # Parameter.
     level += 1
 
     # Get.

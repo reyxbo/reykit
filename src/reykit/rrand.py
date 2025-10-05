@@ -159,7 +159,7 @@ def randn(*thresholds: float, precision: int | None = None) -> int | float:
         - When parameters `precision` is greater than 0, then return float.
     """
 
-    # Set parameter.
+    # Parameter.
     thresholds_len = len(thresholds)
     match thresholds_len:
         case 0:
@@ -329,7 +329,7 @@ def randchar(
     Random characters.
     """
 
-    # Set parameter.
+    # Parameter.
     char_range = string_digits + string_ascii_letters
     if punctuation:
         char_range += string_punctuation

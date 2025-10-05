@@ -10,7 +10,7 @@
 
 
 from typing import Any, Literal, overload
-from collections.abc import Callable, Iterable, Generator, Coroutine
+from collections.abc import Iterable, Sequence, Callable, Generator, Coroutine
 from threading import RLock as TRLock, get_ident as threading_get_ident
 from concurrent.futures import ThreadPoolExecutor, Future as CFuture, as_completed as concurrent_as_completed
 from queue import Queue as QQueue
@@ -30,7 +30,7 @@ from asyncio import (
 )
 from aiohttp import ClientSession, ClientResponse
 
-from .rbase import T, Base, throw, check_most_one, check_response_code
+from .rbase import T, Base, throw, check_most_one, check_response_code, is_iterable
 from .rtime import randn, TimeMark
 from .rwrap import wrap_thread
 
@@ -111,7 +111,7 @@ class ThreadPool(Base):
         ATask instance.
         """
 
-        # Set parameter.
+        # Parameter.
         func_args = (
             *self.args,
             *args
@@ -310,16 +310,16 @@ class ThreadPool(Base):
 def async_run(
     coroutine: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
     *,
-    before: CallableCoroutine | None = None,
-    after: CallableCoroutine | None = None,
+    before: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
+    after: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
     return_exc: Literal[False] = False
 ) -> T: ...
 
 @overload
 def async_run(
     *coroutines: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
-    before: CallableCoroutine | None = None,
-    after: CallableCoroutine | None = None,
+    before: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
+    after: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
     return_exc: Literal[False] = False
 ) -> list[T]: ...
 
@@ -327,23 +327,23 @@ def async_run(
 def async_run(
     coroutine: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
     *,
-    before: CallableCoroutine | None = None,
-    after: CallableCoroutine | None = None,
+    before: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
+    after: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
     return_exc: Literal[True]
 ) -> T | BaseException: ...
 
 @overload
 def async_run(
     *coroutines: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
-    before: CallableCoroutine | None = None,
-    after: CallableCoroutine | None = None,
+    before: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
+    after: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
     return_exc: Literal[True]
 ) -> list[T | BaseException]: ...
 
 def async_run(
     *coroutines: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
-    before: CallableCoroutine | None = None,
-    after: CallableCoroutine | None = None,
+    before: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
+    after: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
     return_exc: bool = False
 ) -> T | BaseException | list[T | BaseException]:
     """
@@ -351,9 +351,11 @@ def async_run(
 
     Parameters
     ----------
-    coroutines : `Coroutine` instances or `ATask` instances or `Coroutine` functions.
+    coroutines : `Coroutine` instances or `ATask` instances or `Coroutine` functions, asynchronous execute.
     before : `Coroutine` instance or `ATask` instance or `Coroutine` function of execute before execute.
+        - `Sequence[CallableCoroutine]`: Synchronous execute in order.
     after : `Coroutine` instance or `ATask` instance or `Coroutine` function of execute after execute.
+        - `Sequence[CallableCoroutine]`: Synchronous execute in order.
     return_exc : Whether return exception instances, otherwise throw first exception.
 
     Returns
@@ -361,18 +363,24 @@ def async_run(
     run results.
     """
 
-    # Set parameter.
-    coroutines = [
-        coroutine()
-        if asyncio_iscoroutinefunction(coroutine)
-        else coroutine
-        for coroutine in coroutines
+    # Parameter.
+    if before is None:
+        before = ()
+    elif not is_iterable(before):
+        before = (before,)
+    if after is None:
+        after = ()
+    elif not is_iterable(after):
+        after = (after,)
+    handle_tasks_func = lambda tasks: [
+        task()
+        if asyncio_iscoroutinefunction(task)
+        else task
+        for task in tasks
     ]
-    if asyncio_iscoroutinefunction(before):
-        before = before()
-    if asyncio_iscoroutinefunction(after):
-        after = after()
-
+    coroutines = handle_tasks_func(coroutines)
+    before = handle_tasks_func(before)
+    after = handle_tasks_func(after)
 
     # Define.
     async def async_run_coroutine() -> list[T | BaseException]:
@@ -385,15 +393,15 @@ def async_run(
         """
 
         # Before.
-        if before is not None:
-            await before
+        for task in before:
+            await task
 
         # Gather.
         results: list[T | BaseException] = await asyncio_gather(*coroutines, return_exceptions=return_exc)
 
         # After.
-        if after is not None:
-            await after
+        for task in after:
+            await task
 
         return results
 
@@ -449,7 +457,7 @@ async def async_sleep(*thresholds: float, precision: int | None = None) -> float
         - When parameters `precision` is `greater than 0`, then return float.
     """
 
-    # Set parameter.
+    # Parameter.
     if len(thresholds) == 1:
         second = thresholds[0]
     else:
@@ -488,7 +496,7 @@ async def async_wait(
     Total spend seconds or None.
     """
 
-    # Set parameter.
+    # Parameter.
     tm = TimeMark()
     tm()
 
@@ -683,7 +691,7 @@ async def async_request(
     # Check.
     check_most_one(data, json)
 
-    # Set parameter.
+    # Parameter.
     if method is None:
         if data is None and json is None:
             method = 'get'
@@ -845,7 +853,7 @@ class AsyncPool(Base):
         kwargs : Function keyword arguments, after default keyword arguments.
         """
 
-        # Set parameter.
+        # Parameter.
         func_args = (
             *self.args,
             *args

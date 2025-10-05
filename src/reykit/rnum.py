@@ -121,7 +121,7 @@ def number_ch(number: int) -> str:
     # Import.
     from .rre import sub_batch
 
-    # Set parameter.
+    # Parameter.
     map_digit = {
         '0': '零',
         '1': '一',
@@ -154,7 +154,7 @@ def number_ch(number: int) -> str:
         16: '兆'
     }
 
-    # Set parameter.
+    # Parameter.
     number_str = str(number)
 
     # Replace digit.

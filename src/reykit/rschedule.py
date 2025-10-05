@@ -118,7 +118,7 @@ class Schedule(Base):
         if self.db is None:
             throw(ValueError, self.db)
 
-        # Set parameter.
+        # Parameter.
 
         ## Table.
         DatabaseTableSchedule._set_name(self.db_names['schedule'])
@@ -254,7 +254,7 @@ class Schedule(Base):
             kwargs : Keyword arguments of function.
             """
 
-            # Set parameter.
+            # Parameter.
             nonlocal task, note
 
             # Status executing.
@@ -329,7 +329,7 @@ class Schedule(Base):
         Task instance.
         """
 
-        # Set parameter.
+        # Parameter.
         if plan is None:
             plan = {}
         trigger = plan.get('trigger')
@@ -376,7 +376,7 @@ class Schedule(Base):
         note : Task note.
         """
 
-        # Set parameter.
+        # Parameter.
         if type(task) == Job:
             task = task.id
         if plan is None:
@@ -423,7 +423,7 @@ class Schedule(Base):
         task : Task instance or ID.
         """
 
-        # Set parameter.
+        # Parameter.
         if type(task) == Job:
             id_ = task.id
         else:
@@ -445,7 +445,7 @@ class Schedule(Base):
         task : Task instance or ID.
         """
 
-        # Set parameter.
+        # Parameter.
         if type(task) == Job:
             id_ = task.id
         else:
@@ -467,7 +467,7 @@ class Schedule(Base):
         task : Task instance or ID.
         """
 
-        # Set parameter.
+        # Parameter.
         if type(task) == Job:
             id_ = task.id
         else:

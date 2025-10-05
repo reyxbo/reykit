@@ -50,7 +50,7 @@ def to_text(data: Any, width: int | None = None) -> str:
     Formatted text.
     """
 
-    # Set parameter.
+    # Parameter.
     if width is None:
         width, _ = get_terminal_size()
 
@@ -135,7 +135,7 @@ def get_width(text: str) -> int:
     Text display width.
     """
 
-    # Set parameter.
+    # Parameter.
     widths = (
         (126, 1),
         (159, 0),
@@ -291,7 +291,7 @@ def frame_text(
     Added frame text.
     """
 
-    # Set parameter.
+    # Parameter.
     if width is None:
         width, _ = get_terminal_size()
     line_chars_dict = {

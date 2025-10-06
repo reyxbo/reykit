@@ -9,7 +9,8 @@
 """
 
 
-from typing import Any, Literal, Self, TypeVar, Type, NoReturn, overload, final
+from typing import Any, Literal, Callable, Self, TypeVar, Type, NoReturn, overload, final
+from types import CoroutineType
 from collections.abc import Callable, Iterable, Container, Mapping
 from sys import exc_info as sys_exc_info
 from os.path import exists as os_exists
@@ -30,6 +31,9 @@ __all__ = (
     'KT',
     'VT',
     'CallableT',
+    'CallableSimple',
+    'CoroutineFunction',
+    'CoroutineFunctionSimple',
     'Base',
     'StaticMeta',
     'ConfigMeta',
@@ -69,6 +73,10 @@ V = TypeVar('V') # Any.
 KT = TypeVar('KT') # Dictionary key.
 VT = TypeVar('VT') # Dictionary value.
 CallableT = TypeVar('CallableT', bound=Callable) # Callable.
+
+type CallableSimple = Callable[[], Any]
+type CoroutineFunction = Callable[..., CoroutineType]
+type CoroutineFunctionSimple = Callable[[], CoroutineType]
 
 
 class Base(object):

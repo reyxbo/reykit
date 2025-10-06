@@ -47,16 +47,7 @@ class Schedule(Base):
     """
     Schedule type.
     Can create database used `self.build_db` method.
-
-    Attributes
-    ----------
-    db_names : Database table name mapping dictionary.
     """
-
-    db_names = {
-        'schedule': 'schedule',
-        'stats_schedule': 'stats_schedule'
-    }
 
 
     def __init__(
@@ -111,7 +102,7 @@ class Schedule(Base):
 
     def build_db(self) -> None:
         """
-        Check and build database tables, by `self.db_names`.
+        Check and build database tables.
         """
 
         # Check.
@@ -119,21 +110,21 @@ class Schedule(Base):
             throw(ValueError, self.db)
 
         # Parameter.
+        database = self.db.database
 
         ## Table.
-        DatabaseTableSchedule._set_name(self.db_names['schedule'])
         tables = [DatabaseTableSchedule]
 
         ## View stats.
         views_stats = [
             {
-                'path': self.db_names['stats_schedule'],
+                'path': 'stats_schedule',
                 'items': [
                     {
                         'name': 'count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`'
+                            f'FROM `{database}`.`schedule`'
                         ),
                         'comment': 'Schedule count.'
                     },
@@ -141,7 +132,7 @@ class Schedule(Base):
                         'name': 'past_day_count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`\n'
+                            f'FROM `{database}`.`schedule`\n'
                             'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) = 0'
                         ),
                         'comment': 'Schedule count in the past day.'
@@ -150,7 +141,7 @@ class Schedule(Base):
                         'name': 'past_week_count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`\n'
+                            f'FROM `{database}`.`schedule`\n'
                             'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) <= 6'
                         ),
                         'comment': 'Schedule count in the past week.'
@@ -159,7 +150,7 @@ class Schedule(Base):
                         'name': 'past_month_count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`\n'
+                            f'FROM `{database}`.`schedule`\n'
                             'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) <= 29'
                         ),
                         'comment': 'Schedule count in the past month.'
@@ -168,7 +159,7 @@ class Schedule(Base):
                         'name': 'task_count',
                         'select': (
                             'SELECT COUNT(DISTINCT `task`)\n'
-                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`'
+                            f'FROM `{database}`.`schedule`'
                         ),
                         'comment': 'Task count.'
                     },
@@ -176,7 +167,7 @@ class Schedule(Base):
                         'name': 'last_time',
                         'select': (
                             'SELECT IFNULL(MAX(`update_time`), MAX(`create_time`))\n'
-                            f'FROM `{self.db.database}`.`{self.db_names['schedule']}`'
+                            f'FROM `{database}`.`schedule`'
                         ),
                         'comment': 'Schedule last record time.'
                     }
@@ -266,7 +257,7 @@ class Schedule(Base):
             with self.db.connect() as conn:
                 conn = self.db.connect()
                 conn.execute.insert(
-                    self.db_names['schedule'],
+                    'schedule',
                     data
                 )
                 id_ = conn.insert_id()
@@ -286,7 +277,7 @@ class Schedule(Base):
                     'status': 2
                 }
                 self.db.execute.update(
-                    self.db_names['schedule'],
+                    'schedule',
                     data
                 )
                 raise
@@ -298,7 +289,7 @@ class Schedule(Base):
                     'status': 1
                 }
                 self.db.execute.update(
-                    self.db_names['schedule'],
+                    'schedule',
                     data
                 )
 

@@ -1,6 +1,6 @@
 # reykit
 
-> Rey's kit method set.
+> Kit method set.
 
 ## Install
 

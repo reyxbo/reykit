@@ -23,14 +23,14 @@ from .rbase import Base, throw
 
 
 __all__ = (
-    'DatabaseTableSchedule',
+    'DatabaseORMTableSchedule',
     'Schedule'
 )
 
 
-class DatabaseTableSchedule(rorm.Model, table=True):
+class DatabaseORMTableSchedule(rorm.Model, table=True):
     """
-    Database `schedule` table model.
+    Database `schedule` table ORM model.
     """
 
     __name__ = 'schedule'
@@ -99,6 +99,10 @@ class Schedule(Base):
         ## Database.
         self.db = db
 
+        ### Build Database.
+        if self.db is not None:
+            self.build_db()
+
 
     def build_db(self) -> None:
         """
@@ -113,7 +117,7 @@ class Schedule(Base):
         database = self.db.database
 
         ## Table.
-        tables = [DatabaseTableSchedule]
+        tables = [DatabaseORMTableSchedule]
 
         ## View stats.
         views_stats = [

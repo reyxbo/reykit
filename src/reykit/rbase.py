@@ -191,10 +191,6 @@ class Null(Base, metaclass=StaticMeta):
     """
     Null type.
 
-    Attributes
-    ----------
-    Type : Type hints of self.
-
     Examples
     --------
     >>> def foo(arg: Any | Null.Type = Null):
@@ -203,19 +199,17 @@ class Null(Base, metaclass=StaticMeta):
     """
 
     Type = NullType
+    'Type hints of self.'
 
 
 class Singleton(Base):
     """
     Singleton type.
     When instantiated, method `__singleton__` will be called only once, and will accept arguments.
-
-    Attributes
-    ----------
-    _instance : Global singleton instance.
     """
 
     __instance: Self
+    'Global singleton instance.'
 
 
     def __new__(self, *arg: Any, **kwargs: Any) -> Self:

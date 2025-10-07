@@ -51,11 +51,6 @@ type CallableCoroutine = Coroutine | ATask | Callable[[], Coroutine]
 class ThreadPool(Base):
     """
     Thread pool type.
-
-    Attributes
-    ----------
-    Queue : Thread queue type.
-    Lock : Thread lock type.
     """
 
     Queue = QQueue
@@ -788,11 +783,6 @@ async def async_request(
 class AsyncPool(Base):
     """
     Asynchronous pool type.
-
-    Attributes
-    ----------
-    Queue : asynchronous queue type.
-    Lock : asynchronous lock type.
     """
 
     Queue = AQueue

@@ -35,10 +35,6 @@ __all__ = (
 class ConfigStdout(Base, metaclass=ConfigMeta):
     """
     Config standard output type.
-
-    Attributes
-    ----------
-    force_print_ascii : Whether force methods print frame use ascii border.
     """
 
     # Module path.
@@ -55,6 +51,7 @@ class ConfigStdout(Base, metaclass=ConfigMeta):
 
     # Force print ascii.
     force_print_ascii: bool = False
+    'Whether force methods print frame use ascii border.'
 
     # Added print position.
     _added_print_position: set = set()

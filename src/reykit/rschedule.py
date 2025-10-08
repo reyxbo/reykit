@@ -16,8 +16,7 @@ from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.job import Job
-from reydb import rorm
-from reydb.rdb import Database
+from reydb import rorm, Database
 
 from .rbase import Base, throw
 

@@ -236,7 +236,6 @@ class Schedule(Base):
         """
 
 
-        # Define.
         @functools_wraps(task)
         def _task(*args, **kwargs) -> None:
             """

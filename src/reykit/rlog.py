@@ -308,7 +308,6 @@ class Log(Base):
         """
 
 
-        # Define.
         def default_filter_method(
             record: LogRecord
         ) -> Literal[True]:
@@ -360,7 +359,6 @@ class Log(Base):
         """
 
 
-        # Define.
         class _Filter(Base, Filter):
             """
             Filter type.
@@ -646,7 +644,6 @@ class Log(Base):
         _, queue = self.add_queue(level=level, filter_=filter_)
 
 
-        # Define.
         @wrap_thread
         def execute() -> None:
             """
@@ -698,7 +695,6 @@ class Log(Base):
         """
 
 
-        # Define.
         def preprocess(__s: str) -> str:
             """
             Preprocess function.

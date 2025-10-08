@@ -377,7 +377,7 @@ def async_run(
     before = handle_tasks_func(before)
     after = handle_tasks_func(after)
 
-    # Define.
+
     async def async_run_coroutine() -> list[T | BaseException]:
         """
         Asynchronous run coroutines.

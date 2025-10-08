@@ -251,7 +251,6 @@ def modify_print(preprocess: Callable[[str], str] | None) -> None:
     """
 
 
-    # Define.
     def write(__s: str) -> int | None:
         """
         Modified standard output write method.
@@ -303,7 +302,6 @@ def add_print_position() -> None:
     """
 
 
-    # Define.
     def preprocess(__s: str) -> str:
         """
         Preprocess function.

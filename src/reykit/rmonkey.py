@@ -209,7 +209,7 @@ def monkey_sqlalchemy_row_index_field():
     from typing import Any, overload
     from sqlalchemy.engine.row import Row
 
-    # Define.
+
     @overload
     def __getitem__(self, index: str | int) -> Any: ...
 
@@ -251,7 +251,6 @@ def monkey_pprint_modify_width_judgment() -> None:
     from pprint import PrettyPrinter, _recursion
 
 
-    # Define.
     def __format(_self, obj, stream, indent, allowance, context, level):
 
         from .rtext import get_width
@@ -299,12 +298,12 @@ def monkey_path_pil_image_get_bytes():
     >>> image.get_bytes()
     """
 
+    # Import.
     from PIL.Image import Image
     from io import BytesIO
     from .rbase import Base
 
 
-    # Define.
     def method_get_bytes(self: Image) -> bytes:
         """
         Get image bytes data.

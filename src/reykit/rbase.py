@@ -153,34 +153,53 @@ class ConfigMeta(StaticMeta):
 
     def __getitem__(cls, name: str) -> Any:
         """
-        Get item.
+        Get config value.
 
         Parameters
         ----------
-        name : Item name.
+        name : Config name.
 
         Returns
         -------
-        Item value.
+        Config value.
         """
 
         # Get.
-        item = getattr(cls, name)
+        value = getattr(cls, name)
 
-        return item
+        return value
 
 
     def __setitem__(cls, name: str, value: Any) -> None:
         """
-        Set item.
+        Set config value.
 
         Parameters
         ----------
-        name : Item name.
+        name : Config name.
         """
 
         # Set.
         setattr(cls, name, value)
+
+
+    def __contains__(cls, name: str) -> bool:
+        """
+        Whether the exist this config value.
+
+        Parameters
+        ----------
+        name : Config name.
+
+        Returns
+        -------
+        Result.
+        """
+
+        # Judge.
+        result = hasattr(cls, name)
+
+        return result
 
 
 type NullType = Type['Null']

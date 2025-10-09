@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@Time    : 2022-12-11 23:25:36
+@Time    : 2022-12-11
 @Author  : Rey
 @Contact : reyxbo@163.com
 @Explain : Regular expression methods.

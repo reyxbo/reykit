@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@Time    : 2023-06-16 13:49:33
+@Time    : 2023-06-16
 @Author  : Rey
 @Contact : reyxbo@163.com
 @Explain : Table methods.

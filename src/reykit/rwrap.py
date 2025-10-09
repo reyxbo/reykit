@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@Time    : 2022-12-05 14:12:25
+@Time    : 2022-12-05
 @Author  : Rey
 @Contact : reyxbo@163.com
 @Explain : Decorator methods.

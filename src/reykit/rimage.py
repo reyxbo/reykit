@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@Time    : 2023-04-22 17:27:47
+@Time    : 2023-04-22
 @Author  : Rey
 @Contact : reyxbo@163.com
 @Explain : Image methods.

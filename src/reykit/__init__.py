@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@Time    : 2022-12-05 14:09:21
+@Time    : 2022-12-05
 @Author  : Rey
 @Contact : reyxbo@163.com
 @Explain : Kit method set.

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@Time    : 2023-10-01 14:47:47
+@Time    : 2023-10-01
 @Author  : Rey
 @Contact : reyxbo@163.com
 @Explain : Standard output and input methods.

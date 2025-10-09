@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@Time    : 2022-12-08 11:07:25
+@Time    : 2022-12-08
 @Author  : Rey
 @Contact : reyxbo@163.com
 @Explain : Network methods.

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@Time    : 2024-01-09 21:44:48
+@Time    : 2024-01-09
 @Author  : Rey
 @Contact : reyxbo@163.com
 @Explain : Schedule methods.
@@ -16,7 +16,7 @@ from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.job import Job
-from reydb import rorm, Database
+from reydb import rorm, DatabaseEngine
 
 from .rbase import Base, throw
 
@@ -55,7 +55,7 @@ class Schedule(Base):
         max_instances: int = 1,
         coalesce: bool = True,
         block: bool = False,
-        db: Database | None = None
+        db_engine: DatabaseEngine | None = None
     ) -> None:
         """
         Build instance attributes.
@@ -66,7 +66,7 @@ class Schedule(Base):
         max_instances : Maximum number of synchronized executions of tasks with the same ID.
         coalesce : Whether to coalesce tasks with the same ID.
         block : Whether to block.
-        db : `Database` instance.
+        db_engine : Database engine.
             - `None`: Not use database.
             - `Database`: Automatic record to database.
         """
@@ -96,10 +96,10 @@ class Schedule(Base):
         self.scheduler.start()
 
         ## Database.
-        self.db = db
+        self.db_engine = db_engine
 
         ### Build Database.
-        if self.db is not None:
+        if self.db_engine is not None:
             self.build_db()
 
 
@@ -109,11 +109,11 @@ class Schedule(Base):
         """
 
         # Check.
-        if self.db is None:
-            throw(ValueError, self.db)
+        if self.db_engine is None:
+            throw(ValueError, self.db_engine)
 
         # Parameter.
-        database = self.db.database
+        database = self.db_engine.database
 
         ## Table.
         tables = [DatabaseORMTableSchedule]
@@ -179,10 +179,10 @@ class Schedule(Base):
         ]
 
         # Build.
-        self.db.build.build(tables=tables, views_stats=views_stats, skip=True)
+        self.db_engine.build.build(tables=tables, views_stats=views_stats, skip=True)
 
         # ## Error.
-        self.db.error.build_db()
+        self.db_engine.error.build_db()
 
 
     def pause(self) -> None:
@@ -256,8 +256,8 @@ class Schedule(Base):
                 'task': task.__name__,
                 'note': note
             }
-            with self.db.connect() as conn:
-                conn = self.db.connect()
+            with self.db_engine.connect() as conn:
+                conn = self.db_engine.connect()
                 conn.execute.insert(
                     'schedule',
                     data
@@ -267,7 +267,7 @@ class Schedule(Base):
             # Try execute.
 
             ## Record error.
-            task = self.db.error.wrap(task, note=note)
+            task = self.db_engine.error.wrap(task, note=note)
 
             try:
                 task(*args, **kwargs)
@@ -278,7 +278,7 @@ class Schedule(Base):
                     'id': id_,
                     'status': 2
                 }
-                self.db.execute.update(
+                self.db_engine.execute.update(
                     'schedule',
                     data
                 )
@@ -290,7 +290,7 @@ class Schedule(Base):
                     'id': id_,
                     'status': 1
                 }
-                self.db.execute.update(
+                self.db_engine.execute.update(
                     'schedule',
                     data
                 )
@@ -335,7 +335,7 @@ class Schedule(Base):
         # Add.
 
         ## Database.
-        if self.db is not None:
+        if self.db_engine is not None:
             task = self.wrap_record_db(task, note)
 
         job = self.scheduler.add_job(

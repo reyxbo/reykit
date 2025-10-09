@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@Time    : 2023-05-09 15:30:10
+@Time    : 2023-05-09
 @Author  : Rey
 @Contact : reyxbo@163.com
 @Explain : Operation system methods.

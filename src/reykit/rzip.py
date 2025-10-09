@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@Time    : 2023-01-19 19:23:57
+@Time    : 2023-01-19
 @Author  : Rey
 @Contact : reyxbo@163.com
 @Explain : File compress methods.

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@Time    : 2022-12-19 20:06:20
+@Time    : 2022-12-19
 @Author  : Rey
 @Contact : reyxbo@163.com
 @Explain : Multi task methods.

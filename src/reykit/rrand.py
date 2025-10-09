@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@Time    : 2023-04-22 22:32:34
+@Time    : 2023-04-22
 @Author  : Rey
 @Contact : reyxbo@163.com
 @Explain : Random methods.

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@Time    : 2023-12-06 16:17:04
+@Time    : 2023-12-06
 @Author  : Rey
 @Contact : reyxbo@163.com
 @Explain : DLL file code methods.

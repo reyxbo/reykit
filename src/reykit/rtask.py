@@ -30,7 +30,7 @@ from asyncio import (
 )
 from aiohttp import ClientSession, ClientResponse
 
-from .rbase import T, Base, throw, check_most_one, check_response_code, is_iterable
+from .rbase import T, Base, throw, check_most_one, is_iterable
 from .rtime import randn, TimeMark
 from .rwrap import wrap_thread
 

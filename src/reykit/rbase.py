@@ -83,51 +83,6 @@ class Base(object):
     Base type.
     """
 
-    def __getitem__(self, name: str) -> Any:
-        """
-        Get Attribute.
-
-        Parameters
-        ----------
-        name : Attribute name.
-
-        Returns
-        -------
-        Attribute value.
-        """
-
-        # Get.
-        value = getattr(self, name)
-
-        return value
-
-
-    def __setitem__(self, name: str, value: Any) -> None:
-        """
-        Set Attribute.
-
-        Parameters
-        ----------
-        name : Attribute name.
-        value : Attribute value.
-        """
-
-        # Set.
-        setattr(self, name, value)
-
-
-    def __delitem__(self, name: str) -> None:
-        """
-        Delete Attribute.
-
-        Parameters
-        ----------
-        name : Attribute name.
-        """
-
-        # Delete.
-        delattr(self, name)
-
 
 class StaticMeta(Base, type):
     """

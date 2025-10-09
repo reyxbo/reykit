@@ -34,7 +34,7 @@ from mimetypes import guess_type
 from filetype import guess as filetype_guess
 from datetime import datetime
 
-from .rbase import Base, throw, check_response_code
+from .rbase import Base, throw
 from .ros import File, get_md5
 from .rre import search, split, sub
 

@@ -50,7 +50,6 @@ __all__ = (
     'check_most_one',
     'check_file_found',
     'check_file_exist',
-    'check_response_code',
     'is_class',
     'is_instance',
     'is_iterable',
@@ -487,44 +486,6 @@ def check_file_exist(path: str) -> None:
     # Throw exception.
     if exist:
         throw(FileExistsError, path)
-
-
-def check_response_code(
-    code: int,
-    range_: int | Iterable[int] | None = None
-) -> bool:
-    """
-    Check if the response code is in range.
-
-    Parameters
-    ----------
-    code : Response code.
-    range\\_ : Pass the code range.
-        - `None`: Check if is between 200 and 299.
-        - `int`: Check if is this value.
-        - `Iterable`: Check if is in sequence.
-
-    Returns
-    -------
-    Check result.
-    """
-
-    # Check.
-    match range_:
-        case None:
-            result = code // 100 == 2
-        case int():
-            result = code == range_
-        case _ if hasattr(range_, '__contains__'):
-            result = code in range_
-        case _:
-            throw(TypeError, range_)
-
-    # Throw exception.
-    if not result:
-        throw(AssertionError, code)
-
-    return result
 
 
 def is_class(obj: Any) -> bool:

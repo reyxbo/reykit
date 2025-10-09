@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@Time    : 2022-12-19
+@Time    : 2022-12-19 20:06:20
 @Author  : Rey
 @Contact : reyxbo@163.com
 @Explain : Multi task methods.
@@ -715,7 +715,25 @@ async def async_request(
                     range_ = None
                 else:
                     range_ = check
-                check_response_code(response.status, range_)
+                match range_:
+                    case None:
+                        result = response.status // 100 == 2
+                    case int():
+                        result = response.status == range_
+                    case _ if hasattr(range_, '__contains__'):
+                        result = response.status in range_
+                    case _:
+                        throw(TypeError, range_)
+
+                ## Throw exception.
+                if not result:
+                    response_text = await response.text()
+                    response_text = response_text[:100]
+                    if len(response_text) > 100:
+                        response_text += '...'
+                    response_text = repr(response_text)
+                    text = f"response code is '{response.status_code}', response content is {response_text}"
+                    throw(AssertionError, text=text)
 
             # Receive.
             match handler:

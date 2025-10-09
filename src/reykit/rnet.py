@@ -14,7 +14,11 @@ from collections.abc import Callable, Iterable
 from warnings import filterwarnings
 from os.path import abspath as os_abspath, isfile as os_isfile
 from socket import socket as  Socket
-from urllib.parse import urlsplit as urllib_urlsplit, quote as urllib_quote, unquote as urllib_unquote
+from urllib.parse import (
+    urlsplit as urllib_urlsplit,
+    quote as urllib_quote,
+    unquote as urllib_unquote
+)
 from requests.api import request as requests_request
 from requests.models import Response
 from requests_cache import (
@@ -32,7 +36,7 @@ from datetime import datetime
 
 from .rbase import Base, throw, check_response_code
 from .ros import File, get_md5
-from .rre import search, split
+from .rre import search, split, sub
 
 
 __all__ = (
@@ -63,34 +67,45 @@ RequestCacheParameters = TypedDict(
 )
 
 
-def join_url(url: str, params: dict) -> str:
+def join_url(*urls: str, **params: dict) -> str:
     """
     Join URL and parameters.
 
     Parameters
     ----------
-    url : URL.
-    params : Parameters of URL.
+    urls : URL.
+    params : URL parameters.
 
     Returns
     -------
     Joined URL.
     """
 
-    # Join parameter.
-    params_str = '&'.join(
-        [
-            f'{key}={urllib_quote(value)}'
-            for key, value in params.items()
-        ]
-    )
+    # Check.
+    if len(urls) == 0:
+        throw(ValueError, urls)
 
     # Join URL.
-    if '?' not in url:
-        url += '?'
-    elif url[-1] != '?':
-        url += '&'
-    url += params_str
+    url: str = '/'.join(urls)
+    url = url.replace('\\', '/')
+    pattern = '(?<!:)//+'
+    url = sub(pattern, url, '/')
+    if url[-1] == '/':
+        url = url[:-1]
+
+    # Join parameter.
+    if params != {}:
+        params_str = '&'.join(
+            [
+                f'{key}={urllib_quote(str(value))}'
+                for key, value in params.items()
+            ]
+        )
+        if '?' not in url:
+            url += '?'
+        elif url[-1] != '?':
+            url += '&'
+        url += params_str
 
     return url
 
@@ -369,7 +384,24 @@ def request(
             range_ = None
         else:
             range_ = check
-        check_response_code(response.status_code, range_)
+        match range_:
+            case None:
+                result = response.status_code // 100 == 2
+            case int():
+                result = response.status_code == range_
+            case _ if hasattr(range_, '__contains__'):
+                result = response.status_code in range_
+            case _:
+                throw(TypeError, range_)
+
+        ## Throw exception.
+        if not result:
+            response_text = response.text[:100]
+            if len(response.text) > 100:
+                response_text += '...'
+            response_text = repr(response_text)
+            text = f"response code is '{response.status_code}', response content is {response_text}"
+            throw(AssertionError, text=text)
 
     return response
 

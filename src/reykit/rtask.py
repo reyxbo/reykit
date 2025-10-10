@@ -572,6 +572,36 @@ async def async_request(
     ssl: bool = False,
     method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = None,
     check: bool | int | Iterable[int] = False,
+    handler: str
+) -> Any: ...
+
+@overload
+async def async_request(
+    url: str,
+    params: dict | None = None,
+    *,
+    json: dict | None = None,
+    headers: dict[str, str] = {},
+    timeout: float | None = None,
+    proxy: str | None = None,
+    ssl: bool = False,
+    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = None,
+    check: bool | int | Iterable[int] = False,
+    handler: str
+) -> Any: ...
+
+@overload
+async def async_request(
+    url: str,
+    params: dict | None = None,
+    data: dict | str | bytes | None = None,
+    *,
+    headers: dict[str, str] = {},
+    timeout: float | None = None,
+    proxy: str | None = None,
+    ssl: bool = False,
+    method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = None,
+    check: bool | int | Iterable[int] = False,
     handler: tuple[str]
 ) -> list: ...
 

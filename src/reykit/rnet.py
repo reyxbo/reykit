@@ -67,13 +67,13 @@ RequestCacheParameters = TypedDict(
 )
 
 
-def join_url(*urls: str, **params: dict) -> str:
+def join_url(*urls: Any, **params: dict) -> str:
     """
     Join URL and parameters.
 
     Parameters
     ----------
-    urls : URL.
+    urls : URL parts.
     params : URL parameters.
 
     Returns
@@ -81,9 +81,12 @@ def join_url(*urls: str, **params: dict) -> str:
     Joined URL.
     """
 
-    # Check.
+    # Parameter.
     if len(urls) == 0:
         throw(ValueError, urls)
+    for index, url in enumerate(urls):
+        if type(url) != str:
+            urls[index] = str(url)
 
     # Join URL.
     url: str = '/'.join(urls)
@@ -421,9 +424,6 @@ def get_response_file_name(response: Response, default_name: str | None = None) 
     File name.
     """
 
-    # Parameter.
-    content = response.content
-
     # Get.
     file_name = None
     Content_disposition = response.headers.get('Content-Disposition', '')
@@ -442,6 +442,7 @@ def get_response_file_name(response: Response, default_name: str | None = None) 
             file_name = url_parts[-1]
     if file_name is None:
         if default_name is None:
+            content = response.content
             default_name = get_md5(content)
             file_type_obj = filetype_guess(content)
             if file_type_obj is not None:

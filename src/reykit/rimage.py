@@ -212,7 +212,7 @@ def to_pil_image(source: str | bytes) -> Image:
 
 
 def generate_captcha_image(
-    text: int | str | None = None,
+    text: int | str = 5,
     path: str | None = None,
     **kwargs: Any
 ) -> bytes:
@@ -222,7 +222,6 @@ def generate_captcha_image(
     Parameters
     ----------
     text : Text, contains digits and Uppercase letters and lowercase letters.
-        - `None`: Random five characters.
         - `int`: Given length Random characters.
         - `str`: Given characters.
     path : File save path.
@@ -235,7 +234,6 @@ def generate_captcha_image(
     """
 
     # Parameter.
-    text = text or 5
     if type(text) == int:
         text = randchar(text, False)
 

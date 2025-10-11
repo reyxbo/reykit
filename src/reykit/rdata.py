@@ -15,6 +15,9 @@ from collections.abc import Callable, Iterable, Generator, AsyncGenerator
 from itertools import chain as IChain
 from decimal import Decimal
 from json import dumps as json_dumps
+from jwt import encode as jwt_encode, decode as jwt_decode
+from jwt.exceptions import InvalidTokenError
+from bcrypt import gensalt as bcrypt_gensalt, hashpw as bcrypt_hashpw, checkpw as bcrypt_checkpw
 
 from .rbase import T, KT, VT, Base, Null, check_least_one, check_most_one, is_iterable
 
@@ -29,7 +32,11 @@ __all__ = (
     'objs_in',
     'chain',
     'default_dict',
-    'FunctionGenerator'
+    'FunctionGenerator',
+    'encode_jwt',
+    'decode_jwt',
+    'hash_bcrypt',
+    'is_hash_bcrypt'
 )
 
 
@@ -545,3 +552,104 @@ class FunctionGenerator(Base):
         agenerator = await self.agenerator()
 
         return agenerator
+
+
+def encode_jwt(json: dict[str, Any], key: str | bytes) -> str:
+    """
+    Encode JSON data to JWT token, based on `HS256`.
+
+    Parameters
+    ----------
+    json : JSON data.
+    key : Key.
+
+    Returns
+    -------
+    Token.
+    """
+
+    # Parameter.
+    if type(key) != str:
+        key = str(key)
+    algorithm = 'HS256'
+
+    # Encode.
+    token = jwt_encode(json, key, algorithm=algorithm)
+
+    return token
+
+
+def decode_jwt(token: str | bytes, key: str| bytes) -> dict[str, Any] | None:
+    """
+    Decode JWT token to JSON data, based on `HS256`. When decode error, then return `None`.
+
+    Parameters
+    ----------
+    token : JWT token.
+    key : Key.
+
+    Returns
+    -------
+    JSON data or null.
+    """
+
+    # Parameter.
+    algorithm = 'HS256'
+
+    # Decode.
+    try:
+        json = jwt_decode(token, key, algorithms=algorithm)
+    except InvalidTokenError:
+        return
+
+    return json
+
+
+def hash_bcrypt(password: str | bytes) -> bytes:
+    """
+    Get hash password, based on algorithm `bcrypt`.
+
+    Parameters
+    ----------
+    password: Password.
+
+    Returns
+    -------
+    Hashed password.
+    """
+
+    # Parameter.
+    if type(password) != bytes:
+        password = bytes(password)
+
+    # Hash.
+    salt = bcrypt_gensalt()
+    password_hash = bcrypt_hashpw(password, salt)
+
+    return password_hash
+
+
+def is_hash_bcrypt(password: str | bytes, password_hash: str | bytes) -> bool:
+    """
+    Whether is match password and hashed password.
+
+    Parameters
+    ----------
+    password: Password.
+    password_hash : Hashed password.
+
+    Returns
+    -------
+    Judgment result.
+    """
+
+    # Parameter.
+    if type(password) != bytes:
+        password = bytes(password)
+    if type(password_hash) != bytes:
+        password_hash = bytes(password_hash)
+
+    # Judge.
+    result = bcrypt_checkpw(password, password_hash)
+
+    return result

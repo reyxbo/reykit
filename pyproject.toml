@@ -1,6 +1,6 @@
 [project]
 name = "reykit"
-version = "1.2.1"
+version = "1.2.3"
 description = "Kit method set."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -12,6 +12,7 @@ authors = [
 dependencies = [
     "aiohttp",
     "apscheduler",
+    "bcrypt",
     "captcha",
     "concurrent-log-handler",
     "filetype",
@@ -26,7 +27,8 @@ dependencies = [
     "requests_cache",
     "reydb",
     "varname",
-    "Pillow"
+    "Pillow",
+    "PyJWT"
 ]
 
 [project.urls]

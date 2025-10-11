@@ -30,5 +30,4 @@ rtask : Multi task methods.
 rtext : Text methods.
 rtime : Time methods.
 rwrap : Decorators.
-rzip : File compress methods.
 """

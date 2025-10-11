@@ -14,11 +14,12 @@ if TYPE_CHECKING:
     from _typeshed import OpenTextMode, OpenBinaryMode
 from io import TextIOBase, BufferedIOBase
 from os import (
+    getcwd as os_getcwd,
     walk as os_walk,
     listdir as os_listdir,
     makedirs as os_makedirs,
     renames as os_renames,
-    remove as os_remove
+    remove as os_remove,
 )
 from os.path import (
     join as os_join,
@@ -40,7 +41,6 @@ from pathlib import Path
 from hashlib import md5 as hashlib_md5
 from tomllib import loads as tomllib_loads
 from json import JSONDecodeError
-from filetype import guess as filetype_guess
 from tempfile import TemporaryFile, TemporaryDirectory
 
 from .rbase import Base, throw
@@ -63,6 +63,8 @@ __all__ = (
     'TempFile',
     'TempFolder',
     'FileStore',
+    'compress',
+    'decompress',
     'doc_to_docx',
     'extract_docx_content',
     'extract_pdf_content',
@@ -2103,6 +2105,97 @@ class FileStore(Base):
         path = self.store(response.content, name)
 
         return path
+
+
+def compress(
+    path: str,
+    build_dir: str | None = None,
+    overwrite: bool = True
+) -> None:
+    """
+    Compress file or folder.
+
+    Parameters
+    ----------
+    path : File or folder path.
+    build_dir : Build directory.
+        - `None`: Work directory.
+        - `str`: Use this value.
+    overwrite : Whether to overwrite.
+    """
+
+    from zipfile import ZipFile, ZIP_DEFLATED
+
+    # Parameter.
+    build_dir = Folder(build_dir).path
+    if overwrite:
+        mode = 'w'
+    else:
+        mode = 'x'
+    is_file = os_isfile(path)
+    if is_file:
+        file = File(path)
+        obj_name = file.name_suffix
+    else:
+        folder = Folder(path)
+        obj_name = folder.name
+    build_name = obj_name + '.zip'
+    build_path = join_path(build_dir, build_name)
+
+    # Compress.
+    with ZipFile(build_path, mode, ZIP_DEFLATED) as zip_file:
+
+        ## File.
+        if is_file:
+            zip_file.write(file.path, file.name_suffix)
+
+        ## Folder.
+        else:
+            dir_path_len = len(folder.path)
+            dirs = os_walk(folder.path)
+            for folder_name, sub_folders_name, files_name in dirs:
+                for sub_folder_name in sub_folders_name:
+                    sub_folder_path = join_path(folder_name, sub_folder_name)
+                    zip_path = sub_folder_path[dir_path_len:]
+                    zip_file.write(sub_folder_path, zip_path)
+                for file_name in files_name:
+                    file_path = join_path(folder_name, file_name)
+                    zip_path = file_path[dir_path_len:]
+                    zip_file.write(file_path, zip_path)
+
+
+def decompress(
+    obj_path: str,
+    build_dir: str | None = None,
+    password: str | None = None
+) -> None:
+    """
+    Decompress compressed object.
+
+    Parameters
+    ----------
+    obj_path : Compressed object path.
+    build_dir : Build directory.
+        - `None`: Work directory.
+        - `str`: Use this value.
+    passwrod : Unzip Password.
+        - `None`: No Unzip Password.
+        - `str`: Use this value.
+    """
+
+    from zipfile import ZipFile, is_zipfile
+
+    # Check object whether can be decompress.
+    is_support = is_zipfile(obj_path)
+    if not is_support:
+        raise AssertionError('file format that cannot be decompressed')
+
+    # Parameter.
+    build_dir = build_dir or os_getcwd()
+
+    # Decompress.
+    with ZipFile(obj_path) as zip_file:
+        zip_file.extractall(build_dir, pwd=password)
 
 
 def doc_to_docx(path: str, save_path: str | None = None) -> str:

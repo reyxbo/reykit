@@ -313,7 +313,7 @@ def randi(
 
 
 def randchar(
-    length: int,
+    length: int = 32,
     punctuation: bool = True
 ) -> str:
     """

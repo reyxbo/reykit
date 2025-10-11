@@ -619,8 +619,8 @@ def hash_bcrypt(password: str | bytes) -> bytes:
     """
 
     # Parameter.
-    if type(password) != bytes:
-        password = bytes(password)
+    if type(password) == str:
+        password = bytes(password, encoding='utf-8')
 
     # Hash.
     salt = bcrypt_gensalt()
@@ -644,10 +644,10 @@ def is_hash_bcrypt(password: str | bytes, password_hash: str | bytes) -> bool:
     """
 
     # Parameter.
-    if type(password) != bytes:
-        password = bytes(password)
-    if type(password_hash) != bytes:
-        password_hash = bytes(password_hash)
+    if type(password) == str:
+        password = bytes(password, encoding='utf-8')
+    if type(password_hash) == str:
+        password_hash = bytes(password_hash, encoding='utf-8')
 
     # Judge.
     result = bcrypt_checkpw(password, password_hash)

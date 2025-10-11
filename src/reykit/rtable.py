@@ -86,6 +86,32 @@ class Table(Base):
         return result
 
 
+    def to_row(self, index: int = 0) -> dict | None:
+        """
+        Convert data as one row of table.
+
+        Parameters
+        ----------
+        index: Row index number.
+
+        Returns
+        -------
+        Row. When not exist this row, then return null.
+        """
+
+        # Parameter.
+        table = self.to_table()
+
+        # Check.
+        if len(table) < index + 1:
+            return
+
+        # Get.
+        row = table[index]
+
+        return row
+
+
     @overload
     def to_dict(
         self,

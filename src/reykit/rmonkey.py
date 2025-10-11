@@ -154,6 +154,7 @@ def monkey_sqlalchemy_result_more_fetch():
 
     CursorResult.data = method_data
     CursorResult.to_table = Table.to_table
+    CursorResult.to_row = Table.to_row
     CursorResult.to_dict = Table.to_dict
     CursorResult.to_list = Table.to_list
     CursorResult.to_text = Table.to_text
@@ -178,6 +179,7 @@ def monkey_sqlalchemy_result_more_fetch():
 
         # Add method.
         to_table = Table.to_table
+        to_row = Table.to_row
         to_dict = Table.to_dict
         to_list = Table.to_list
         to_text = Table.to_text

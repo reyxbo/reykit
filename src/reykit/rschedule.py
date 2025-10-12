@@ -27,7 +27,7 @@ __all__ = (
 )
 
 
-class DatabaseORMTableSchedule(rorm.Model, table=True):
+class DatabaseORMTableSchedule(rorm.Table):
     """
     Database `schedule` table ORM model.
     """

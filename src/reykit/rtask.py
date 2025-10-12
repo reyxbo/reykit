@@ -37,6 +37,7 @@ from .rwrap import wrap_thread
 
 __all__ = (
     'ThreadPool',
+    'async_gather',
     'async_run',
     'async_sleep',
     'async_wait',
@@ -302,6 +303,100 @@ class ThreadPool(Base):
 
 
 @overload
+async def async_gather(
+    coroutine: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
+    *,
+    before: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
+    after: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
+    return_exc: Literal[False] = False
+) -> T: ...
+
+@overload
+async def async_gather(
+    *coroutines: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
+    before: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
+    after: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
+    return_exc: Literal[False] = False
+) -> list[T]: ...
+
+@overload
+async def async_gather(
+    coroutine: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
+    *,
+    before: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
+    after: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
+    return_exc: Literal[True]
+) -> T | BaseException: ...
+
+@overload
+async def async_gather(
+    *coroutines: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
+    before: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
+    after: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
+    return_exc: Literal[True]
+) -> list[T | BaseException]: ...
+
+async def async_gather(
+    *coroutines: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
+    before: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
+    after: CallableCoroutine | Sequence[CallableCoroutine] | None = None,
+    return_exc: bool = False
+) -> T | BaseException | list[T | BaseException]:
+    """
+    Gather and execute multiple asynchronous coroutines.
+
+    Parameters
+    ----------
+    coroutines : `Coroutine` instances or `ATask` instances or `Coroutine` functions, asynchronous execute.
+    before : `Coroutine` instance or `ATask` instance or `Coroutine` function of execute before execute.
+        - `Sequence[CallableCoroutine]`: Synchronous execute in order.
+    after : `Coroutine` instance or `ATask` instance or `Coroutine` function of execute after execute.
+        - `Sequence[CallableCoroutine]`: Synchronous execute in order.
+    return_exc : Whether return exception instances, otherwise throw first exception.
+
+    Returns
+    -------
+    Run results.
+    """
+
+    # Parameter.
+    if before is None:
+        before = ()
+    elif not is_iterable(before):
+        before = (before,)
+    if after is None:
+        after = ()
+    elif not is_iterable(after):
+        after = (after,)
+    handle_tasks_func = lambda tasks: [
+        task()
+        if asyncio_iscoroutinefunction(task)
+        else task
+        for task in tasks
+    ]
+    coroutines = handle_tasks_func(coroutines)
+    before = handle_tasks_func(before)
+    after = handle_tasks_func(after)
+
+    # Before.
+    for task in before:
+        await task
+
+    # Gather.
+    results: list[T | BaseException] = await asyncio_gather(*coroutines, return_exceptions=return_exc)
+
+    # After.
+    for task in after:
+        await task
+
+    # One.
+    if len(results) == 1:
+        results = results[0]
+
+    return results
+
+
+@overload
 def async_run(
     coroutine: Coroutine[Any, Any, T] | ATask[Any, Any, T] | Callable[[], Coroutine[Any, Any, T]],
     *,
@@ -342,7 +437,7 @@ def async_run(
     return_exc: bool = False
 ) -> T | BaseException | list[T | BaseException]:
     """
-    Asynchronous run coroutines.
+    Top level startup, gather and execute multiple asynchronous coroutines.
 
     Parameters
     ----------
@@ -355,59 +450,17 @@ def async_run(
 
     Returns
     -------
-    run results.
+    Run results.
     """
 
-    # Parameter.
-    if before is None:
-        before = ()
-    elif not is_iterable(before):
-        before = (before,)
-    if after is None:
-        after = ()
-    elif not is_iterable(after):
-        after = (after,)
-    handle_tasks_func = lambda tasks: [
-        task()
-        if asyncio_iscoroutinefunction(task)
-        else task
-        for task in tasks
-    ]
-    coroutines = handle_tasks_func(coroutines)
-    before = handle_tasks_func(before)
-    after = handle_tasks_func(after)
-
-
-    async def async_run_coroutine() -> list[T | BaseException]:
-        """
-        Asynchronous run coroutines.
-
-        Returns
-        -------
-        Run result list.
-        """
-
-        # Before.
-        for task in before:
-            await task
-
-        # Gather.
-        results: list[T | BaseException] = await asyncio_gather(*coroutines, return_exceptions=return_exc)
-
-        # After.
-        for task in after:
-            await task
-
-        return results
-
-
     # Run.
-    coroutine = async_run_coroutine()
-    results = asyncio_run(coroutine)
-
-    # One.
-    if len(results) == 1:
-        results = results[0]
+    coroutine = async_gather(
+        *coroutines,
+        before=before,
+        after=after,
+        return_exc=return_exc
+    )
+    results: T | BaseException | list[T | BaseException] = asyncio_run(coroutine)
 
     return results
 

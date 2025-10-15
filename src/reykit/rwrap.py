@@ -20,7 +20,7 @@ from threading import Thread
 from argparse import ArgumentParser
 from contextlib import redirect_stdout
 
-from .rbase import T, catch_exc, get_arg_info
+from .rbase import T, CallableT, CallableSimple, catch_exc, get_arg_info
 from .rstdout import echo
 from .rtime import now, time_to, TimeMark
 
@@ -34,7 +34,8 @@ __all__ = (
     'wrap_dos_command',
     'wrap_cache_data',
     'wrap_cache',
-    'wrap_redirect_stdout'
+    'wrap_redirect_stdout',
+    'wrap_copy_type_hints'
 )
 
 
@@ -622,3 +623,43 @@ def wrap_redirect_stdout(
         redirect.append(value)
 
     return result
+
+
+def wrap_copy_type_hints(
+    func: CallableT,
+    before: CallableSimple[[tuple, dict], Any] | None = None,
+    after: CallableSimple[[Any], Any] | None = None
+) -> CallableT:
+    """
+    decorator, Copy function type hints and extra execute.
+
+    Parameters
+    ----------
+    func : Function.
+    before : Execution before execution function, can handle input arguments of function.
+    after : Execution after execution function, can handle return of function.
+
+    Returns
+    -------
+    Decorated function.
+    """
+
+
+    @functools_wraps(func)
+    def wrap(*args, **kwargs):
+
+        # Before.
+        if before is not None:
+            args, kwargs = before(args, kwargs)
+
+        # Execute.
+        result = func(*args, **kwargs)
+
+        # After.
+        if after is not None:
+            result = after(result)
+
+        return result
+
+
+    return wrap

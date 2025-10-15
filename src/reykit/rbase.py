@@ -61,7 +61,8 @@ __all__ = (
     'get_astname',
     'get_varname',
     'block',
-    'at_exit'
+    'at_exit',
+    'copy_type_hints'
 )
 
 
@@ -892,3 +893,23 @@ def at_exit(*contents: str | Callable | tuple[Callable, Iterable, Mapping]) -> l
     funcs = list(reversed(funcs))
 
     return funcs
+
+
+def copy_type_hints(
+    real_func: Callable,
+    copy_func: CallableT
+) -> CallableT:
+    """
+    Decorator, copy function type hints to another function.
+
+    Parameters
+    ----------
+    real_func : Real function.
+    copy_func : Copy function.
+
+    Returns
+    -------
+    Real function.
+    """
+
+    return real_func

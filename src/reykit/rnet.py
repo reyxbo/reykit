@@ -263,9 +263,9 @@ def request(
     data: dict | str | bytes | None = None,
     json: dict | None = None,
     files: dict[str, str | bytes | tuple[str | bytes, dict]] | None = None,
-    headers: dict[str, str] = {},
+    headers: dict[str, str] | None = None,
     timeout: float | None = None,
-    proxies: dict[str, str] = {},
+    proxies: dict[str, str] | None = None,
     stream: bool = False,
     verify: bool = False,
     method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = None,
@@ -309,7 +309,7 @@ def request(
         - `Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head']`: Use this request method.
     check : Check response code, and throw exception.
         - `Literal[False]`: Not check.
-        - `Literal[True]`: Check if is between 200 and 299.
+        - `Literal[True]`: Check if is between 200 and 399.
         - `int`: Check if is this value.
         - `Iterable`: Check if is in sequence.
 
@@ -319,6 +319,10 @@ def request(
     """
 
     # Parameter.
+    if headers is None:
+        headers = {}
+    else:
+        headers = headers.copy()
     if method is None:
         if data is None and json is None and files is None:
             method = 'get'
@@ -335,6 +339,7 @@ def request(
             if 'Content-Type' not in headers:
                 headers['Content-Type'] = get_content_type(data)
     else:
+        files = files.copy()
         for key, value in files.items():
             if type(value) == tuple:
                 item_data, item_headers = value
@@ -389,7 +394,7 @@ def request(
             range_ = check
         match range_:
             case None:
-                result = response.status_code // 100 == 2
+                result = 200<= response.status_code <= 399
             case int():
                 result = response.status_code == range_
             case _ if hasattr(range_, '__contains__'):

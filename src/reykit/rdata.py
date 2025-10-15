@@ -19,7 +19,7 @@ from jwt import encode as jwt_encode, decode as jwt_decode
 from jwt.exceptions import InvalidTokenError
 from bcrypt import gensalt as bcrypt_gensalt, hashpw as bcrypt_hashpw, checkpw as bcrypt_checkpw
 
-from .rbase import T, KT, VT, Base, Null, check_least_one, check_most_one, is_iterable
+from .rbase import T, KT, VT, Base, Null, throw, check_least_one, check_most_one, is_iterable
 
 
 __all__ = (
@@ -567,6 +567,11 @@ def encode_jwt(json: dict[str, Any], key: str | bytes) -> str:
     -------
     Token.
     """
+
+    # Check.
+    sub = json.get('sub', '')
+    if type(sub) != str:
+        throw(TypeError, sub)
 
     # Parameter.
     if type(key) != str:

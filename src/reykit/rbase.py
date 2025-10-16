@@ -897,7 +897,7 @@ def at_exit(*contents: str | Callable | tuple[Callable, Iterable, Mapping]) -> l
 
 def copy_type_hints(
     real_func: Callable,
-    copy_func: CallableT
+    _: CallableT
 ) -> CallableT:
     """
     Decorator, copy function type hints to another function.

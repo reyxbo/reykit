@@ -397,13 +397,14 @@ class Schedule(Base):
             if key != 'trigger'
         }
 
-        # Echo.
-        if self.echo:
-            task = self.wrap_echo(task, task_name)
-
         # Database.
         if self.db_engine is not None:
             task = self.wrap_record_db(task, note)
+            self.db_engine.error.wrap(task, note)
+
+        # Echo.
+        if self.echo:
+            task = self.wrap_echo(task, task_name)
 
         # Add.
         job = self.scheduler.add_job(

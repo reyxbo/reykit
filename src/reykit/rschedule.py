@@ -9,9 +9,11 @@
 """
 
 
-from typing import Any, Literal, TypedDict, NotRequired
-from functools import wraps as functools_wraps
+from typing import Any
 from collections.abc import Callable
+from types import ModuleType
+from inspect import ismodule
+from functools import wraps as functools_wraps
 from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -55,7 +57,8 @@ class Schedule(Base):
         max_instances: int = 1,
         coalesce: bool = True,
         block: bool = False,
-        db_engine: DatabaseEngine | None = None
+        db_engine: DatabaseEngine | None = None,
+        echo: bool = False
     ) -> None:
         """
         Build instance attributes.
@@ -69,9 +72,12 @@ class Schedule(Base):
         db_engine : Database engine.
             - `None`: Not use database.
             - `Database`: Automatic record to database.
+        echo : Whether to print the report.
         """
 
         # Build.
+        self.db_engine = db_engine
+        self.echo = echo
 
         ## Scheduler.
         executor = ThreadPoolExecutor(max_workers)
@@ -92,13 +98,7 @@ class Schedule(Base):
             )
         self.scheduler = scheduler
 
-        ### Start.
-        self.scheduler.start()
-
-        ## Database.
-        self.db_engine = db_engine
-
-        ### Build Database.
+        ## Build Database.
         if self.db_engine is not None:
             self.build_db()
 
@@ -185,10 +185,27 @@ class Schedule(Base):
         self.db_engine.error.build_db()
 
 
+    def start(self) -> None:
+        """
+        Start scheduler.
+        """
+
+        # Echo.
+        if self.echo:
+            print('Start scheduler.')
+
+        # Pause.
+        self.scheduler.start()
+
+
     def pause(self) -> None:
         """
         Pause scheduler.
         """
+
+        # Echo.
+        if self.echo:
+            print('Pause scheduler.')
 
         # Pause.
         self.scheduler.pause()
@@ -198,6 +215,10 @@ class Schedule(Base):
         """
         Resume scheduler.
         """
+
+        # Echo.
+        if self.echo:
+            print('Resume scheduler.')
 
         # Resume.
         self.scheduler.resume()
@@ -298,12 +319,50 @@ class Schedule(Base):
         return _task
 
 
-    def add_task(
+    def wrap_echo(
         self,
         task: Callable,
+        name: str
+    ) -> None:
+        """
+        Decorator, print report.
+
+        Parameters
+        ----------
+        task : Task.
+        name : Task name.
+        """
+
+
+        @functools_wraps(task)
+        def _task(*args, **kwargs) -> None:
+            """
+            Decorated function.
+
+            Parameters
+            ----------
+            args : Position arguments of function.
+            kwargs : Keyword arguments of function.
+            """
+
+            # Parameter.
+            nonlocal task
+
+            # Execute and echo.
+            print(f'Execute | {name}')
+            task(*args, **kwargs)
+            print(f'Finish  | {name}')
+
+
+        return _task
+
+
+    def add_task(
+        self,
+        task: Callable | ModuleType,
         plan: dict[str, Any],
-        args: Any | None = None,
-        kwargs: Any | None = None,
+        args: tuple | None = None,
+        kwargs: dict[str, Any] | None = None,
         note: str | None = None
     ) -> Job:
         """
@@ -311,7 +370,9 @@ class Schedule(Base):
 
         Parameters
         ----------
-        task : Task function.
+        task : Task.
+            - `Callable`: Use this function.
+            - `ModuleType`: Use this `main` function of module.
         plan : Plan trigger keyword arguments.
         args : Task position arguments.
         kwargs : Task keyword arguments.
@@ -323,6 +384,10 @@ class Schedule(Base):
         """
 
         # Parameter.
+        task_name = task.__name__
+        *_, task_name = task_name.rsplit('.', 1)
+        if ismodule(task):
+            task = getattr(task, 'main')
         if plan is None:
             plan = {}
         trigger = plan.get('trigger')
@@ -332,19 +397,27 @@ class Schedule(Base):
             if key != 'trigger'
         }
 
-        # Add.
+        # Echo.
+        if self.echo:
+            task = self.wrap_echo(task, task_name)
 
-        ## Database.
+        # Database.
         if self.db_engine is not None:
             task = self.wrap_record_db(task, note)
 
+        # Add.
         job = self.scheduler.add_job(
             task,
             trigger,
             args,
             kwargs,
+            name=task_name,
             **trigger_args
         )
+
+        # Echo.
+        if self.echo:
+            print(f'Added   | {task_name}')
 
         return job
 
@@ -353,8 +426,8 @@ class Schedule(Base):
         self,
         task: Job | str,
         plan: dict[str, Any],
-        args: Any | None = None,
-        kwargs: Any | None = None,
+        args: tuple | None = None,
+        kwargs: dict[str, Any] | None = None,
         note: str | None = None
     ) -> None:
         """
@@ -371,7 +444,12 @@ class Schedule(Base):
 
         # Parameter.
         if type(task) == Job:
-            task = task.id
+            task_id = task.id
+            task_name = task.name
+        else:
+            task_id = task
+            task = self.scheduler.get_job(task_id)
+            task_name = task.name
         if plan is None:
             plan = {}
         trigger = plan.get('trigger')
@@ -384,7 +462,7 @@ class Schedule(Base):
         # Modify plan.
         if plan != {}:
             self.scheduler.reschedule_job(
-                task,
+                task_id,
                 trigger=trigger,
                 **trigger_args
             )
@@ -395,13 +473,14 @@ class Schedule(Base):
             or kwargs != {}
         ):
             self.scheduler.modify_job(
-                task,
+                task_id,
                 args=args,
                 kwargs=kwargs
             )
 
-        # Modify note.
-        self.notes[task] = note
+        # Echo.
+        if self.echo:
+            print(f'Modify  | {task_name}')
 
 
     def remove_task(
@@ -418,12 +497,19 @@ class Schedule(Base):
 
         # Parameter.
         if type(task) == Job:
-            id_ = task.id
+            task_id = task.id
+            task_name = task.name
         else:
-            id_ = task
+            task_id = task
+            task = self.scheduler.get_job(task_id)
+            task_name = task.name
 
         # Remove.
-        self.scheduler.remove_job(id_)
+        self.scheduler.remove_job(task_id)
+
+        # Echo.
+        if self.echo:
+            print(f'Remove  | {task_name}')
 
 
     def pause_task(
@@ -440,12 +526,19 @@ class Schedule(Base):
 
         # Parameter.
         if type(task) == Job:
-            id_ = task.id
+            task_id = task.id
+            task_name = task.name
         else:
-            id_ = task
+            task_id = task
+            task = self.scheduler.get_job(task_id)
+            task_name = task.name
 
         # Pause.
-        self.scheduler.pause_job(id_)
+        self.scheduler.pause_job(task_id)
+
+        # Echo.
+        if self.echo:
+            print(f'Pause   | {task_name}')
 
 
     def resume_task(
@@ -462,9 +555,16 @@ class Schedule(Base):
 
         # Parameter.
         if type(task) == Job:
-            id_ = task.id
+            task_id = task.id
+            task_name = task.name
         else:
-            id_ = task
+            task_id = task
+            task = self.scheduler.get_job(task_id)
+            task_name = task.name
 
         # Resume.
-        self.scheduler.resume_job(id_)
+        self.scheduler.resume_job(task_id)
+
+        # Echo.
+        if self.echo:
+            print(f'Resume  | {task_name}')

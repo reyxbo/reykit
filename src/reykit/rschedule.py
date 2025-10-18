@@ -278,7 +278,6 @@ class Schedule(Base):
                 'note': note
             }
             with self.db_engine.connect() as conn:
-                conn = self.db_engine.connect()
                 conn.execute.insert(
                     'schedule',
                     data
@@ -286,10 +285,6 @@ class Schedule(Base):
                 id_ = conn.insert_id()
 
             # Try execute.
-
-            ## Record error.
-            task = self.db_engine.error.wrap(task, note=note)
-
             try:
                 task(*args, **kwargs)
 
@@ -400,7 +395,7 @@ class Schedule(Base):
         # Database.
         if self.db_engine is not None:
             task = self.wrap_record_db(task, note)
-            self.db_engine.error.wrap(task, note)
+            task = self.db_engine.error.wrap(task, note)
 
         # Echo.
         if self.echo:

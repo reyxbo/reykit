@@ -185,40 +185,40 @@ class Schedule(Base):
         self.db_engine.error.build_db()
 
 
-    def start(self) -> None:
+    def run(self) -> None:
         """
-        Start scheduler.
+        Run the scheduler to start.
         """
 
         # Echo.
         if self.echo:
-            print('Start scheduler.')
+            print('Run scheduler.')
 
         # Pause.
         self.scheduler.start()
 
 
-    def pause(self) -> None:
+    def stop(self) -> None:
         """
-        Pause scheduler.
+        Stop started scheduler.
         """
 
         # Echo.
         if self.echo:
-            print('Pause scheduler.')
+            print('Stop scheduler.')
 
         # Pause.
         self.scheduler.pause()
 
 
-    def resume(self) -> None:
+    def start(self) -> None:
         """
-        Resume scheduler.
+        Start stopped scheduler.
         """
 
         # Echo.
         if self.echo:
-            print('Resume scheduler.')
+            print('Start scheduler.')
 
         # Resume.
         self.scheduler.resume()
@@ -413,12 +413,12 @@ class Schedule(Base):
 
         # Echo.
         if self.echo:
-            print(f'Added   | {task_name}')
+            print(f'Add    | {task_name}')
 
         return job
 
 
-    def modify_task(
+    def update_task(
         self,
         task: Job | str,
         plan: dict[str, Any],
@@ -427,7 +427,7 @@ class Schedule(Base):
         note: str | None = None
     ) -> None:
         """
-        Modify task.
+        Update task.
 
         Parameters
         ----------
@@ -476,7 +476,7 @@ class Schedule(Base):
 
         # Echo.
         if self.echo:
-            print(f'Modify  | {task_name}')
+            print(f'Update | {task_name}')
 
 
     def remove_task(
@@ -505,15 +505,15 @@ class Schedule(Base):
 
         # Echo.
         if self.echo:
-            print(f'Remove  | {task_name}')
+            print(f'Remove | {task_name}')
 
 
-    def pause_task(
+    def stop_task(
         self,
         task: Job | str   
     ) -> None:
         """
-        Pause task.
+        Stop started task.
 
         Parameters
         ----------
@@ -534,15 +534,15 @@ class Schedule(Base):
 
         # Echo.
         if self.echo:
-            print(f'Pause   | {task_name}')
+            print(f'Stop   | {task_name}')
 
 
-    def resume_task(
+    def start_task(
         self,
         task: Job | str
     ) -> None:
         """
-        Resume task.
+        Start stopped task.
 
         Parameters
         ----------
@@ -563,4 +563,4 @@ class Schedule(Base):
 
         # Echo.
         if self.echo:
-            print(f'Resume  | {task_name}')
+            print(f'Start  | {task_name}')

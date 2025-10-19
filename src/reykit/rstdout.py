@@ -41,7 +41,7 @@ class ConfigStdout(Base, metaclass=ConfigMeta):
     _path_rstdout: Final[str] = os_abspath(__file__)
 
     # Status.
-    _stoped: bool = False
+    _stopped: bool = False
     _modified: bool = False
 
     # IO.
@@ -220,7 +220,7 @@ def stop_print() -> None:
     sys.stdout = ConfigStdout._io_null
 
     # Update status.
-    ConfigStdout._stoped = True
+    ConfigStdout._stopped = True
 
 
 def start_print() -> None:
@@ -229,14 +229,14 @@ def start_print() -> None:
     """
 
     # Check.
-    if not ConfigStdout._stoped:
+    if not ConfigStdout._stopped:
         return
 
     # Start.
     sys.stdout = ConfigStdout._io_stdout
 
     # Update status.
-    ConfigStdout._stoped = False
+    ConfigStdout._stopped = False
 
 
 def modify_print(preprocess: Callable[[str], str] | None) -> None:

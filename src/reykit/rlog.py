@@ -96,7 +96,7 @@ class Log(Base):
 
         # Set attribute.
         self.name: Final[str] = name
-        self.stoped = False
+        self.stopped = False
 
         # Get logger.
         self.logger = getLogger(name)
@@ -895,28 +895,28 @@ class Log(Base):
         self.log(*messages, level=self.CRITICAL, **params)
 
 
-    def pause(self) -> None:
+    def stop(self) -> None:
         """
-        Pause record.
+        Stop started record.
         """
 
         # Set level.
         self.logger.setLevel(100)
 
         # Update status.
-        self.stoped = True
+        self.stopped = True
 
 
-    def resume(self) -> None:
+    def start(self) -> None:
         """
-        Resume record.
+        Start stopped record.
         """
 
         # Set level.
         self.logger.setLevel(self.DEBUG)
 
         # Update status.
-        self.stoped = False
+        self.stopped = False
 
 
     def __del__(self) -> None:

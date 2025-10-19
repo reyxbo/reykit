@@ -66,8 +66,8 @@ __all__ = (
     'get_process_table',
     'search_process',
     'kill_process',
-    'pause_process',
-    'resume_process',
+    'stop_process',
+    'start_process',
     'get_idle_port',
     'memory_read',
     'memory_write',
@@ -629,13 +629,13 @@ def kill_process(
     return processes
 
 
-def pause_process(
+def stop_process(
     id_: int | Sequence[int] | None = None,
     name: str | Sequence[str] | None = None,
     port: str | int | Sequence[str | int] | None = None,
 ) -> list[Process]:
     """
-    Search and pause process by ID or name or port.
+    Search and stop started process by ID or name or port.
 
     Parameters
     ----------
@@ -667,13 +667,13 @@ def pause_process(
     return processes
 
 
-def resume_process(
+def start_process(
     id_: int | Sequence[int] | None = None,
     name: str | Sequence[str] | None = None,
     port: str | int | Sequence[str | int] | None = None,
 ) -> list[Process]:
     """
-    Search and resume process by ID or name or port.
+    Search and start stopped process by ID or name or port.
 
     Parameters
     ----------

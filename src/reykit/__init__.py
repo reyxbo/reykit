@@ -9,10 +9,10 @@
 
 Modules
 -------
+rdll : DLL file methods.
 rall : All methods.
 rbase : Base methods.
 rdata : Data methods.
-rdll : DLL file methods.
 remail : E-mail methods.
 rimage : Image methods.
 rlog : Log methods.

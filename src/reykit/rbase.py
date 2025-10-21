@@ -37,6 +37,7 @@ __all__ = (
     'Base',
     'StaticMeta',
     'ConfigMeta',
+    'Config',
     'Singleton',
     'NullType',
     'Null',
@@ -155,6 +156,12 @@ class ConfigMeta(StaticMeta):
         result = hasattr(cls, name)
 
         return result
+
+
+class Config(Base, metaclass=ConfigMeta):
+    """
+    Config type.
+    """
 
 
 type NullType = Type['Null']

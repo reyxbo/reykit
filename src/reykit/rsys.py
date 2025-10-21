@@ -51,11 +51,11 @@ from tkinter.filedialog import (
     askdirectory as tkinter_askdirectory
 )
 
-from .rbase import Base, ConfigMeta, throw, get_varname
+from .rbase import Config, throw, get_varname
 
 
 __all__ = (
-    'ConfigSystem',
+    'SystemConfig',
     'add_env_path',
     'reset_env_path',
     'del_modules',
@@ -111,9 +111,9 @@ NetWorkInfo = TypedDict(
 ProcessInfo = TypedDict('ProcessInfo', {'create_time': datetime, 'id': int, 'name': str, 'ports': list[int] | None})
 
 
-class ConfigSystem(Base, metaclass=ConfigMeta):
+class SystemConfig(Config):
     """
-    Config system type.
+    System config type.
     """
 
     # Added environment path.
@@ -137,7 +137,7 @@ def add_env_path(path: str) -> list[str]:
     abs_path = os_abspath(path)
 
     # Add.
-    ConfigSystem._added_env_paths.append(abs_path)
+    SystemConfig._added_env_paths.append(abs_path)
     sys_path.append(abs_path)
 
     return sys_path
@@ -149,9 +149,9 @@ def reset_env_path() -> None:
     """
 
     # Delete.
-    for path in ConfigSystem._added_env_paths:
+    for path in SystemConfig._added_env_paths:
         sys_path.remove(path)
-    ConfigSystem._added_env_paths = []
+    SystemConfig._added_env_paths = []
 
 
 def del_modules(path: str) -> list[str]:

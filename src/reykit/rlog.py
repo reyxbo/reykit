@@ -29,24 +29,24 @@ from logging import (
 from logging.handlers import QueueHandler
 from concurrent_log_handler import ConcurrentRotatingFileHandler, ConcurrentTimedRotatingFileHandler
 
-from .rbase import Base, ConfigMeta, Null, throw, catch_exc, get_first_notnone, get_stack_param
+from .rbase import Base, Config, Null, throw, catch_exc, get_first_notnone, get_stack_param
 from .rre import search, sub
-from .rstdout import ConfigStdout, modify_print, reset_print
+from .rstdout import StdoutConfig, modify_print, reset_print
 from .rtext import to_text
 from .rtime import now, time_to
 from .rwrap import wrap_thread
 
 
 __all__ = (
-    'ConfigLog',
+    'LogConfig',
     'Log',
     'Mark'
 )
 
 
-class ConfigLog(Base, metaclass=ConfigMeta):
+class LogConfig(Config):
     """
-    Config log type.
+    Log config type.
     """
 
     # Module path.
@@ -122,21 +122,21 @@ class Log(Base):
 
         ## Compatible '__call__'.
         if (
-            stack_param['filename'] == ConfigLog.path_rlog
+            stack_param['filename'] == LogConfig.path_rlog
             and stack_param['name'] in ('debug', 'info', 'warning', 'error', 'critical')
         ):
             stack_param = stack_params[-2]
 
         ## Compatible 'print'.
         if (
-            stack_param['filename'] == ConfigLog.path_rlog
+            stack_param['filename'] == LogConfig.path_rlog
             and stack_param['name'] == 'preprocess'
         ):
             stack_param = stack_params[-3]
 
         ## Compatible 'echo'.
         if (
-            stack_param['filename'] == ConfigStdout._path_rstdout
+            stack_param['filename'] == StdoutConfig._path_rstdout
             and stack_param['name'] == 'echo'
         ):
             stack_param = stack_params[-4]

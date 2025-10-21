@@ -17,12 +17,12 @@ from random import Random
 from secrets import randbelow as secrets_randbelow
 from threading import get_ident as threading_get_ident
 
-from .rbase import T, Base, ConfigMeta, throw
+from .rbase import T, Base, Config, throw
 from .rnum import digits
 
 
 __all__ = (
-    'ConfigRandom',
+    'RandomConfig',
     'RandomSeed',
     'randn',
     'randb',
@@ -32,9 +32,9 @@ __all__ = (
 )
 
 
-class ConfigRandom(Base, metaclass=ConfigMeta):
+class RandomConfig(Config):
     """
-    Config random type.
+    Random config type.
     """
 
     # RRandom.
@@ -82,7 +82,7 @@ class RandomSeed(Base):
 
             ## Record.
             thread_id = threading_get_ident()
-            ConfigRandom._rrandom_dict[thread_id] = self
+            RandomConfig._rrandom_dict[thread_id] = self
 
 
     def __del__(self) -> None:
@@ -92,8 +92,8 @@ class RandomSeed(Base):
 
         # Delete.
         thread_id = threading_get_ident()
-        if thread_id in ConfigRandom._rrandom_dict:
-            del ConfigRandom._rrandom_dict[thread_id]
+        if thread_id in RandomConfig._rrandom_dict:
+            del RandomConfig._rrandom_dict[thread_id]
 
 
     def __enter__(self) -> Self:
@@ -186,7 +186,7 @@ def randn(*thresholds: float, precision: int | None = None) -> int | float:
 
     ## No seed.
     thread_id = threading_get_ident()
-    seed = ConfigRandom._rrandom_dict.get(thread_id)
+    seed = RandomConfig._rrandom_dict.get(thread_id)
     if seed is None:
         range_ = threshold_high - threshold_low + 1
         number = secrets_randbelow(range_)

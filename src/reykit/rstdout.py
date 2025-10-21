@@ -16,11 +16,11 @@ from io import TextIOWrapper
 from os import devnull as os_devnull, isatty as os_isatty, get_terminal_size as os_get_terminal_size
 from os.path import abspath as os_abspath
 
-from .rbase import T, Base, ConfigMeta, get_stack_param, get_varname
+from .rbase import T, Config, get_stack_param, get_varname
 
 
 __all__ = (
-    'ConfigStdout',
+    'StdoutConfig',
     'get_terminal_size',
     'echo',
     'ask',
@@ -32,9 +32,9 @@ __all__ = (
 )
 
 
-class ConfigStdout(Base, metaclass=ConfigMeta):
+class StdoutConfig(Config):
     """
-    Config standard output type.
+    Standard config output type.
     """
 
     # Module path.
@@ -130,7 +130,7 @@ def echo(
     # Parameter.
     if title is None:
         title: list[str] = get_varname('data')
-    if ConfigStdout.force_print_ascii:
+    if StdoutConfig.force_print_ascii:
         border = 'ascii'
 
     # Frame.
@@ -189,7 +189,7 @@ def ask(
     from .rtext import frame_data
 
     # Parameter.
-    if ConfigStdout.force_print_ascii:
+    if StdoutConfig.force_print_ascii:
         border = 'ascii'
 
     # Frame.
@@ -217,10 +217,10 @@ def stop_print() -> None:
     """
 
     # Stop.
-    sys.stdout = ConfigStdout._io_null
+    sys.stdout = StdoutConfig._io_null
 
     # Update status.
-    ConfigStdout._stopped = True
+    StdoutConfig._stopped = True
 
 
 def start_print() -> None:
@@ -229,14 +229,14 @@ def start_print() -> None:
     """
 
     # Check.
-    if not ConfigStdout._stopped:
+    if not StdoutConfig._stopped:
         return
 
     # Start.
-    sys.stdout = ConfigStdout._io_stdout
+    sys.stdout = StdoutConfig._io_stdout
 
     # Update status.
-    ConfigStdout._stopped = False
+    StdoutConfig._stopped = False
 
 
 def modify_print(preprocess: Callable[[str], str] | None) -> None:
@@ -269,15 +269,15 @@ def modify_print(preprocess: Callable[[str], str] | None) -> None:
 
         # Write.
         if type(__s) == str:
-            write_len = ConfigStdout._io_stdout_write(__s)
+            write_len = StdoutConfig._io_stdout_write(__s)
             return write_len
 
 
     # Modify.
-    ConfigStdout._io_stdout.write = write
+    StdoutConfig._io_stdout.write = write
 
     # Update status.
-    ConfigStdout._modified = True
+    StdoutConfig._modified = True
 
 
 def reset_print() -> None:
@@ -286,14 +286,14 @@ def reset_print() -> None:
     """
 
     # Check.
-    if not ConfigStdout._modified:
+    if not StdoutConfig._modified:
         return
 
     # Reset.
-    ConfigStdout._io_stdout.write = ConfigStdout._io_stdout_write
+    StdoutConfig._io_stdout.write = StdoutConfig._io_stdout_write
 
     # Update status.
-    ConfigStdout._modified = False
+    StdoutConfig._modified = False
 
 
 def add_print_position() -> None:
@@ -321,7 +321,7 @@ def add_print_position() -> None:
 
         ## Compatible 'echo'.
         if (
-            stack_floor['filename'] == ConfigStdout._path_rstdout
+            stack_floor['filename'] == StdoutConfig._path_rstdout
             and stack_floor['name'] == 'echo'
         ):
             stack_floor = stack_params[-2]
@@ -330,10 +330,10 @@ def add_print_position() -> None:
         position = 'File "%s", line %s' % (stack_floor['filename'], stack_floor['lineno'])
 
         # Added.
-        if position in ConfigStdout._added_print_position:
+        if position in StdoutConfig._added_print_position:
             return __s
 
-        ConfigStdout._added_print_position.add(position)
+        StdoutConfig._added_print_position.add(position)
         __s = '%s\n%s' % (position, __s)
 
         return __s

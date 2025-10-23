@@ -84,9 +84,10 @@ def join_url(*urls: Any, **params: dict) -> str:
     # Parameter.
     if len(urls) == 0:
         throw(ValueError, urls)
-    for index, url in enumerate(urls):
-        if type(url) != str:
-            urls[index] = str(url)
+    urls = [
+        str(url)
+        for url in urls
+    ]
 
     # Join URL.
     url: str = '/'.join(urls)

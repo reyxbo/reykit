@@ -39,7 +39,17 @@ class DatabaseORMTableSchedule(rorm.Table):
     create_time: rorm.Datetime = rorm.Field(field_default=':create_time', not_null=True, index_n=True, comment='Record create time.')
     update_time: rorm.Datetime = rorm.Field(field_default=':update_time', index_n=True, comment='Record update time.')
     id: int = rorm.Field(rorm.types_mysql.INTEGER(unsigned=True), key_auto=True, comment='ID.')
-    status: str = rorm.Field(rorm.types_mysql.TINYINT(unsigned=True), not_null=True, comment='Schedule status, 0 is executing, 1 is completed, 2 is occurred error.')
+    status: str = rorm.Field(
+        rorm.types_mysql.TINYINT(unsigned=True),
+        field_default='0',
+        not_null=True,
+        comment=(
+            'Schedule status, '
+            '0 is executing, '
+            '1 is completed, '
+            '2 is occurred error.'
+        )
+    )
     task: str = rorm.Field(rorm.types.VARCHAR(100), not_null=True, comment='Schedule task function name.')
     note: str = rorm.Field(rorm.types.VARCHAR(500), comment='Schedule note.')
 
@@ -273,7 +283,6 @@ class Schedule(Base):
 
             # Status executing.
             data = {
-                'status': 0,
                 'task': task.__name__,
                 'note': note
             }

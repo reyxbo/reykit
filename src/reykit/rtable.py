@@ -122,8 +122,7 @@ class Table(Base):
     def to_dict(
         self,
         key_field: int | str = 0,
-        *,
-        val_field: int | str
+        val_field: int | str = ...
     ) -> dict: ...
 
     def to_dict(

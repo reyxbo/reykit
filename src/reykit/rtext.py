@@ -31,7 +31,7 @@ __all__ = (
 )
 
 
-# Monkey path.
+# Monkey patch.
 monkey_pprint_modify_width_judgment()
 
 

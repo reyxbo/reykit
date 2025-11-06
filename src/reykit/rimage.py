@@ -31,7 +31,7 @@ __all__ = (
 )
 
 
-# Monkey path.
+# Monkey patch.
 Image_ = monkey_path_pil_image_get_bytes()
 Image = Image_
 

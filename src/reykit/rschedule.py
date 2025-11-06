@@ -31,16 +31,16 @@ __all__ = (
 
 class DatabaseORMTableSchedule(rorm.Table):
     """
-    Database `schedule` table ORM model.
+    Database "schedule" table ORM model.
     """
 
     __name__ = 'schedule'
     __comment__ = 'Schedule execute record table.'
     create_time: rorm.Datetime = rorm.Field(field_default=':create_time', not_null=True, index_n=True, comment='Record create time.')
     update_time: rorm.Datetime = rorm.Field(field_default=':update_time', index_n=True, comment='Record update time.')
-    id: int = rorm.Field(rorm.types_mysql.INTEGER(unsigned=True), key_auto=True, comment='ID.')
+    id: int = rorm.Field(rorm.types.INTEGER, key_auto=True, comment='ID.')
     status: str = rorm.Field(
-        rorm.types_mysql.TINYINT(unsigned=True),
+        rorm.types.SMALLINT,
         field_default='0',
         not_null=True,
         comment=(
@@ -57,7 +57,7 @@ class DatabaseORMTableSchedule(rorm.Table):
 class Schedule(Base):
     """
     Schedule type.
-    Can create database used `self.build_db` method.
+    Can create database used "self.build_db" method.
     """
 
 
@@ -80,8 +80,8 @@ class Schedule(Base):
         coalesce : Whether to coalesce tasks with the same ID.
         block : Whether to block.
         db_engine : Database engine.
-            - `None`: Not use database.
-            - `Database`: Automatic record to database.
+            - "None": Not use database.
+            - "Database": Automatic record to database.
         echo : Whether to print the report.
         """
 
@@ -123,7 +123,6 @@ class Schedule(Base):
             throw(ValueError, self.db_engine)
 
         # Parameter.
-        database = self.db_engine.database
 
         ## Table.
         tables = [DatabaseORMTableSchedule]
@@ -131,13 +130,13 @@ class Schedule(Base):
         ## View stats.
         views_stats = [
             {
-                'path': 'stats_schedule',
+                'table': 'stats_schedule',
                 'items': [
                     {
                         'name': 'count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{database}`.`schedule`'
+                            f'FROM "schedule"'
                         ),
                         'comment': 'Schedule count.'
                     },
@@ -145,8 +144,8 @@ class Schedule(Base):
                         'name': 'past_day_count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{database}`.`schedule`\n'
-                            'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) = 0'
+                            f'FROM "schedule"\n'
+                            'WHERE DATE_PART(\'day\', NOW() - "create_time") = 0'
                         ),
                         'comment': 'Schedule count in the past day.'
                     },
@@ -154,8 +153,8 @@ class Schedule(Base):
                         'name': 'past_week_count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{database}`.`schedule`\n'
-                            'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) <= 6'
+                            f'FROM "schedule"\n'
+                            'WHERE DATE_PART(\'day\', NOW() - "create_time") <= 6'
                         ),
                         'comment': 'Schedule count in the past week.'
                     },
@@ -163,24 +162,24 @@ class Schedule(Base):
                         'name': 'past_month_count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM `{database}`.`schedule`\n'
-                            'WHERE TIMESTAMPDIFF(DAY, `create_time`, NOW()) <= 29'
+                            f'FROM "schedule"\n'
+                            'WHERE DATE_PART(\'day\', NOW() - "create_time") <= 29'
                         ),
                         'comment': 'Schedule count in the past month.'
                     },
                     {
                         'name': 'task_count',
                         'select': (
-                            'SELECT COUNT(DISTINCT `task`)\n'
-                            f'FROM `{database}`.`schedule`'
+                            'SELECT COUNT(DISTINCT "task")\n'
+                            f'FROM "schedule"'
                         ),
                         'comment': 'Task count.'
                     },
                     {
                         'name': 'last_time',
                         'select': (
-                            'SELECT IFNULL(MAX(`update_time`), MAX(`create_time`))\n'
-                            f'FROM `{database}`.`schedule`'
+                            'SELECT IFNULL(MAX("update_time"), MAX("create_time"))\n'
+                            f'FROM "schedule"'
                         ),
                         'comment': 'Schedule last record time.'
                     }
@@ -286,12 +285,12 @@ class Schedule(Base):
                 'task': task.__name__,
                 'note': note
             }
-            with self.db_engine.connect() as conn:
-                conn.execute.insert(
-                    'schedule',
-                    data
-                )
-                id_ = conn.insert_id()
+            result = self.db_engine.execute.insert(
+                'schedule',
+                data,
+                return_field='id'
+            )
+            id_: int = result.scalar()
 
             # Try execute.
             try:
@@ -375,8 +374,8 @@ class Schedule(Base):
         Parameters
         ----------
         task : Task.
-            - `Callable`: Use this function.
-            - `ModuleType`: Use this `main` function of module.
+            - "Callable": Use this function.
+            - "ModuleType": Use this "main" function of module.
         plan : Plan trigger keyword arguments.
         args : Task position arguments.
         kwargs : Task keyword arguments.

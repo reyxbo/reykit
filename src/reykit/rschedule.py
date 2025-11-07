@@ -19,6 +19,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.job import Job
 from reydb import rorm, DatabaseEngine
+from reykit.rtime import now
 
 from .rbase import Base, throw
 
@@ -36,8 +37,8 @@ class DatabaseORMTableSchedule(rorm.Table):
 
     __name__ = 'schedule'
     __comment__ = 'Schedule execute record table.'
-    create_time: rorm.Datetime = rorm.Field(field_default=':create_time', not_null=True, index_n=True, comment='Record create time.')
-    update_time: rorm.Datetime = rorm.Field(field_default=':update_time', index_n=True, comment='Record update time.')
+    create_time: rorm.Datetime = rorm.Field(field_default=':time', not_null=True, index_n=True, comment='Record create time.')
+    update_time: rorm.Datetime = rorm.Field(field_default=':time', arg_default=now, index_n=True, comment='Record update time.')
     id: int = rorm.Field(key_auto=True, comment='ID.')
     status: str = rorm.Field(
         rorm.types.SMALLINT,
@@ -282,6 +283,7 @@ class Schedule(Base):
 
             # Status executing.
             data = {
+                'update_time': ':NOW()',
                 'task': task.__name__,
                 'note': note
             }
@@ -299,6 +301,7 @@ class Schedule(Base):
             # Status occurred error.
             except BaseException:
                 data = {
+                    'update_time': ':NOW()',
                     'id': id_,
                     'status': 2
                 }
@@ -311,6 +314,7 @@ class Schedule(Base):
             # Status completed.
             else:
                 data = {
+                    'update_time': ':NOW()',
                     'id': id_,
                     'status': 1
                 }

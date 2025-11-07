@@ -38,7 +38,7 @@ class DatabaseORMTableSchedule(rorm.Table):
     __comment__ = 'Schedule execute record table.'
     create_time: rorm.Datetime = rorm.Field(field_default=':create_time', not_null=True, index_n=True, comment='Record create time.')
     update_time: rorm.Datetime = rorm.Field(field_default=':update_time', index_n=True, comment='Record update time.')
-    id: int = rorm.Field(rorm.types.INTEGER, key_auto=True, comment='ID.')
+    id: int = rorm.Field(key_auto=True, comment='ID.')
     status: str = rorm.Field(
         rorm.types.SMALLINT,
         field_default='0',
@@ -288,7 +288,7 @@ class Schedule(Base):
             result = self.db_engine.execute.insert(
                 'schedule',
                 data,
-                return_field='id'
+                returning='id'
             )
             id_: int = result.scalar()
 

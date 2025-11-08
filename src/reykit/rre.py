@@ -120,7 +120,7 @@ def sub(
     count = count or 0
 
     # Replace.
-    result = re_sub(pattern, replace, text, count, RS)
+    result = re_sub(pattern, replace, text, count=count, flags=RS)
 
     return result
 

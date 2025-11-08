@@ -137,7 +137,7 @@ class Schedule(Base):
                         'name': 'count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM "schedule"'
+                            'FROM "schedule"'
                         ),
                         'comment': 'Schedule count.'
                     },
@@ -145,7 +145,7 @@ class Schedule(Base):
                         'name': 'past_day_count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM "schedule"\n'
+                            'FROM "schedule"\n'
                             'WHERE DATE_PART(\'day\', NOW() - "create_time") = 0'
                         ),
                         'comment': 'Schedule count in the past day.'
@@ -154,7 +154,7 @@ class Schedule(Base):
                         'name': 'past_week_count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM "schedule"\n'
+                            'FROM "schedule"\n'
                             'WHERE DATE_PART(\'day\', NOW() - "create_time") <= 6'
                         ),
                         'comment': 'Schedule count in the past week.'
@@ -163,7 +163,7 @@ class Schedule(Base):
                         'name': 'past_month_count',
                         'select': (
                             'SELECT COUNT(1)\n'
-                            f'FROM "schedule"\n'
+                            'FROM "schedule"\n'
                             'WHERE DATE_PART(\'day\', NOW() - "create_time") <= 29'
                         ),
                         'comment': 'Schedule count in the past month.'
@@ -172,7 +172,7 @@ class Schedule(Base):
                         'name': 'task_count',
                         'select': (
                             'SELECT COUNT(DISTINCT "task")\n'
-                            f'FROM "schedule"'
+                            'FROM "schedule"'
                         ),
                         'comment': 'Task count.'
                     },
@@ -180,7 +180,7 @@ class Schedule(Base):
                         'name': 'last_time',
                         'select': (
                             'SELECT IFNULL(MAX("update_time"), MAX("create_time"))\n'
-                            f'FROM "schedule"'
+                            'FROM "schedule"'
                         ),
                         'comment': 'Schedule last record time.'
                     }

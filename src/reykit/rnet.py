@@ -280,7 +280,7 @@ def request(
     url : Request URL.
     params : Request URL add parameters.
     data : Request body data.
-        - `dict`, Convert to `key=value&...`: format bytes.
+        - `dict`: Convert to `key=value&...` format bytes.
             Automatic set `Content-Type` to `application/x-www-form-urlencoded`.
         - `str`: File path to read file bytes data.
             Automatic set `Content-Type` to file media type, and `filename` to file name.

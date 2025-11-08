@@ -207,9 +207,9 @@ def fill_width(text: str, char: str, width: int, align: Literal['left', 'right',
     char : Fill character.
     width : Fill width.
     align : Align orientation.
-        - `Literal[`left`]`: Fill right, align left.
-        - `Literal[`right`]`: Fill left, align right.
-        - `Literal[`center`]`: Fill both sides, align center.
+        - `Literal['left']`: Fill right, align left.
+        - `Literal['right']`: Fill left, align right.
+        - `Literal['center']`: Fill both sides, align center.
 
     Returns
     -------
@@ -278,9 +278,9 @@ def frame_text(
     width : Frame width.
         - `None` : Use terminal display character size.
     frame : Frame type.
-        - `Literal[`left`]`: Line beginning add character column.
-        - `Literal[`top`]`: Line head add character line, with title.
-        - `Literal[`box`]`: Add four borders, with title, automatic newline.
+        - `Literal['left']`: Line beginning add character column.
+        - `Literal['top']`: Line head add character line, with title.
+        - `Literal['box']`: Add four borders, with title, automatic newline.
     border : Border type.
         - `Literal['ascii']`: Use ASCII character.
         - `Literal['thick']`: Use thick line character.
@@ -409,9 +409,9 @@ def frame_data(
     width : Frame width.
         - `None` : Use terminal display character size.
     frame : Frame type.
-        - `Literal[`left`]`: Line beginning add character column.
-        - `Literal[`top`]`: Line head add character line, with title.
-        - `Literal[`box`]`: Add four borders, with title, automatic newline.
+        - `Literal['left']`: Line beginning add character column.
+        - `Literal['top']`: Line head add character line, with title.
+        - `Literal['box']`: Add four borders, with title, automatic newline.
     border : Border type.
         - `Literal['ascii']`: Use ASCII character.
         - `Literal['thick']`: Use thick line character.

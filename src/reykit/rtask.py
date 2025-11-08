@@ -759,7 +759,7 @@ async def async_request(
         - `tuple[str]`: Get these attribute.
             `Callable`: Execute this method. When return `Coroutine`, then use `await` syntax execute `Coroutine`.
             `Any`: Return this value.
-        - `Callable`, Execute this method. When return `Coroutine`, then use `await`: syntax execute `Coroutine`.
+        - `Callable`: Execute this method. When return `Coroutine`, then use `await` syntax execute `Coroutine`.
 
     Returns
     -------

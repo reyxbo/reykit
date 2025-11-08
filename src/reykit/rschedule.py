@@ -179,7 +179,7 @@ class Schedule(Base):
                     {
                         'name': 'last_time',
                         'select': (
-                            'SELECT IFNULL(MAX("update_time"), MAX("create_time"))\n'
+                            'SELECT COALESCE(MAX("update_time"), MAX("create_time"))\n'
                             'FROM "schedule"'
                         ),
                         'comment': 'Schedule last record time.'

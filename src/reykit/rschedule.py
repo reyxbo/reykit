@@ -301,8 +301,8 @@ class Schedule(Base):
             # Status occurred error.
             except BaseException:
                 data = {
-                    'update_time': ':NOW()',
                     'id': id_,
+                    'update_time': ':NOW()',
                     'status': 2
                 }
                 self.db_engine.execute.update(
@@ -314,8 +314,8 @@ class Schedule(Base):
             # Status completed.
             else:
                 data = {
-                    'update_time': ':NOW()',
                     'id': id_,
+                    'update_time': ':NOW()',
                     'status': 1
                 }
                 self.db_engine.execute.update(

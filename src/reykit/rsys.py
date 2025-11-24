@@ -35,21 +35,6 @@ from pymem import Pymem
 from argparse import ArgumentParser
 from datetime import datetime
 from webbrowser import open as webbrowser_open
-from tkinter.messagebox import (
-    showinfo as tkinter_showinfo,
-    showwarning as tkinter_showwarning,
-    showerror as tkinter_showerror,
-    askyesno as tkinter_askyesno,
-    askyesnocancel as tkinter_askyesnocancel,
-    askokcancel as tkinter_askokcancel,
-    askretrycancel as tkinter_askretrycancel
-)
-from tkinter.filedialog import (
-    askopenfilename as tkinter_askopenfilename,
-    askopenfilenames as tkinter_askopenfilenames,
-    asksaveasfilename as tkinter_asksaveasfilename,
-    askdirectory as tkinter_askdirectory
-)
 
 from .rbase import Config, throw, get_varname
 
@@ -832,20 +817,22 @@ def popup_message(
     title : Message box title.
     """
 
+    from tkinter.messagebox import showinfo, showwarning, showerror
+
     # Pop up.
     match style:
 
         ## Information.
         case 'info':
-            method = tkinter_showinfo
+            method = showinfo
 
         ## Warning.
         case 'warn':
-            method = tkinter_showwarning
+            method = showwarning
 
         ## Error.
         case 'error':
-            method = tkinter_showerror
+            method = showerror
 
     method(title, message)
 
@@ -887,24 +874,26 @@ def popup_ask(
     Ask result.
     """
 
+    from tkinter.messagebox import askyesno, askyesnocancel, askokcancel, askretrycancel
+
     # Pop up.
     match style:
 
         ## Yes and no.
         case 'yes_no':
-            method = tkinter_askyesno
+            method = askyesno
 
         ## Ok and cancel.
         case 'ok_cancel':
-            method = tkinter_askokcancel
+            method = askyesnocancel
 
         ## Retry and cancel.
         case 'retry_cancel':
-            method = tkinter_askretrycancel
+            method = askokcancel
 
         ## Yes and no and cancel.
         case 'yes_no_cancel':
-            method = tkinter_askyesnocancel
+            method = askretrycancel
 
     method(title, message)
 
@@ -964,6 +953,8 @@ def popup_select(
         - `None`: Close select box.
     """
 
+    from tkinter.filedialog import askopenfilename, askopenfilenames, asksaveasfilename, askdirectory
+
     # Pop up.
     kwargs = {
         'filetypes': filter_file,
@@ -980,19 +971,19 @@ def popup_select(
 
         ## File.
         case 'file':
-            method = tkinter_askopenfilename
+            method = askopenfilename
 
         ## Files.
         case 'files':
-            method = tkinter_askopenfilenames
+            method = askopenfilenames
 
         ## Folder.
         case 'folder':
-            method = tkinter_askdirectory
+            method = asksaveasfilename
 
         ## Save.
         case 'save':
-            method = tkinter_asksaveasfilename
+            method = askdirectory
 
     path = method(**kwargs)
     path = path or None

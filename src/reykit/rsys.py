@@ -979,11 +979,11 @@ def popup_select(
 
         ## Folder.
         case 'folder':
-            method = asksaveasfilename
+            method = askdirectory
 
         ## Save.
         case 'save':
-            method = askdirectory
+            method = asksaveasfilename
 
     path = method(**kwargs)
     path = path or None

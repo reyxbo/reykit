@@ -14,6 +14,7 @@ from collections.abc import Callable
 from types import ModuleType
 from inspect import ismodule
 from functools import wraps as functools_wraps
+from enum import StrEnum
 from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -25,9 +26,23 @@ from .rbase import Base, throw
 
 
 __all__ = (
+    'ScheduleStatusEnum',
     'DatabaseORMTableSchedule',
     'Schedule'
 )
+
+
+class ScheduleStatusEnum(StrEnum):
+    """
+    Schedule status enumeration type.
+    """
+
+    START = 'start'
+    'Schedule stated.'
+    SUCCESS = 'success'
+    'Schedule successded.'
+    FAIL = 'fail'
+    'Schedule failed.'
 
 
 class DatabaseORMTableSchedule(rorm.Table):
@@ -39,18 +54,7 @@ class DatabaseORMTableSchedule(rorm.Table):
     __comment__ = 'Schedule execute record table.'
     create_time: rorm.Datetime = rorm.Field(field_default=':time', not_null=True, index_n=True, comment='Record create time.')
     update_time: rorm.Datetime = rorm.Field(field_default=':time', arg_default=now, index_n=True, comment='Record update time.')
-    id: int = rorm.Field(key_auto=True, comment='ID.')
-    status: str = rorm.Field(
-        rorm.types.SMALLINT,
-        field_default='0',
-        not_null=True,
-        comment=(
-            'Schedule status, '
-            '0 is executing, '
-            '1 is completed, '
-            '2 is occurred error.'
-        )
-    )
+    status: str = rorm.Field(rorm.ENUM(ScheduleStatusEnum), field_default=ScheduleStatusEnum.START, not_null=True, comment='Schedule status.')
     task: str = rorm.Field(rorm.types.VARCHAR(100), not_null=True, comment='Schedule task function name.')
     note: str = rorm.Field(rorm.types.VARCHAR(500), comment='Schedule note.')
 
@@ -303,7 +307,7 @@ class Schedule(Base):
                 data = {
                     'id': id_,
                     'update_time': ':NOW()',
-                    'status': 2
+                    'status': ScheduleStatusEnum.FAIL
                 }
                 self.db_engine.execute.update(
                     'schedule',
@@ -316,7 +320,7 @@ class Schedule(Base):
                 data = {
                     'id': id_,
                     'update_time': ':NOW()',
-                    'status': 1
+                    'status': ScheduleStatusEnum.SUCCESS
                 }
                 self.db_engine.execute.update(
                     'schedule',

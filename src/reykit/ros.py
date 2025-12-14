@@ -23,6 +23,7 @@ from os import (
 )
 from os.path import (
     join as os_join,
+    relpath as os_relpath,
     isfile as os_isfile,
     isdir as os_isdir,
     basename as os_basename,
@@ -2105,6 +2106,44 @@ class FileStore(Base):
         path = self.store(response.content, name)
 
         return path
+
+
+    def get_relpath(self, abspath: str) -> str:
+        """
+        Get store file relative path based on absolute path.
+
+        Parameters
+        ----------
+        abspath : Store file absolute path.
+
+        Returns
+        -------
+        Relative path.
+        """
+
+        # Get.
+        relpath = os_relpath(abspath, self.folder.path)
+
+        return relpath
+
+
+    def get_abspath(self, relpath: str) -> str:
+        """
+        Get store file absolute path based on relative path.
+
+        Parameters
+        ----------
+        relpath : Store file relative path.
+
+        Returns
+        -------
+        Absolute path.
+        """
+
+        # Get.
+        abspath = self.folder + relpath
+
+        return abspath
 
 
 def compress(

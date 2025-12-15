@@ -260,6 +260,7 @@ class Schedule(Base):
     def wrap_record_db(
         self,
         task: Callable,
+        name: str,
         note: str | None
     ) -> None:
         """
@@ -268,6 +269,7 @@ class Schedule(Base):
         Parameters
         ----------
         task : Task.
+        name : Task name.
         note : Task note.
         """
 
@@ -289,7 +291,7 @@ class Schedule(Base):
             # Status executing.
             data = {
                 'update_time': ':NOW()',
-                'task': task.__name__,
+                'task': name,
                 'note': note
             }
             result = self.db_engine.execute.insert(
@@ -375,6 +377,7 @@ class Schedule(Base):
         plan: dict[str, Any],
         args: tuple | None = None,
         kwargs: dict[str, Any] | None = None,
+        name: str | None = None,
         note: str | None = None
     ) -> Job:
         """
@@ -384,10 +387,12 @@ class Schedule(Base):
         ----------
         task : Task.
             - "Callable": Use this function.
-            - "ModuleType": Use this "main" function of module.
+            - "ModuleType": Use this `main` function of module.
         plan : Plan trigger keyword arguments.
         args : Task position arguments.
         kwargs : Task keyword arguments.
+        name : Task name.
+            - `None`: Use function name or module name.
         note : Task note.
 
         Returns
@@ -396,8 +401,8 @@ class Schedule(Base):
         """
 
         # Parameter.
-        task_name = task.__name__
-        *_, task_name = task_name.rsplit('.', 1)
+        name_default = task.__name__
+        *_, name_default = name_default.rsplit('.', 1)
         if ismodule(task):
             task = getattr(task, 'main')
         if plan is None:
@@ -408,6 +413,7 @@ class Schedule(Base):
             for key, value in plan.items()
             if key != 'trigger'
         }
+        name = name or name_default
 
         # Database.
         if self.db_engine is not None:
@@ -416,7 +422,7 @@ class Schedule(Base):
 
         # Echo.
         if self.echo:
-            task = self.wrap_echo(task, task_name)
+            task = self.wrap_echo(task, name)
 
         # Add.
         job = self.scheduler.add_job(
@@ -424,13 +430,13 @@ class Schedule(Base):
             trigger,
             args,
             kwargs,
-            name=task_name,
+            name=name,
             **trigger_args
         )
 
         # Echo.
         if self.echo:
-            print(f'Add    | {task_name}')
+            print(f'Add    | {name}')
 
         return job
 

@@ -417,7 +417,7 @@ class Schedule(Base):
 
         # Database.
         if self.db_engine is not None:
-            task = self.wrap_record_db(task, note)
+            task = self.wrap_record_db(task, name, note)
             task = self.db_engine.error.wrap(task, note)
 
         # Echo.

@@ -170,7 +170,7 @@ class Email(Base):
         to: str | list[str],
         title: str | None = None,
         text: str | None = None,
-        attachment: dict[str, FileSourceBytes] = {},
+        attachment: dict[str, FileSourceBytes] | None = None,
         cc: str | list[str] | None = None,
         show_from: str | None = None,
         show_to: str | list[str] | None = None,
@@ -235,6 +235,7 @@ class Email(Base):
             show_cc = show_cc.split(',')
 
         ## Attachment.
+        attachment = attachment or {}
         for file_name, file_source in attachment.items():
             file_bytes = read_file_bytes(file_source)
             attachment[file_name] = file_bytes

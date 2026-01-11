@@ -2077,7 +2077,7 @@ class FileStore(Base):
         return path
 
 
-    def download(self, url: str, name: str | None = None) -> str:
+    def download(self, url: str, name: str | None = None, **request_params: Any) -> str:
         """
         Download file from URL.
 
@@ -2086,6 +2086,7 @@ class FileStore(Base):
         url : Download URL.
         name : File name.
             - `None`: Use MD5 value join automatic judge file type.
+        request_params : Request method parameters.
 
         Returns
         -------
@@ -2096,7 +2097,7 @@ class FileStore(Base):
         from .rnet import request, get_response_file_name
 
         # Download.
-        response = request(url)
+        response = request(url, **request_params)
 
         # File name.
         if name is None:

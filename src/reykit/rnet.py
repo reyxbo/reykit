@@ -233,11 +233,11 @@ def request(
     data: dict | str | bytes | None = None,
     *,
     files: dict[str, str | bytes | tuple[str | bytes, dict]] | None = None,
-    headers: dict[str, str] = {},
+    headers: dict[str, str] | None = None,
     timeout: float | None = None,
-    proxies: dict[str, str] = {},
+    proxies: dict[str, str] | None = None,
     stream: bool = False,
-    verify: bool = False,
+    verify: bool = True,
     method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = Literal['post'],
     check: bool | int | Iterable[int] = False
 ) -> Response: ...
@@ -249,11 +249,11 @@ def request(
     params: dict | None = None,
     *,
     json: dict | None = None,
-    headers: dict[str, str] = {},
+    headers: dict[str, str] | None = None,
     timeout: float | None = None,
-    proxies: dict[str, str] = {},
+    proxies: dict[str, str] | None = None,
     stream: bool = False,
-    verify: bool = False,
+    verify: bool = True,
     method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = Literal['post'],
     check: bool | int | Iterable[int] = False
 ) -> Response: ...
@@ -268,7 +268,7 @@ def request(
     timeout: float | None = None,
     proxies: dict[str, str] | None = None,
     stream: bool = False,
-    verify: bool = False,
+    verify: bool = True,
     method: Literal['get', 'post', 'put', 'patch', 'delete', 'options', 'head'] | None = None,
     check: bool | int | Iterable[int] = False
 ) -> Response:

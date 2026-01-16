@@ -395,7 +395,7 @@ def request(
             range_ = check
         match range_:
             case None:
-                result = 200<= response.status_code <= 399
+                result = 200 <= response.status_code <= 399
             case int():
                 result = response.status_code == range_
             case _ if hasattr(range_, '__contains__'):

@@ -2091,13 +2091,19 @@ class FileStore(Base):
         Returns
         -------
         File absolute path.
+        When response code is not within the range of 200 to 299, then throw exception.
         """
 
         # Import.
         from .rnet import request, get_response_file_name
 
         # Download.
-        response = request(url, **request_params)
+        check = range(200, 300)
+        response = request(
+            url,
+            check=check,
+            **request_params
+        )
 
         # File name.
         if name is None:

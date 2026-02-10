@@ -164,7 +164,7 @@ class Config(Base, metaclass=ConfigMeta):
     """
 
 
-type NullType = Type['Null']
+type NullType = type['Null']
 
 
 @final
